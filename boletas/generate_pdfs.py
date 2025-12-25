@@ -4,9 +4,12 @@ import csv
 import shutil
 from playwright.sync_api import sync_playwright
 
-# Nombre del archivo CSV y de la plantilla HTML
-csv_filename = 'V2_Consumos_agua_Excedentes_Contaminantes.csv'
-template_filename = 'boleta_kentro.html'
+# Obtener el directorio actual del script
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Nombre del archivo CSV y de la plantilla HTML (rutas absolutas)
+csv_filename = os.path.join(current_dir, 'V2_Consumos_agua_Excedentes_Contaminantes.csv')
+template_filename = os.path.join(current_dir, 'boleta_kentro.html')
 
 # Leer el contenido de la plantilla HTML
 with open(template_filename, 'r', encoding='utf-8') as f:
@@ -14,6 +17,15 @@ with open(template_filename, 'r', encoding='utf-8') as f:
 
 # Lista para almacenar los archivos HTML generados
 html_files = []
+
+# Definir la ruta base de salida: .../Documentos_generados/boletas
+# Definir la ruta base de salida: .../Documentos_generados/boletas
+# current_dir ya fue definido arriba
+output_base_dir = os.path.abspath(os.path.join(current_dir, '..', '..', 'Documentos_generados', 'boletas'))
+
+# Crear la carpeta base si no existe
+if not os.path.exists(output_base_dir):
+    os.makedirs(output_base_dir)
 
 # Leer el archivo CSV y procesar cada fila
 with open(csv_filename, 'r', encoding='utf-8') as f:
@@ -24,9 +36,12 @@ with open(csv_filename, 'r', encoding='utf-8') as f:
             # Obtener el mes de consumo para nombrar la carpeta
             mes_consumo = row.get('mes_consumo', 'sin_mes').strip()
             
+            # Definir la carpeta destino dentro de Documentos_generados/boletas/mes_consumo
+            target_folder = os.path.join(output_base_dir, mes_consumo)
+
             # Crear la carpeta si no existe
-            if not os.path.exists(mes_consumo):
-                os.makedirs(mes_consumo)
+            if not os.path.exists(target_folder):
+                os.makedirs(target_folder)
             
             # Crear una copia del contenido de la plantilla para modificar
             new_html_content = template_content
@@ -57,7 +72,7 @@ with open(csv_filename, 'r', encoding='utf-8') as f:
             
             # Generar el nombre del nuevo archivo HTML
             local_name = row.get('Local', 'desconocido').strip().replace(' ', '_')
-            output_filename = os.path.join(mes_consumo, f'Boleta_local_{local_name}_{mes_consumo}.html')
+            output_filename = os.path.join(target_folder, f'Boleta_local_{local_name}_{mes_consumo}.html')
             
             # Guardar el nuevo archivo HTML
             with open(output_filename, 'w', encoding='utf-8') as new_f:
