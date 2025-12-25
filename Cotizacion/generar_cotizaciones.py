@@ -4,26 +4,22 @@ import shutil
 from jinja2 import Environment, FileSystemLoader
 
 # Configuración
-csv_file = 'cotizaciones.csv'
-template_file = 'diseno-sin-imagen.html'
-output_dir = 'output'
-css_source = 'estilos.css'
+# Configuración
+base_dir = os.path.dirname(os.path.abspath(__file__))
+csv_file = os.path.join(base_dir, 'cotizaciones.csv')
+template_file = 'plantilla_cotizacion.html'
+output_dir = os.path.join(base_dir, '..', '..', 'Documentos_generados', 'cotizaciones')
 
 # Crear directorio de salida si no existe
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-# Copiar archivo CSS a la carpeta de salida
-if os.path.exists(css_source):
-    shutil.copy(css_source, output_dir)
-    print(f"Copiado {css_source} a {output_dir}")
-else:
-    print(f"Advertencia: No se encontró {css_source}")
+
 
 
 
 # Configuración de Jinja2
-env = Environment(loader=FileSystemLoader('.'))
+env = Environment(loader=FileSystemLoader(base_dir))
 template = env.get_template(template_file)
 
 # Leer CSV y Agrupar Datos
