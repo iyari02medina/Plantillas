@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orden de Trabajo - Desazolve - Gestión Hidráulica</title>
+
+    <!-- Fuentes (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+    <!-- Botón Flotante -->
+    <div class="print-btn-container">
+        <button onclick="window.print()" class="btn-print">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Imprimir / PDF
+        </button>
+    </div>
+
+    <!-- Contenedor Principal (Hoja) -->
+    <div class="page-container">
+
+        <!-- Barra Superior -->
+        <div class="top-bar"></div>
+
+        <div class="content-wrapper">
+
+            <!-- Encabezado (Preservado) -->
+            <header>
+                <div class="logo-section">
+                    <div class="logo-box">
+                        <img style="margin-bottom: .5rem;" src="logo-cophi-negro.jpg" alt="Logo Cophi">
+                        <p>CONTROL DE PROCESOS<br>HIDRAULICOS S.A. DE C.V.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="header-info">
+                    <h1>COTIZACIÓN</h1>
+                    <p class="subtitle" style="overflow-wrap: break-word;">ORDEN DE TRABAJO DE DESAZOLVE</p>
+                    <div class="meta-data">
+                        <div>Folio: <span style="font-weight: 600;">{{ folio_cot }}</span></div>
+                        <div>Fecha: <span style="font-weight: 600;">{{ fecha_cot }}</span></div>
+
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sección Cliente (Preservado) -->
+            <section class="client-card">
+
+                <div class="client-grid">
+                    <div>
+                        <p class="label">Empresa: </p>
+                        <p class="value-lg">{{ nombre_cliente }}</p>
+                        <p class="value-text">{{ direccion_cliente }}</p>
+                    </div>
+                    <div class="client-right-col">
+                        <div style="margin-bottom: 0.75rem;">
+                            <p class="label">Atención a</p>
+                            <p class="value-md">{{ nombre_contacto }}</p>
+                        </div>
+                        <div>
+                            <p class="label">Contacto</p>
+                            <p class="value-text">{{ telefono_contacto }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Datos del Área a Tratar -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">Datos del Área a Tratar</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ubicación</label>
+                        <input type="text" class="form-input" placeholder="Registro, tarja, bajadas, wc, coladera...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Tubería</label>
+                        <input type="text" class="form-input" placeholder="Concreto, PVC, Albañal...">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Diámetro Aprox.</label>
+                        <input type="text" class="form-input" placeholder="4&quot;, 6&quot;, 8&quot;...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Longitud Sondeada (m)</label>
+                        <input type="text" class="form-input" placeholder="Metros lineales trabajados">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Nivel de Flujo Inicial:</label>
+                    <div class="checklist-grid grid-cols-3">
+                        <label class="checklist-item"><input type="checkbox"> Nulo / Tapado total</label>
+                        <label class="checklist-item"><input type="checkbox"> Lento</label>
+                        <label class="checklist-item"><input type="checkbox"> Normal / Preventivo</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Detalle del Servicio (Técnico) -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">Detalle del Servicio (Técnico)</span>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Equipo Utilizado:</label>
+                    <div class="checklist-grid grid-cols-3">
+                        <label class="checklist-item"><input type="checkbox"> Guía Eléctrica (K-50/1500)</label>
+                        <label class="checklist-item"><input type="checkbox"> Hidrolavadora / Jet</label>
+                        <label class="checklist-item"><input type="checkbox"> Camión Succión (Vactor)</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Hallazgos y Residuos -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">Hallazgos y Residuos</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Obstrucción Encontrada</label>
+                        <input type="text" class="form-input" placeholder="Grasa, raíces, objetos, azolve...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Volumen de azolve retirado</label>
+                    <input type="text" class="form-input" placeholder="Litros / Cubetas / m³">
+                </div>
+            </div>
+
+            <!-- 6. Diagnóstico y Recomendaciones -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">Diagnóstico y Recomendaciones</span>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Estado de la Tubería:</label>
+                    <div class="checklist-grid grid-cols-3">
+                        <label class="checklist-item"><input type="checkbox"> Bueno</label>
+                        <label class="checklist-item"><input type="checkbox"> Fracturada / Dañada</label>
+                        <label class="checklist-item"><input type="checkbox"> Obstrucción Persistente</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Observaciones</label>
+                    <textarea class="form-input" rows="3"
+                        placeholder="Comentarios adicionales del técnico..."></textarea>
+                </div>
+            </div>
+
+            <!-- 7. Evidencia Fotográfica -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">Evidencia Fotográfica</span>
+                </div>
+                <div class="photo-grid">
+                    <div class="photo-placeholder">
+                        <span class="photo-icon">📷</span>
+                        <span>Registro saturado / Nivel alto (Antes)</span>
+                    </div>
+                    <div class="photo-placeholder">
+                        <span class="photo-icon">✨</span>
+                        <span>Flujo corriente / Limpia (Después)</span>
+                    </div>
+                    <div class="photo-placeholder">
+                        <span class="photo-icon">🛠️</span>
+                        <span>Equipo en operación</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. Comentarios Adicionales y Cierre -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">Comentarios Adicionales</span>
+                </div>
+                <div class="form-group mb-3">
+                    <textarea class="form-input" rows="2" placeholder="Espacio para notas del cliente..."></textarea>
+                </div>
+            </div>
+
+            <!-- Footer (Preservado) -->
+            <footer>
+                <div class="page-counter">
+                    PÁGINA <span class="page-val">1</span> de <span class="total-pages">1</span>
+                </div>
+                <div class="footer-line">
+                </div>
+                <div class="footer-content">
+                    <div>CONTROL DE PROCESOS
+                        HIDRAULICOS S.A.
+                        DE C.V.</div>
+                    <div>(222)-889-4469</div>
+                    <div>ejecutivo@cophi.mx</div>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <script src="paginacion.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario Permiso de Descargas - Plantilla Jinja2</title>
+    <style>
+        /* --- CONFIGURACIÓN DE PÁGINA E IMPRESIÓN --- */
+        @page {
+            size: letter;
+            margin: 0.5cm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            margin: 0;
+            padding: 20px;
+            background-color: #525659;
+            /* Fondo gris estilo visor de PDF */
+            color: #000;
+        }
+
+        /* Simulación de hoja de papel en pantalla */
+        .page {
+            width: 21.59cm;
+            /* Carta */
+            min-height: 27.94cm;
+            background: white;
+            padding-top: 0;
+            padding-right: 1.5cm;
+            padding-bottom: 1.5cm;
+            padding-left: 1.5cm;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+            /* Evita que contenido largo rompa el diseño */
+        }
+
+        /* Estilos específicos para impresión */
+        @media print {
+
+            html,
+            body {
+                height: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: none;
+            }
+
+            .page {
+                margin: 0 !important;
+                padding: 1.5cm !important;
+                /* Mantener padding interno para el contenido */
+                border: initial;
+                border-radius: initial;
+                width: initial;
+                min-height: 100%;
+                height: 100%;
+                box-shadow: none;
+                background: initial;
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+
+            /* Evitar salto de página después de la última página */
+            .page:last-child {
+                page-break-after: auto;
+            }
+
+            /* Ocultar elementos de UI si los hubiera */
+            .no-print {
+                display: none;
+            }
+        }
+
+        /* --- TIPOGRAFÍA Y ESTRUCTURA --- */
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin: 0;
+        }
+
+        .header {
+            position: relative;
+            margin-bottom: 5px;
+            /* text-align: center; */
+        }
+
+        .header img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .nis-overlay {
+            /* 1. Flujo Normal: Eliminamos position: absolute; */
+            /* position: absolute; */
+            /* top: 60px; */
+            /* right: 20px; */
+
+            /* 2. Empujar a la derecha */
+            display: block;
+            /* Aseguramos que sea un elemento de bloque */
+            width: fit-content;
+            /* Opcional: El ancho es solo el contenido, no todo el contenedor */
+            margin-left: auto;
+            /* Esto empuja el elemento completamente a la derecha */
+            margin-right: 20px;
+            /* Margen para simular el "right: 20px" original */
+            /* Si también quieres simular el "top: 60px" sin position: absolute, usa margin-top: */
+            margin-top: 0px;
+            margin-bottom: 20px;
+
+            /* Demás estilos (se mantienen) */
+            color: black;
+            font-weight: bold;
+            font-size: 11pt;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        .logo-col {
+            width: 20%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 8pt;
+            font-weight: bold;
+        }
+
+        .logo-placeholder {
+            width: 70px;
+            height: 70px;
+            background-color: #eee;
+            border: 1px dashed #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 7pt;
+        }
+
+        .title-col {
+            width: 60%;
+            text-align: center;
+        }
+
+        .main-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 5px;
+        }
+
+        .sub-title {
+            font-size: 10pt;
+            font-weight: normal;
+        }
+
+        .nis-label {
+            color: red;
+            font-weight: bold;
+            font-size: 11pt;
+            margin-top: 5px;
+            text-align: right;
+            display: block;
+        }
+
+        .legal-text {
+            font-size: 8pt;
+            text-align: justify;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        /* --- FORMULARIOS --- */
+        .section-header {
+            background-color: #e0e0e0;
+            font-weight: bold;
+            padding: 4px;
+            border: 1px solid #000;
+            font-size: 9pt;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        .subsection-header {
+            font-weight: bold;
+            margin: 5px 0;
+            font-size: 9.5pt;
+        }
+
+        .form-row {
+            display: flex;
+            margin-bottom: 3px;
+            align-items: flex-end;
+            /* Alinear al fondo para que la línea coincida */
+        }
+
+        .field {
+            display: flex;
+            align-items: flex-end;
+            margin-right: 10px;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .w-50 {
+            width: 50%;
+        }
+
+        .w-33 {
+            width: 33.33%;
+        }
+
+        .w-25 {
+            width: 25%;
+        }
+
+        .label {
+            font-weight: bold;
+            white-space: nowrap;
+            margin-right: 5px;
+            font-size: 9pt;
+            padding-bottom: 2px;
+        }
+
+        .input-line {
+            border-bottom: 1px solid #000;
+            flex-grow: 1;
+            padding: 0 5px 2px 5px;
+            font-family: "Courier New", monospace;
+            /* Fuente monoespaciada para datos */
+            color: #000;
+            /* Azul para resaltar los datos inyectados, negro para final */
+            min-height: 18px;
+            font-size: 10pt;
+        }
+
+        /* Simular el color de Jinja para que se vea claro en el preview */
+        .jinja {
+            color: #0056b3;
+            font-weight: bold;
+        }
+
+        /* --- LISTAS DE VERIFICACIÓN --- */
+        .checklist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 8.5pt;
+        }
+
+        .checklist li {
+            margin-bottom: 3px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .box {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 1px solid #000;
+            margin-right: 8px;
+            margin-top: 1px;
+            flex-shrink: 0;
+            text-align: center;
+            line-height: 11px;
+            font-size: 10px;
+        }
+
+        /* --- TABLAS --- */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-top: 5px;
+        }
+
+        .data-table th,
+        .data-table td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: center;
+        }
+
+        .data-table th {
+            background-color: #f0f0f0;
+        }
+
+        .data-table td {
+            text-align: left;
+        }
+
+        .data-table td.center {
+            text-align: center;
+        }
+
+        /* --- PIE DE PÁGINA --- */
+        .footer {
+            position: absolute;
+            bottom: 1cm;
+            left: 1.5cm;
+            right: 1.5cm;
+            border-top: 1px solid #999;
+            padding-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 7pt;
+            color: #666;
+        }
+
+        /* --- UTILIDADES --- */
+        .spacer {
+            height: 10px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-justify {
+            text-align: justify;
+        }
+
+        .croquis-box {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        .signature-section {
+            display: flex;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            flex-direction: column;
+            align-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .sig-block {
+            width: 40%;
+            text-align: center;
+            font-size: 8pt;
+            margin-top: 50px;
+        }
+
+        .sig-line {
+            border-top: 1px solid #000;
+            padding-top: 5px;
+        }
+
+        .stamp-box {
+            width: 120px;
+            height: 100px;
+            border: 1px solid #000;
+            margin: 0 auto;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7pt;
+            color: #999;
+        }
+
+        .registro-info {
+            display: block;
+            margin-top: 5px;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= PÁGINA 1 ================= -->
+    <div class="page">
+        <!-- Header -->
+        <header class="header">
+            <img src="header.JPG" alt="Encabezado SOAPAP">
+            <div style="display: flex; justify-content: right; text-align: end; font-weight: bold;">Cuestionario para
+                Solicitud de Permiso
+                de Descargas de
+                <br>
+                Aguas Residuales de Industrias, Servicios y Comercios. PD 3
+            </div>
+            <div class="nis-overlay">NIS: <span class="jinja">{{ nis }}</span></div>
+        </header>
+
+        <div class="main-title" style="text-align: center; font-size: 11pt; font-weight: bold; margin-bottom: 10px;">
+            Cuestionario para Solicitud de Permiso de Descargas de Aguas Residuales de Industrias, Servicios y
+            Comercios. PD 3
+        </div>
+
+        <p class="legal-text">
+            De conformidad por lo dispuesto en el Artículo 119 bis y 121 de la Ley General del Equilibrio Ecológico y
+            Protección al
+            Ambiente y el artículo 69 de la Ley de Agua para el Estado de Puebla, y con alineamiento en la Normatividad
+            Oficial
+            Mexicana aplicable vigente, a continuación se solicita nos proporcione la siguiente información a fin de que
+            se emita el
+            Permiso de Descarga correspondiente.
+        </p>
+
+        <!-- 1.0 Datos de Identificación -->
+        <div class="section-header">1.0.- Datos de Identificación</div>
+
+        <!-- 1.1 Propietario -->
+        <div class="subsection-header">1.1.- Datos del Propietario.</div>
+        <div class="form-row">
+            <div class="field w-100">
+                <span class="label">Nombre:</span>
+                <span class="input-line jinja">{{ prop_nombre }}</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field w-50">
+                <span class="label">Dirección:</span>
+                <span class="input-line jinja">{{ prop_direccion }}</span>
+            </div>
+            <div class="field w-50">
+                <span class="label">Colonia:</span>
+                <span class="input-line jinja">{{ prop_colonia }}</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field w-33">
+                <span class="label">Municipio:</span>
+                <span class="input-line jinja">{{ prop_municipio }}</span>
+            </div>
+            <div class="field w-33">
+                <span class="label">Teléfono:</span>
+                <span class="input-line jinja">{{ prop_telefono }}</span>
+            </div>
+            <div class="field w-33">
+                <span class="label">Localidad:</span>
+                <span class="input-line jinja">{{ prop_localidad }}</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field w-50">
+                <span class="label">Código Postal:</span>
+                <span class="input-line jinja">{{ prop_cp }}</span>
+            </div>
+            <div class="field w-50">
+                <span class="label">R. F. C.:</span>
+                <span class="input-line jinja">{{ prop_rfc }}</span>
+            </div>
+        </div>
+
+        <!-- 1.2 Arrendatario -->
+        <div class="subsection-header">1.2.- Datos del Arrendatario.</div>
+        <div class="form-row">
+            <div class="field w-100">
+                <span class="label">Nombre:</span>
+                <span class="input-line jinja">{{ arr_nombre }}</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field w-50">
+                <span class="label">Dirección:</span>
+                <span class="input-line jinja">{{ arr_direccion }}</span>
+            </div>
+            <div class="field w-50">
+                <span class="label">Colonia:</span>
+                <span class="input-line jinja">{{ arr_colonia }}</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field w-33">
+                <span class="label">Municipio:</span>
+                <span class="input-line jinja">{{ arr_municipio }}</span>
+            </div>
+            <div class="field w-33">
+                <span class="label">Teléfono:</span>
+                <span class="input-line jinja">{{ arr_telefono }}</span>
+            </div>
+            <div class="field w-33">
+                <span class="label">Localidad:</span>
+                <span class="input-line jinja">{{ arr_localidad }}</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field w-50">
+                <span class="label">Código Postal:</span>
+                <span class="input-line jinja">{{ arr_cp }}</span>
+            </div>
+            <div class="field w-50">
+                <span class="label">R. F. C.:</span>
+                <span class="input-line jinja">{{ arr_rfc }}</span>
+            </div>
+        </div>
+
+        <!-- 1.3 Documentos -->
+        <div class="subsection-header">1.3.- Anexe copia de los siguientes documentos:</div>
+        <ul class="checklist">
+            <li><span class=""></span> a) Poder notarial que lo acredite y/o acta constitutiva de la sociedad.</li>
+            <li><span class=""></span> b) Registro Federal de Contribuyentes</li>
+            <li><span class=""></span> c) Carta poder y copia de la identificación de la persona que realiza el
+                trámite.</li>
+            <li><span class=""></span> d) Factibilidad de los servicios de agua potable y drenaje prestados por el
+                SOAPAP.</li>
+            <li><span class=""></span> e) Licencia de Funcionamiento.</li>
+            <li><span class=""></span> f) Constancia de Alineamiento y Número Oficial.</li>
+            <li><span class=""></span> g) Licencia de sustancias susceptibles de inhalación y efectos tóxicos.</li>
+            <li><span class=""></span> h) Aviso de Funcionamiento o Licencia Sanitaria.</li>
+            <li><span class=""></span> i) Constancia de medidas preventivas expedida por Bomberos.</li>
+            <li><span class=""></span> j) Constancia de medidas básicas de seguridad expedida por Protección Civil.
+            </li>
+            <li><span class=""></span> k) Boleta de Predial.</li>
+        </ul>
+
+        <footer class="footer">
+            <span>SOAPAP-DG/GSMA/DCTSD-CPD-03</span>
+            <span>Página 1 de 6</span>
+        </footer>
+    </div>
+
+    <!-- ================= PÁGINA 2 ================= -->
+    <div class="page">
+        <header class="header">
+            <img src="header.JPG" alt="Encabezado SOAPAP">
+            <div style="display: flex; justify-content: right; text-align: end; font-weight: bold;">Cuestionario para
+                Solicitud de Permiso
+                de Descargas de
+                <br>
+                Aguas Residuales de Industrias, Servicios y Comercios. PD 3
+            </div>
+            <div class="nis-overlay">NIS: <span class="jinja">{{ nis }}</span></div>
+        </header>
+
+        <ul class="checklist">
+            <li><span class=""></span> l) Recibo de pago por el concepto del Permiso de Descarga.</li>
+            <li><span class=""></span> m) Planos (tamaño mínimo aceptado doble carta) de los sistemas de drenaje.
+            </li>
+        </ul>
+
+        <div class="section-header">2.0.- Datos del Predio</div>
+        <p class="legal-text">
+            2.1.- Anexar hoja con la georreferencia del Predio (con coordenadas en grados, minutos y segundos),
+            indicando las calles con las que colinda el predio; así como la ubicación donde su predio se conecta a la
+            red de drenaje municipal.
+        </p>
+
+        <!-- Placeholder para la imagen de ejemplo -->
+        <div class="croquis-box">
+            [ Espacio para Croquis / Ejemplo de Coordenadas ]
+        </div>
+
+        <div class="section-header">3.0.- Datos del Giro o Actividad</div>
+
+        <div class="subsection-header">3.1.- Clasificación del Giro.</div>
+        <div class="form-row">
+            <div class="field w-100">
+                <span class="label">Giro de acuerdo a la Licencia de Funcionamiento:</span>
+                <span class="input-line jinja">{{ giro_licencia }}</span>
+            </div>
+        </div>
+
+        <div class="subsection-header">3.2.- Descripción del Giro.</div>
+        <div class="form-row">
+            <div class="field w-100">
+                <span class="label">Descripción de las actividades que realizan:</span>
+                <span class="input-line jinja">{{ giro_descripcion }}</span>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <span>SOAPAP-DG/GSMA/DCTSD-CPD-03</span>
+            <span>Página 2 de 6</span>
+        </footer>
+    </div>
+
+    <!-- ================= PÁGINA 3 ================= -->
+    <div class="page">
+        <header class="header">
+            <img src="header.JPG" alt="Encabezado SOAPAP">
+            <div style="display: flex; justify-content: right; text-align: end; font-weight: bold;">Cuestionario para
+                Solicitud de Permiso
+                de Descargas de
+                <br>
+                Aguas Residuales de Industrias, Servicios y Comercios. PD 3
+            </div>
+            <div class="nis-overlay">NIS: <span class="jinja">{{ nis }}</span></div>
+        </header>
+
+        <div class="subsection-header">3.3.- Proporcione la siguiente información:</div>
+        <div class="form-row">
+            <div class="field w-50">
+                <span class="label">Número total de empleados:</span>
+                <span class="input-line jinja">{{ num_empleados }}</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field w-100">
+                <span class="label">Número y horario de los turnos:</span>
+                <span class="input-line jinja">{{ turnos }}</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field w-100">
+                <span class="label">Horario de atención:</span>
+                <span class="input-line jinja">{{ horario_atencion }}</span>
+            </div>
+        </div>
+
+        <div class="section-header">4.0.- Descripción del Servicio de Agua Potable</div>
+
+        <div class="subsection-header">4.1.- Indique cual es la fuente de abastecimiento de agua potable.</div>
+
+        <table style="width:100%; font-size: 9pt;">
+            <tr>
+                <td style="width: 25%;"><strong>Pozo Particular:</strong></td>
+                <td style="width: 15%;">
+                    Sí <span class="box">{% if pozo=='Si' %}X{%endif%}</span> No <span class="box">{% if pozo=='No'
+                        %}X{%endif%}</span>
+                </td>
+                <td>
+                    <div class="field w-100">
+                        <span class="label">No. Concesión:</span>
+                        <span class="input-line jinja">{{ num_concesion }}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pipas:</strong></td>
+                <td>
+                    Sí <span class="box">{% if pipas=='Si' %}X{%endif%}</span> No <span class="box">{% if pipas=='No'
+                        %}X{%endif%}</span>
+                </td>
+                <td>
+                    <div class="field w-100">
+                        <span class="label">No. Pipas/mes y cap:</span>
+                        <span class="input-line jinja">{{ datos_pipas }}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Servicio Público:</strong></td>
+                <td>
+                    Sí <span class="box">{% if red=='Si' %}X{%endif%}</span> No <span class="box">{% if red=='No'
+                        %}X{%endif%}</span>
+                </td>
+                <td>
+                    <div class="field w-100">
+                        <span class="label">No. Tomas:</span>
+                        <span class="input-line jinja">{{ num_tomas }}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <div class="field w-100">
+                        <span class="label">Otro, especifique:</span>
+                        <span class="input-line jinja">{{ fuente_otro }}</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="subsection-header" style="margin-top:15px;">4.2.- Proporcione la siguiente información sobre el uso
+            del agua:</div>
+        <table class="data-table" style="text-align: left;">
+            <tr>
+                <td>a) Número total de W.C.</td>
+                <td class="jinja" style="width: 20%;">{{ total_wc }}</td>
+            </tr>
+            <tr>
+                <td>b) Mingitorios</td>
+                <td class="jinja">{{ total_mingitorios }}</td>
+            </tr>
+            <tr>
+                <td>c) Número total de lavamanos</td>
+                <td class="jinja">{{ total_lavamanos }}</td>
+            </tr>
+            <tr>
+                <td>d) Número total de regaderas</td>
+                <td class="jinja">{{ total_regaderas }}</td>
+            </tr>
+            <tr>
+                <td>e) Número total de cisternas</td>
+                <td class="jinja">{{ total_cisternas }}</td>
+            </tr>
+            <tr>
+                <td>f) Capacidad de la(s) cisterna(s) (m³)</td>
+                <td class="jinja">{{ cap_cisternas }}</td>
+            </tr>
+            <tr>
+                <td>g) Número total de tinacos</td>
+                <td class="jinja">{{ total_tinacos }}</td>
+            </tr>
+            <tr>
+                <td>h) Capacidad de los tinacos (m³)</td>
+                <td class="jinja">{{ cap_tinacos }}</td>
+            </tr>
+            <tr>
+                <td>i) ¿Cuenta con comedor o área de preparación de alimentos?</td>
+                <td class="jinja">{{ tiene_comedor }}</td>
+            </tr>
+        </table>
+
+        <footer class="footer">
+            <span>SOAPAP-DG/GSMA/DCTSD-CPD-03</span>
+            <span>Página 3 de 6</span>
+        </footer>
+    </div>
+
+    <!-- ================= PÁGINA 4 ================= -->
+    <div class="page">
+        <header class="header">
+            <img src="header.JPG" alt="Encabezado SOAPAP">
+            <div style="display: flex; justify-content: right; text-align: end; font-weight: bold;">Cuestionario para
+                Solicitud de Permiso
+                de Descargas de
+                <br>
+                Aguas Residuales de Industrias, Servicios y Comercios. PD 3
+            </div>
+            <div class="nis-overlay">NIS: <span class="jinja">{{ nis }}</span></div>
+        </header>
+
+        <div class="subsection-header">4.3.- ¿Tiene algún mecanismo para ahorro de agua potable?</div>
+        <p style="font-size: 8pt; margin:0;">Si su respuesta es si, enumérelos y descríbalos a continuación.</p>
+        <div style="border-bottom: 1px solid #000; min-height: 40px; margin-bottom: 15px;" class="jinja">{{
+            mecanismos_ahorro }}</div>
+
+        <div class="section-header">5.0.- Descripción de la(s) Descarga(s)</div>
+
+        <div class="subsection-header">5.1.- ¿Se encuentra actualmente realizando descargas de aguas residuales al
+            sistema de drenaje Municipal?</div>
+        <div style="margin-bottom: 10px;">
+            Sí <span class="box">{% if descarga_muni=='Si' %}X{%endif%}</span> No <span class="box">{% if
+                descarga_muni=='No' %}X{%endif%}</span>
+        </div>
+
+        <div class="subsection-header">5.2.- Variación de flujo de agua residual.</div>
+        <div class="form-row">
+            <div class="field w-100">
+                <span class="label">Promedio mensual de aguas residuales generadas (m³/mes):</span>
+                <span class="input-line jinja">{{ promedio_descarga }}</span>
+            </div>
+        </div>
+
+        <div class="subsection-header" style="margin-top:15px;">5.3.- ¿Cuenta con registro(s) a pie de banqueta donde
+            realiza el aforo y muestreo?</div>
+        <div style="margin-bottom: 5px;">
+            Sí <span class="box">{% if tiene_registro=='Si' %}X{%endif%}</span> No <span class="box">{% if
+                tiene_registro=='No' %}X{%endif%}</span>
+        </div>
+        <p style="font-size: 8pt; font-style: italic; margin:0; margin-bottom: 15px;">NOTA: En caso de ser afirmativo,
+            describa las
+            características (localización, profundidad, diámetro, material).</p>
+        <div style="border-bottom: 1px solid #000; min-height: 40px; margin-bottom: 15px;" class="jinja">
+            <span class="registro-info">{% if tiene_registro=='Si' %}Localización: {{ localización_registro
+                }}{%endif%}</span>
+            <span class="registro-info">{% if tiene_registro=='Si' %}Profundidad: {{ profundidad_registro
+                }}{%endif%}</span>
+            <span class="registro-info">{% if tiene_registro=='Si' %}Diámetro: {{ diametro_registro
+                }}{%endif%}</span>
+            <span class="registro-info">{% if tiene_registro=='Si' %}Material: {{ material_registro }}{%endif%}</span>
+        </div>
+        <div class="subsection-header">5.4.- ¿Cuenta con medidor de descarga?</div>
+        <div style="margin-bottom: 5px;">
+            Sí <span class="box">{% if tiene_medidor_descargas=='Si' %}X{%endif%}</span> No <span class="box">{% if
+                tiene_medidor_descargas=='No' %}X{%endif%}</span>
+        </div>
+        <p style="font-size: 8pt; font-style: italic; margin:0; margin-bottom: 15px;">NOTA: En caso afirmativo anexe
+            fotografía.</p>
+
+        <div class="subsection-header">5.5 ¿Utiliza algún sistema de pretratamiento para las aguas residuales?</div>
+        <div style="margin-bottom: 5px;">
+            Sí <span class="box">{% if tiene_pretrat=='Si' %}X{%endif%}</span> No <span class="box">{% if
+                tiene_pretrat=='No' %}X{%endif%}</span>
+        </div>
+        <p style="font-size: 8pt; font-style: italic; margin:0; margin-bottom: 15px;">NOTA: Describa operación,
+            bitácoras y disposición de
+            residuos.</p>
+        <div style="border-bottom: 1px solid #000; min-height: 60px; margin-bottom: 15px;" class="jinja">
+            <span class="registro-info">{% if tiene_pretrat=='Si' %}Operación: {{ operación_pretratamiento
+                }}{%endif%}</span>
+            <span class="registro-info">{% if tiene_pretrat=='Si' %}Disposición de residuos: {{ disposición_residuos
+                }}{%endif%}</span>
+        </div>
+        <footer class="footer">
+            <span>SOAPAP-DG/GSMA/DCTSD-CPD-03</span>
+            <span>Página 4 de 6</span>
+        </footer>
+    </div>
+
+    <!-- ================= PÁGINA 5 ================= -->
+    <div class="page">
+        <header class="header">
+            <img src="header.JPG" alt="Encabezado SOAPAP">
+            <div style="display: flex; justify-content: right; text-align: end; font-weight: bold;">Cuestionario para
+                Solicitud de Permiso
+                de Descargas de
+                <br>
+                Aguas Residuales de Industrias, Servicios y Comercios. PD 3
+            </div>
+            <div class="nis-overlay">NIS: <span class="jinja">{{ nis }}</span></div>
+        </header>
+
+        <div class="subsection-header">5.6.- ¿Ha realizado análisis en sus descargas de agua residual?</div>
+        <div style="margin-bottom: 10px;">
+            Sí <span class="box">{% if tiene_analisis=='Si' %}X{%endif%}</span> No <span class="box">{% if
+                tiene_analisis=='No' %}X{%endif%}</span>
+        </div>
+        <p style="font-size: 8pt; font-style: italic; margin-bottom: 20px;">NOTA: En caso de ser afirmativo, anexe copia
+            de los tres últimos resultados.</p>
+
+        <hr style="border: 0; border-top: 1px solid #000; margin: 20px 0;">
+
+        <p class="legal-text text-justify">
+            <strong>Manifiesto bajo protesta de decir verdad</strong> que los datos asentados en esta solicitud son
+            reales y que pueden ser sujetos a su verificación por parte de SOAPAP a través de Concesiones Integrales
+            S.A. de C.V. y/o Agua de Puebla para Todos, y que en caso de haberme conducido con falsedad en la
+            información, aplicarán las sanciones que correspondan.
+        </p>
+
+        <p class="legal-text text-justify">
+            <strong>Nota 1:</strong> En términos del artículo 48 de la Ley del Agua para el Estado de Puebla, será
+            obligación del propietario notificar a SOAPAP la venta, traspaso o cambio de giro.
+            <br>
+            <strong>Nota 2:</strong> La omisión de la entrega total de la información requerida será causal de la
+            negación del permiso.
+        </p>
+
+        <p class="legal-text">
+            Autorizo al Sistema Operador realizar una visita de verificación cuando lo consideren conveniente.
+        </p>
+
+        <div style="border: 1px solid #000; padding: 10px; margin-top: 20px;">
+            <div class="subsection-header" style="text-align: center; margin-top:0;">Aviso de Privacidad</div>
+            <p style="font-size: 7pt; text-align: justify; margin: 5px 0;">
+                Que derivado de los datos personales vertidos por el Titular en esta solicitud, los mismos no podrán
+                proporcionarse o hacerse públicos por esta Autoridad Administrativa, salvo consentimiento expreso del
+                usuario. Sus datos se encuentran protegidos con fundamento en los artículos de la Ley General de
+                Protección de Datos Personales.
+            </p>
+            <div
+                style="display: flex; justify-content: space-around; margin-top: 15px; font-weight: bold; font-size: 9pt;">
+                <div>SI ACEPTO <span class="box"></span></div>
+                <div>NO ACEPTO <span class="box"></span></div>
+            </div>
+        </div>
+
+        <div class="signature-section">
+            <div class="sig-block">
+                <div class="jinja">{{ prop_nombre }}</div>
+                <div class="sig-line">Nombre y Firma del Propietario<br>y/o Representante de la Empresa</div>
+            </div>
+            <div class="sig-block">
+                <div class="stamp-box">Sello de la empresa</div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <span>SOAPAP-DG/GSMA/DCTSD-CPD-03</span>
+            <span>Página 5 de 6</span>
+        </footer>
+    </div>
+
+    <!-- ================= PÁGINA 6 ================= -->
+    <div class="page">
+        <header class="header">
+            <img src="header.JPG" alt="Encabezado SOAPAP">
+            <div style="display: flex; justify-content: right; text-align: end; font-weight: bold;">Cuestionario para
+                Solicitud de Permiso
+                de Descargas de
+                <br>
+                Aguas Residuales de Industrias, Servicios y Comercios. PD 3
+            </div>
+            <div class="nis-overlay">NIS: <span class="jinja">{{ nis }}</span></div>
+        </header>
+
+        <div class="main-title" style="text-align: center; font-size: 11pt; font-weight: bold; margin-bottom: 10px;">
+            Observaciones de visita de verificación
+        </div>
+
+        <div class="form-row">
+            <div class="field w-33">
+                <span class="label">Fecha de Visita:</span>
+                <span class="input-line"></span>
+            </div>
+            <div class="field w-33">
+                <span class="label">Hora inicio:</span>
+                <span class="input-line"></span>
+            </div>
+            <div class="field w-33">
+                <span class="label">Hora término:</span>
+                <span class="input-line"></span>
+            </div>
+        </div>
+
+        <div class="subsection-header" style="margin-top: 15px;">Observaciones:</div>
+        <div style="border: 1px solid #000; height: 350px; margin-bottom: 20px;"></div>
+
+        <div style="font-weight: bold; font-size: 9pt;">Datos de quien(es) atiende(n) la visita de verificación:</div>
+        <table class="data-table" style="margin-bottom: 20px;">
+            <tr>
+                <th style="width: 50px;">No.</th>
+                <th>NOMBRE</th>
+                <th>FIRMA</th>
+                <th>PUESTO</th>
+            </tr>
+            <tr>
+                <td>1.-</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2.-</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>3.-</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+
+        <div style="font-weight: bold; font-size: 9pt;">Datos de quienes realizan la visita de verificación:</div>
+        <table class="data-table">
+            <tr>
+                <th style="width: 50px;">No.</th>
+                <th>NOMBRE</th>
+                <th>FIRMA</th>
+            </tr>
+            <tr>
+                <td>1.-</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2.-</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>3.-</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+
+        <footer class="footer">
+            <span>SOAPAP-DG/GSMA/DCTSD-CPD-03</span>
+            <span>Página 6 de 6</span>
+        </footer>
+    </div>
+
+</body>
+
+</html>

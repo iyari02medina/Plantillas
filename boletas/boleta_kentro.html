@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Boleta Excedentes Contaminantes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 16px;
+            color: #333;
+            margin: 0;
+            padding: 40px;
+            /* Más espacio interno */
+            background-color: #fff;
+            /* Borde superior decorativo estilo portada - Color oscurecido */
+            border-top: 12px solid #006994;
+        }
+
+        .container {
+            width: 800px;
+            margin: 0 auto;
+        }
+
+        /* --- NUEVO DISEÑO DE ENCABEZADO (PORTADA) --- */
+        .header-modern {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            /* Alinear al fondo para equilibrio */
+            padding-bottom: 25px;
+            /* Línea sutil separadora */
+        }
+
+        .brand-wrapper {
+            display: flex;
+            flex-direction: column;
+            /* Cambiado a columna para poner texto abajo */
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .brand-logo {
+            width: 130px;
+            /* Un poco más grande para compensar */
+            height: auto;
+        }
+
+        .brand-text {
+            /* Eliminamos bordes y padding lateral */
+            border-left: none;
+            padding-left: 0;
+        }
+
+        .brand-legal {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 8px;
+            font-weight: 700;
+            /* Más negrita para que destaque */
+            color: #555;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            line-height: 1.4;
+        }
+
+        .doc-title-wrapper {
+            text-align: right;
+        }
+
+        .doc-main-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 32px;
+            color: #006994;
+            margin: 0;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .doc-sub-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            color: #888;
+            margin-top: 5px;
+            /* Se eliminó text-transform: uppercase para respetar la ortografía natural */
+            letter-spacing: 1px;
+        }
+
+        /* --- FIN NUEVO HEADER --- */
+
+        /* INFO SUPERIOR (Local y Fecha) */
+        .top-info-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 10px 0;
+            /* Espacio entre celdas */
+            margin-bottom: 25px;
+        }
+
+        .top-info-table th {
+            text-align: right;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            padding-bottom: 5px;
+        }
+
+        .top-info-table td {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            /* Bordes redondeados modernos */
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #444;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .top-spacer {
+            width: 50%;
+        }
+
+        /* ESTILOS GENERALES DE TABLAS */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .data-table th,
+        .data-table td {
+            border-bottom: 1px solid #eee;
+            /* Solo líneas horizontales para limpieza */
+            padding: 8px 10px;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .section-header {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #fff;
+            /* Fondo blanco limpio */
+            color: #006994;
+            /* Color corregido */
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: left;
+            border-bottom: 2px solid #006994 !important;
+            /* Borde corregido */
+            padding: 10px 5px !important;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* Layout columnas */
+        .columns-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .left-column {
+            flex: 1.4;
+        }
+
+        .right-column {
+            flex: 0.8;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Tabla Resultados */
+        .results-header td {
+            background-color: #f4f4f4;
+            color: #555;
+            font-weight: 700;
+            font-size: 10px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: 600;
+        }
+
+        /* Tabla Importe - Diseño tarjeta */
+        .importe-card {
+            background-color: #fbfbfb;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .importe-table th {
+            background-color: #006994;
+            /* Fondo corregido */
+            color: white;
+            padding: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+        }
+
+        .total-row td {
+            background-color: #eaf8fe;
+            color: #000;
+            font-weight: 800;
+            font-size: 16px;
+            border-top: 2px solid #006994;
+            /* Borde corregido */
+        }
+
+        /* Banco */
+        .banco-title {
+            text-align: center;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #888;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .banco-table td {
+            font-size: 14px;
+        }
+
+        .banco-header {
+            background-color: #444;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 4px;
+            font-weight: bold;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+
+            /* Add print margins */
+            @page {
+                margin: 20px;
+                size: auto;
+            }
+
+            /* Ensure the layout is preserved */
+            .container {
+                width: 800px !important;
+                margin: 0 auto !important;
+            }
+
+            /* General element fidelity */
+            body,
+            .container,
+            .header-modern,
+            .top-info-table,
+            .data-table,
+            .columns-container,
+            .left-column,
+            .right-column,
+            .importe-card {
+                box-sizing: border-box;
+            }
+
+            /* Prevent elements from breaking across pages */
+            .header-modern,
+            .top-info-table,
+            .data-table,
+            .columns-container,
+            .importe-card,
+            .brand-wrapper,
+            .doc-title-wrapper {
+                break-inside: avoid;
+            }
+
+            .tr-color {
+                color: #333 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- NUEVO HEADER: ESTILO PORTADA -->
+        <header class="header-modern">
+            <div class="brand-wrapper">
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <img src="https://www.cophi.mx/logo-cophi2.jpg" alt="COPHI Logo" class="brand-logo">
+                    <img src="../kentro_logo.png" alt="Kentro Logo" class="brand-logo">
+                </div>
+                <div class="brand-text" style="width: 130px;">
+                    <p class="brand-legal">Control de procesos hidráulicos<br>S.A. de C.V.</p>
+                </div>
+            </div>
+            <div class="doc-title-wrapper">
+                <h2 class="doc-main-title">Boleta</h2>
+                <h3 class="doc-sub-title">Excedentes Contaminantes</h3>
+                <h3 class="doc-sub-title" style="font-weight: bold;">{{ Plaza }}</h3>
+            </div>
+        </header>
+
+        <!-- GRID SUPERIOR: DATOS A LA IZQUIERDA, TARJETAS A LA DERECHA -->
+        <div class="upper-grid">
+            <!-- NUMERO LOCAL (Diseño Tarjetas) -->
+            <table class="top-info-table">
+                <tr class="tr-color">
+                    <td class="top-spacer" style="background: none; border: none; box-shadow: none;"></td>
+                    <th><b>Número de Local</b></th>
+                </tr>
+                <tr>
+                    <td class="top-spacer" style="background: none; border: none; box-shadow: none;"></td>
+                    <td>{{ Local }}</td>
+                </tr>
+            </table>
+
+            <!-- DATOS DE EMISION -->
+            <table class="data-table">
+                <tr>
+                    <td colspan="2" class="section-header">Datos de Emisión</td>
+                </tr>
+                <tr>
+                    <td style="width: 30%; color: #666;">Usuario:</td>
+                    <td style="text-align: right; font-weight: 600;">{{ Nombre }}</td>
+                </tr>
+                <tr>
+                    <td style="color: #666;">Periodo de servicio:</td>
+                    <td style="text-align: right;">{{ mes_consumo }}</td>
+                </tr>
+                <tr>
+                    <td style="color: #666;">Tarifa:</td>
+                    <td style="text-align: right;">Excedentes Contaminantes</td>
+                </tr>
+                <tr>
+                    <td style="color: #666;">Uso:</td>
+                    <td style="text-align: right;">Mixto</td>
+                </tr>
+            </table>
+
+            <!-- DESCRIPCION SERVICIOS -->
+            <table class="data-table">
+                <tr>
+                    <td colspan="2" class="section-header">Descripción de Servicios</td>
+                </tr>
+                <tr>
+                    <td style="width: 30%; color: #666;">{{ cuota_boleta }}</td>
+                    <td style="text-align: right;">${% if cuota_boleta.strip() == "Tarifa Mínima Fija:" %}{{ precio }}{%
+                        else %}{{ precio_m3 }}{% endif %} MXN</td>
+                </tr>
+                <tr>
+                    <td style="color: #666;">m3 consumidos:</td>
+                    <td style="text-align: right;">{{ consumo }}</td>
+                </tr>
+            </table>
+
+            <!-- COLUMNAS INFERIORES -->
+            <div class="columns-container">
+
+                <!-- COLUMNA IZQUIERDA: BANCO -->
+                <div class="left-column">
+                    <!-- BANCO -->
+                    <div style="margin-top: 10px;">
+                        <div class="banco-title">Información Bancaria</div>
+                        <div class="banco-header">BBVA</div>
+                        <table class="data-table banco-table" style="margin-top: 5px;">
+                            <tr>
+                                <td style="width: 30%; color: #666;">No. de Cuenta:</td>
+                                <td class="text-center">0484339932</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #666;">No. de Cliente:</td>
+                                <td class="text-center">D5570308</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #666;">R.F.C:</td>
+                                <td class="text-center">MECA700525T62</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #666;">No. Cuenta CLABE:</td>
+                                <td class="text-center">012650004843399325</td>
+                            </tr>
+                            <tr>
+                                <td style="color: #666;">Concepto:</td>
+                                <td class="text-center">{{ concepto_pago }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: IMPORTE -->
+                <div style="margin-top: 35px;" class="right-column">
+
+                    <!-- IMPORTE (Estilo Tarjeta) -->
+                    <div class="importe-card">
+                        <table class="data-table importe-table" style="margin-bottom: 0;">
+                            <tr>
+                                <th colspan="2">IMPORTE A PAGAR</th>
+                            </tr>
+                            <tr>
+                                <td style="padding-top: 15px;">Subtotal</td>
+                                <td class="text-center" style="padding-top: 15px;">${{ precio }} MXN</td>
+                            </tr>
+                            <tr>
+                                <td>IVA:</td>
+                                <td class="text-center">${{ iva }} MXN</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td>TOTAL</td>
+                                <td class="text-center">${{ precio_total }} MXN</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER SIMPLE -->
+        <div class="footer">
+            Dudas o aclaraciones: <strong>222-8-89-44-69</strong>
+        </div>
+
+</body>
+
+</html>

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orden de Trabajo</title>
+
+    <!-- Fuentes (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+    <!-- Botón Flotante -->
+    <div class="print-btn-container">
+        <button onclick="window.print()" class="btn-print">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Imprimir / PDF
+        </button>
+    </div>
+
+    <!-- Contenedor Principal (Hoja) -->
+    <div class="page-container">
+
+        <!-- Barra Superior -->
+        <div class="top-bar"></div>
+
+        <div class="content-wrapper">
+
+            <!-- Encabezado -->
+            <header>
+                <div class="logo-section">
+                    <img src="../logo-cophi-negro.jpg" alt="Logo Cophi">
+                    <p>CONTROL DE PROCESOS<br>HIDRAULICOS S.A. DE C.V.
+                    </p>
+                </div>
+
+                <div class="header-info">
+                    <h1>Limpieza de Trampa de Grasa</h1>
+                    <p class="subtitle" style="overflow-wrap: break-word;">{{ nombre_cliente }}</p>
+                    <div class="meta-data">
+                        <div>Folio: <span style="font-weight: 600;">{{ folio_ot }}</span></div>
+                        <div>Fecha: <span style="font-weight: 600;">{{ fecha_ot }}</span></div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sección Cliente -->
+            <section class="client-card">
+
+                <div class="client-grid">
+                    <div>
+                        <p class="label">Empresa: </p>
+                        <p class="value-lg">{{ nombre_cliente }}</p>
+                        <p class="value-text">{{ direccion_cliente }}</p>
+                    </div>
+                    <div class="client-right-col">
+                        <div style="margin-bottom: 0.75rem;">
+                            <p class="label">Atención a</p>
+                            <p class="value-md">{{ nombre_contacto }}</p>
+                        </div>
+                        <div>
+                            <p class="label">Contacto</p>
+                            <p class="value-text">{{ telefono_contacto }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Datos del Equipo -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">2. Datos del Equipo (La Trampa)</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ubicación</label>
+                        <input type="text" class="form-input" placeholder="Ej. Cocina, Exterior..."
+                            value="{{ ubicacion_equipo }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Trampa</label>
+                        <input type="text" class="form-input" placeholder="Acero, Obra, Plástico..."
+                            value="{{ tipo_trampa }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Capacidad Estimada</label>
+                        <input type="text" class="form-input" placeholder="Kg / Litros" value="{{ capacidad_trampa }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estado Inicial de Tapa</label>
+                        <input type="text" class="form-input" placeholder="Sellada, rota, sin tornillos..."
+                            value="{{ estado_tapa }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Detalle del Servicio -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">4. Detalle del Servicio</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nivel de Saturación Inicial (%):</label>
+                        <input type="text" class="form-input" placeholder="25%, 50%, 90%..."
+                            value="{{ nivel_saturacion }}">
+                    </div>
+                </div>
+                <div class="my-2">
+                    <label class="form-label">Acciones Realizadas:</label>
+                </div>
+                <div class="checklist-grid">
+                    <label class="checklist-item">
+                        <input type="checkbox" {{ 'checked' if accion_retiro_solidos }}> Retiro de sólidos superficiales
+                        (Nata)
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" {{ 'checked' if accion_succion_liquidos }}> Succión de líquidos y lodos
+                        (Vaciado)
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" {{ 'checked' if accion_raspado_paredes }}> Raspado de paredes y difusores
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" {{ 'checked' if accion_lavado_presion }}> Lavado a presión interno
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" {{ 'checked' if accion_aplicacion_bacterias }}> Aplicación de
+                        bacterias/enzimas
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" {{ 'checked' if accion_prueba_flujo }}> Prueba de flujo (Grifos abiertos)
+                    </label>
+                    <label class="checklist-item col-span-2">
+                        <input type="checkbox" {{ 'checked' if accion_limpieza_perimetral }}> Limpieza del área
+                        perimetral y desodorización
+                    </label>
+                </div>
+            </div>
+
+            <!-- 5. Registro de Residuos -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">5. Registro de Residuos</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Volumen Total Extraído</label>
+                        <input type="text" class="form-input" placeholder="Litros / m³" value="{{ volumen_extraido }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Características del Residuo</label>
+                    <input type="text" class="form-input" placeholder="Ej. Exceso de sólidos, objetos extraños..."
+                        value="{{ caracteristicas_residuo }}">
+                </div>
+            </div>
+
+            <!-- 6. Diagnóstico Técnico -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">6. Diagnóstico Técnico y Recomendaciones</span>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Estado físico de la trampa:</label>
+                    <div class="checklist-grid grid-cols-3">
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if estado_bueno }}>
+                            Bueno</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if estado_reparacion }}>
+                            Requiere Reparación</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if estado_faltantes }}> Faltan
+                            Componentes</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Observaciones / Recomendaciones</label>
+                    <textarea class="form-input" rows="3"
+                        placeholder="Comentarios del técnico...">{{ observaciones_tecnico }}</textarea>
+                </div>
+            </div>
+
+            <!-- 7. Evidencia Fotográfica -->
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">7. Evidencia Fotográfica</span>
+                </div>
+                <div class="photo-grid">
+                    <div class="photo-placeholder">
+                        <span class="photo-icon">📷</span>
+                        <span>Trampa Llena (Antes)</span>
+                    </div>
+                    <div class="photo-placeholder">
+                        <span class="photo-icon">✨</span>
+                        <span>Trampa Vacía y Limpia (Después)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. Cierre y Lineas de Drenaje -->
+            <div class="closing-section">
+                <p class="legal-note">
+                    "El cliente acepta que el servicio se realizó a satisfacción y el área quedó limpia."
+                </p>
+
+                <div class="signatures-body">
+                    <div class="signature-box">
+                        <div class="signature-line-body"></div>
+                        <p class="signer-name">Firma del Técnico</p>
+                    </div>
+                    <div class="signature-box">
+                        <div class="signature-line-body"></div>
+                        <p class="signer-name">Nombre y Firma del Cliente</p>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                <div class="page-counter">Página <span class="page-val">1</span>-<span class="total-pages">1</span>
+                </div>
+                <div class="footer-line">
+                </div>
+                <div class="footer-content">
+                    <div>CONTROL DE PROCESOS
+                        HIDRAULICOS S.A.
+                        DE C.V.</div>
+                    <div>(222)-889-4469</div>
+                    <div>ejecutivo@cophi.mx</div>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateElement = document.getElementById('current-date');
+            if (dateElement) {
+                const today = new Date();
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                // Capitalizar primera letra del mes
+                const dateStr = today.toLocaleDateString('es-MX', options);
+                dateElement.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+            }
+
+            // Ejecutar Paginación con un retraso para asegurar carga de estilos
+            setTimeout(paginateContent, 1000);
+        });
+
+        async function paginateContent() {
+            // console.log("Iniciando paginación...");
+            const firstPage = document.querySelector('.page-container');
+            if (!firstPage) return;
+
+            await checkPageOverflow(firstPage, 1);
+
+            // Una vez finalizada la paginación, actualizar todos los totales
+            const totalPages = document.querySelectorAll('.page-container').length;
+            document.querySelectorAll('.total-pages').forEach(el => {
+                el.textContent = totalPages;
+            });
+        }
+
+        async function checkPageOverflow(page, pageNum) {
+            if (!pageNum) pageNum = 1;
+
+            // Safety limit
+            if (pageNum > 20) {
+                console.warn("Límite de páginas alcanzado.");
+                return;
+            }
+
+            // console.log(`Verificando desbordamiento en página ${pageNum}...`);
+            const contentWrapper = page.querySelector('.content-wrapper');
+            const footer = page.querySelector('footer');
+            if (!contentWrapper || !footer) return;
+
+            // Constantes para tamaño Carta (27.94cm a 96dpi ~= 1056px)
+            const PAGE_HEIGHT_PX = 1056;
+
+            // Altura real ocupada por el footer
+            const footerHeight = footer.offsetHeight || 150;
+
+            // El límite donde el contenido DEBE detenerse
+            // Footer está posicionado 'bottom: 1rem' (16px) desde el borde inferior
+            // Calculamos el límite más ajustado para aprovechar todo el espacio disponible
+            // Dejamos un buffer de 80px para evitar solapamientos y tener buen espaciado
+            // Verificar si hay imagenes en esta página
+            const hasImages = contentWrapper.querySelector('.images-column img');
+
+            // Si hay imágenes, usamos el margen ajustado que pidió el usuario (-5 -10)
+            // Si no, usamos un margen estándar más seguro (-16 -20)
+            const buffer = hasImages ? 15 : 36;
+            const limit = PAGE_HEIGHT_PX - footerHeight - buffer;
+
+            // console.log(`Límite de corte calculado: ${limit}px`);
+
+            // Obtener elementos de contenido
+            // IMPORTANT: Excluir explícitamente el footer de esta lista para no moverlo
+            const children = Array.from(contentWrapper.children).filter(el => el !== footer && el.tagName !== 'SCRIPT');
+            const pageRect = page.getBoundingClientRect();
+
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                // Ignorar elementos de estructura fijos
+                if (child.classList.contains('top-bar') || child.tagName === 'HEADER') continue;
+
+                // getBoundingClientRect es relativo al viewport. Restamos pageRect.top para tener 'top' relativo a la página.
+                const childRect = child.getBoundingClientRect();
+                const relativeBottom = childRect.bottom - pageRect.top;
+
+                // CASO 1: Tabla (puede dividirse)
+                if (child.classList.contains('table-container')) {
+                    const table = child.querySelector('table');
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                    // Revisar cada fila
+                    for (let r = 0; r < rows.length; r++) {
+                        const row = rows[r];
+                        const rowRect = row.getBoundingClientRect();
+                        const rowRelativeBottom = rowRect.bottom - pageRect.top;
+
+                        if (rowRelativeBottom > limit) {
+                            console.log(`Desbordamiento detectado en fila ${r} de ${rows.length}. Creando página ${pageNum + 1}`);
+
+                            // Si es la PRIMERA fila la que no cabe:
+                            // 1. Si NO estamos al principio de la página (i > 0), movemos la TABLA ENTERA a una nueva página para probar suerte.
+                            if (r === 0 && i > 0) {
+                                console.log('La primera fila no cabe y no estamos al inicio. Moviendo tabla completa a la siguiente página.');
+                                const newPage = createNewPageFrom(page);
+                                const nextNum = pageNum + 1;
+                                const pageVal = newPage.querySelector('.page-val');
+                                if (pageVal) pageVal.textContent = nextNum;
+
+                                const elementsToMove = children.slice(i);
+                                moveSiblingsToPage(elementsToMove, newPage);
+                                await checkPageOverflow(newPage, pageNum + 1);
+                                return;
+                            }
+
+                            // 2. Si r > 0, O si estamos al principio (i==0) y la fila 0 es enorme:
+                            // Dividimos la tabla.
+                            // Si r=0 y i=0, forzamos dejar la fila 0 aquí para evitar bucle infinito de mover la tabla entera eternamente.
+                            let splitIndex = r;
+                            if (r === 0 && i === 0) {
+                                console.warn('Fila 0 desborda al inicio de página. Forzando corte en fila 1.');
+                                splitIndex = 1;
+                                // Si solo hay 1 fila y es enorme, no movemos nada (dejamos que desborde) para no crear página vacía
+                                if (splitIndex >= rows.length) return;
+                            }
+
+                            const newPage = createNewPageFrom(page);
+                            const nextNum = pageNum + 1;
+                            const pageVal = newPage.querySelector('.page-val');
+                            if (pageVal) pageVal.textContent = nextNum;
+
+                            // PASO 3: Mover filas restantes
+                            const remainingRows = rows.slice(splitIndex);
+                            console.log(`Moviendo ${remainingRows.length} filas restantes`);
+                            moveTableRowsToPage(remainingRows, newPage, child);
+
+                            // PASO 4: Mover TODO el contenido que sigue a esta tabla
+                            // (Incluyendo otras tablas, grupo financiero, etc.)
+                            const nextSiblings = children.slice(i + 1);
+                            if (nextSiblings.length > 0) {
+                                console.log(`Moviendo ${nextSiblings.length} elementos hermanos siguientes a la nueva página.`);
+                                moveSiblingsToPage(nextSiblings, newPage);
+                            }
+
+                            // Verificar recursivamente la nueva página
+                            await checkPageOverflow(newPage, pageNum + 1);
+                            return;
+                        }
+                    }
+                }
+                // CASO 1.5: Imágenes (puede dividirse)
+                if (child.classList.contains('images-column')) {
+                    const wrappers = Array.from(child.children);
+                    for (let w = 0; w < wrappers.length; w++) {
+                        const wrapper = wrappers[w];
+                        const rect = wrapper.getBoundingClientRect();
+                        const bottom = rect.bottom - pageRect.top;
+
+                        if (bottom > limit) {
+                            console.log(`Desbordamiento de imagen ${w}.`);
+
+                            // Determinar si es el primer elemento significativo de la página
+                            const startOfContent = children.findIndex(c => !c.classList.contains('top-bar') && c.tagName !== 'HEADER');
+                            const isAtTop = (i === startOfContent);
+
+                            // Si es la primera imagen y no estamos al inicio, movemos todo el bloque
+                            if (w === 0 && !isAtTop) {
+                                console.log('Moviendo columna de imágenes completa');
+                                const newPage = createNewPageFrom(page);
+                                const nextNum = pageNum + 1;
+                                const pageVal = newPage.querySelector('.page-val');
+                                if (pageVal) pageVal.textContent = nextNum;
+
+                                const elementsToMove = children.slice(i);
+                                moveSiblingsToPage(elementsToMove, newPage);
+                                await checkPageOverflow(newPage, pageNum + 1);
+                                return;
+                            }
+
+                            // Si es la primera imagen y ESTAMOS al inicio, forzamos dividir en la siguiente
+                            // Nota: Si solo hay 1 imagen y es gigante, w=0, isAtTop=true -> split=1. 1 >= length -> return.
+                            // Esto evita bucle infinito para imágenes gigantes.
+                            const splitIndex = (w === 0 && isAtTop) ? 1 : w;
+
+                            if (splitIndex >= wrappers.length) {
+                                console.warn("Imagen gigante al inicio no se puede dividir más.");
+                                return;
+                            }
+
+                            console.log(`Dividiendo columna de imágenes en índice ${splitIndex}`);
+                            const newPage = createNewPageFrom(page);
+                            const nextNum = pageNum + 1;
+                            const pageVal = newPage.querySelector('.page-val');
+                            if (pageVal) pageVal.textContent = nextNum;
+
+                            // 1. Crear nueva columna de imágenes en la nueva página
+                            const contentWrapper = newPage.querySelector('.content-wrapper');
+                            const footer = contentWrapper.querySelector('footer');
+
+                            // Clonar contenedor vacío
+                            const newImagesColumn = child.cloneNode(false); // false = no clonar hijos deep
+                            contentWrapper.insertBefore(newImagesColumn, footer);
+
+                            // 2. Mover wrappers restantes
+                            const remainingWrappers = wrappers.slice(splitIndex);
+                            remainingWrappers.forEach(r => newImagesColumn.appendChild(r));
+
+                            // 3. Mover hermanos siguientes
+                            const nextSiblings = children.slice(i + 1);
+                            if (nextSiblings.length > 0) {
+                                moveSiblingsToPage(nextSiblings, newPage);
+                            }
+
+                            await checkPageOverflow(newPage, pageNum + 1);
+                            return;
+                        }
+                    }
+                }
+                // CASO 2: Bloques Normales (Totales, Notas, etc.)
+                else {
+                    if (relativeBottom > limit) {
+                        // PREVENCIÓN DE BUCLE INFINITO PARA BLOQUES NORMALES
+                        // Si este bloque es el primero de la página (más allá del header), y aún así desborda,
+                        // NO intentamos moverlo, porque en la nueva página pasará exactamente lo mismo.
+                        const startOfContent = children.findIndex(c => !c.classList.contains('top-bar') && c.tagName !== 'HEADER');
+                        if (i === startOfContent) {
+                            console.warn(`Bloque ${child.className || child.tagName} desborda al inicio de página. No se puede mover. Deteniendo paginación.`);
+                            return;
+                        }
+
+                        // console.log(`Desbordamiento detectado en bloque ${child.className}. Creando página ${pageNum + 1}`);
+                        const newPage = createNewPageFrom(page);
+                        const nextNum = pageNum + 1;
+                        const pageVal = newPage.querySelector('.page-val');
+                        if (pageVal) pageVal.textContent = nextNum;
+
+                        // ESPECIAL: Si el bloque que se mueve es financial-group (o un summary suelto antiguo), 
+                        // también mover la última fila de la tabla para que vayan juntos
+                        let elementsToMove = children.slice(i);
+
+                        const isFinancialBlock = child.classList.contains('financial-group') || child.classList.contains('financial-summary');
+
+                        if (isFinancialBlock) {
+                            // Buscar la tabla anterior
+                            const tableContainer = children.slice(0, i).reverse().find(el => el.classList.contains('table-container'));
+                            if (tableContainer) {
+                                const tbody = tableContainer.querySelector('tbody');
+                                const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                                // Si hay al menos una fila, mover la última
+                                if (rows.length > 0) {
+                                    console.log('Financial Group forzando movimiento de última fila de tabla.');
+                                    const lastRow = rows[rows.length - 1];
+
+                                    // Preparar nueva página con tabla
+                                    const targetContentWrapper = newPage.querySelector('.content-wrapper');
+                                    const targetFooter = targetContentWrapper.querySelector('footer');
+
+                                    let targetTableContainer = targetContentWrapper.querySelector('.table-container');
+                                    if (!targetTableContainer) {
+                                        targetTableContainer = tableContainer.cloneNode(true);
+                                        targetTableContainer.querySelector('tbody').innerHTML = '';
+                                        targetContentWrapper.insertBefore(targetTableContainer, targetFooter);
+                                    }
+
+                                    // Mover la última fila a la nueva página
+                                    const targetTbody = targetTableContainer.querySelector('tbody');
+                                    targetTbody.appendChild(lastRow);
+                                }
+                            }
+                        }
+
+                        // Mover este bloque y todos los siguientes
+                        moveSiblingsToPage(elementsToMove, newPage);
+
+                        await checkPageOverflow(newPage, pageNum + 1);
+                        return;
+                    }
+                }
+            }
+            // console.log(`Página ${pageNum} verificada, sin más desbordamientos.`);
+        }
+
+        function createNewPageFrom(originalPage) {
+            const newPage = originalPage.cloneNode(true);
+            const contentWrapper = newPage.querySelector('.content-wrapper');
+
+            // Limpiar contenido principal para recibir solo lo movido
+            // Mantenemos Header y Footer intactos
+            const contentSelectors = ['.client-card', '.main-section', '.table-container', '.financial-summary', '.financial-group', '.images-column', '.table-container-alcance-table', '.form-section', '.closing-section']; // ADDED form-section and closing-section
+            contentSelectors.forEach(sel => {
+                const els = contentWrapper.querySelectorAll(sel);
+                els.forEach(e => e.remove());
+            });
+
+            document.body.appendChild(newPage);
+            return newPage;
+        }
+
+        function moveTableRowsToPage(rows, targetPage, originalTableContainer) {
+            const contentWrapper = targetPage.querySelector('.content-wrapper');
+            const footer = contentWrapper.querySelector('footer');
+
+            // Crear wrapper de tabla si no existe
+            let targetTableContainer = contentWrapper.querySelector('.table-container');
+            if (!targetTableContainer) {
+                targetTableContainer = originalTableContainer.cloneNode(true);
+                // Limpiar tbody
+                targetTableContainer.querySelector('tbody').innerHTML = '';
+                // Insertar ANTES del footer
+                contentWrapper.insertBefore(targetTableContainer, footer);
+            }
+
+            const tbody = targetTableContainer.querySelector('tbody');
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function moveSiblingsToPage(elements, targetPage) {
+            const contentWrapper = targetPage.querySelector('.content-wrapper');
+            const footer = contentWrapper.querySelector('footer');
+
+            elements.forEach(el => {
+                // Verificar que sea un nodo elemento y no el footer ni script
+                if (el.nodeType === 1 && el.tagName !== 'SCRIPT' && el !== footer) {
+                    contentWrapper.insertBefore(el, footer);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

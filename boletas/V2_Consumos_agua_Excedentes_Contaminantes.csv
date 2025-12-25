@@ -1,0 +1,267 @@
+Plaza,Nombre,Local,fecha_lectura,lectura,lectura_anterior,consumo,mes_consumo,excedentes_contaminantes,precio_m3,precio,iva,precio_total,cuota_boleta,concepto_pago
+plaza kentro,"HSBC MEXICO S,A, DE C,V,",1,29/08/2025,147.39,,,Agosto,no,,,,,,L-1-Agosto
+plaza kentro,"HSBC MEXICO S,A, DE C,V,",1,29/09/2025,149.9,147.39,2.51,Septiembre,no,,,,,,L-1-Septiembre
+plaza kentro,"HSBC MEXICO S,A, DE C,V,",1,01/11/2025,152.54,149.9,2.64,Octubre,no,,,,,,L-1-Octubre
+plaza kentro,"HSBC MEXICO S,A, DE C,V,",2,29/08/2025,2441.01,,,Agosto,no,,,,,,L-2-Agosto
+plaza kentro,"HSBC MEXICO S,A, DE C,V,",2,29/09/2025,2535.67,2441.01,94.66,Septiembre,no,,,,,,L-2-Septiembre
+plaza kentro,"HSBC MEXICO S,A, DE C,V,",2,01/11/2025,2558.33,2535.67,22.66,Octubre,no,,,,,,L-2-Octubre
+plaza kentro,GP GASTRONIMICA PREMIUM SA DE CV,3,29/08/2025,238.63,,,Agosto,no,,,,,,L-3-Agosto
+plaza kentro,GP GASTRONIMICA PREMIUM SA DE CV,3,29/09/2025,241.04,238.63,2.41,Septiembre,no,,,,,,L-3-Septiembre
+plaza kentro,GP GASTRONIMICA PREMIUM SA DE CV,3,01/11/2025,243.27,241.04,2.23,Octubre,no,,,,,,L-3-Octubre
+plaza kentro,FARMACOS ESPECIALIZADOS SA DECV,4,29/08/2025,276.56,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-4-Agosto
+plaza kentro,FARMACOS ESPECIALIZADOS SA DECV,4,29/09/2025,280.07,276.56,3.51,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-4-Septiembre
+plaza kentro,FARMACOS ESPECIALIZADOS SA DECV,4,01/11/2025,283.51,280.07,3.44,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-4-Octubre
+plaza kentro,FARMACOS ESPECIALIZADOS SA DECV,4,30/11/2025,286.66,283.51,3.15,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-4-Noviembre
+plaza kentro,COMERCIALIZADORA PERSIANAS GABIN SA DE CV,5,29/08/2025,86.66,,,Agosto,no,,,,,,L-5-Agosto
+plaza kentro,COMERCIALIZADORA PERSIANAS GABIN SA DE CV,5,29/09/2025,88.08,86.66,1.42,Septiembre,no,,,,,,L-5-Septiembre
+plaza kentro,COMERCIALIZADORA PERSIANAS GABIN SA DE CV,5,01/11/2025,89.42,88.08,1.34,Octubre,no,,,,,,L-5-Octubre
+plaza kentro,ARRENDADORA SHEL HA SA DE CV,6,29/08/2025,238.1,,,Agosto,no,,,,,,L-6-Agosto
+plaza kentro,ARRENDADORA SHEL HA SA DE CV,6,29/09/2025,238.83,238.1,0.73,Septiembre,no,,,,,,L-6-Septiembre
+plaza kentro,ARRENDADORA SHEL HA SA DE CV,6,01/11/2025,239.75,238.83,0.92,Octubre,no,,,,,,L-6-Octubre
+plaza kentro,SUMINISTROS TACTICOS,7,29/08/2025,2.0,,,Agosto,no,,,,,,L-7-Agosto
+plaza kentro,SUMINISTROS TACTICOS,7,29/09/2025,2.14,2.0,0.14,Septiembre,no,,,,,,L-7-Septiembre
+plaza kentro,SUMINISTROS TACTICOS,7,01/11/2025,2.19,2.14,0.05,Octubre,no,,,,,,L-7-Octubre
+plaza kentro,MANUEL GERRA BELLEGO,8,29/08/2025,75.86,,,Agosto,no,,,,,,L-8-Agosto
+plaza kentro,MANUEL GERRA BELLEGO,8,29/09/2025,76.21,75.86,0.35,Septiembre,no,,,,,,L-8-Septiembre
+plaza kentro,MANUEL GERRA BELLEGO,8,01/11/2025,77.38,76.21,1.17,Octubre,no,,,,,,L-8-Octubre
+plaza kentro,SANTANDER MEXICO S.A. DE C.V,11,29/08/2025,674.61,,,Agosto,no,,,,,,L-11-Agosto
+plaza kentro,SANTANDER MEXICO S.A. DE C.V,11,29/09/2025,707.32,674.61,32.71,Septiembre,no,,,,,,L-11-Septiembre
+plaza kentro,SANTANDER MEXICO S.A. DE C.V,11,01/11/2025,720.42,707.32,13.1,Octubre,no,,,,,,L-11-Octubre
+plaza kentro,UNIFORMES MEDICOS,13,29/08/2025,97.94,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-13-Agosto
+plaza kentro,UNIFORMES MEDICOS,13,29/09/2025,100.46,97.94,2.52,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-13-Septiembre
+plaza kentro,UNIFORMES MEDICOS,13,01/11/2025,103.17,100.46,2.71,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-13-Octubre
+plaza kentro,UNIFORMES MEDICOS,13,30/11/2025,105.32,103.17,2.15,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-13-Noviembre
+plaza kentro,DULCE HABITO,14,29/08/2025,241.15,,,Agosto,no,,,,,,L-14-Agosto
+plaza kentro,DULCE HABITO,14,29/09/2025,247.2,241.15,6.05,Septiembre,no,,,,,,L-14-Septiembre
+plaza kentro,DULCE HABITO,14,01/11/2025,254.86,247.2,7.66,Octubre,no,,,,,,L-14-Octubre
+plaza kentro,Z&B CASH CENTRO CAMBIARIO,16,29/08/2025,156.92,,,Agosto,no,,,,,,L-16-Agosto
+plaza kentro,Z&B CASH CENTRO CAMBIARIO,16,29/09/2025,162.19,156.92,5.27,Septiembre,no,,,,,,L-16-Septiembre
+plaza kentro,Z&B CASH CENTRO CAMBIARIO,16,01/11/2025,162.97,162.19,0.78,Octubre,no,,,,,,L-16-Octubre
+plaza kentro,DSP ESPECIALISTAS,17,29/08/2025,7.37,,,Agosto,no,,,,,,L-17-Agosto
+plaza kentro,DSP ESPECIALISTAS,17,29/09/2025,14.74,7.37,7.37,Septiembre,no,,,,,,L-17-Septiembre
+plaza kentro,DSP ESPECIALISTAS,17,01/11/2025,21.31,14.74,6.57,Octubre,no,,,,,,L-17-Octubre
+plaza kentro,BBVA BANCOMER S.A.,18,29/08/2025,469.65,,,Agosto,no,,,,,,L-18-Agosto
+plaza kentro,BBVA BANCOMER S.A.,18,29/09/2025,476.18,469.65,6.53,Septiembre,no,,,,,,L-18-Septiembre
+plaza kentro,BBVA BANCOMER S.A.,18,01/11/2025,485.83,476.18,9.65,Octubre,no,,,,,,L-18-Octubre
+plaza kentro,TOMA CERRADA,19,29/08/2025,0.08,,,Agosto,no,,,,,,L-19-Agosto
+plaza kentro,TOMA CERRADA,19,29/09/2025,0.0,0.08,-0.08,Septiembre,no,,,,,,L-19-Septiembre
+plaza kentro,TOMA CERRADA,19,01/11/2025,0.08,0.0,0.08,Octubre,no,,,,,,L-19-Octubre
+plaza kentro,TOMA CERRADA,20,29/08/2025,0.07,,,Agosto,no,,,,,,L-20-Agosto
+plaza kentro,TOMA CERRADA,20,29/09/2025,0.0,0.07,-0.07,Septiembre,no,,,,,,L-20-Septiembre
+plaza kentro,TOMA CERRADA,20,01/11/2025,0.07,0.0,0.07,Octubre,no,,,,,,L-20-Octubre
+plaza kentro,GRUPO ALLEGUE,22,29/08/2025,301.43,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-22-Agosto
+plaza kentro,GRUPO ALLEGUE,22,29/09/2025,441.42,301.43,139.99,Septiembre,si,74.0,10359.26,1657.48,12016.74,Costo m3 por contaminantes: ,L-22-Septiembre
+plaza kentro,GRUPO ALLEGUE,22,01/11/2025,569.03,441.42,127.61,Octubre,si,74.0,9443.14,1510.9,10954.04,Costo m3 por contaminantes: ,L-22-Octubre
+plaza kentro,GRUPO ALLEGUE,22,30/11/2025,704.03,569.03,135.0,Noviembre,si,74.0,9990.0,1598.4,11588.4,Costo m3 por contaminantes: ,L-22-Noviembre
+plaza kentro,GRUPO ALLEGUE,23,29/08/2025,0.16,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-23-Agosto
+plaza kentro,GRUPO ALLEGUE,23,29/09/2025,0.16,0.16,0.0,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-23-Septiembre
+plaza kentro,GRUPO ALLEGUE,23,01/11/2025,0.16,0.16,0.0,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-23-Octubre
+plaza kentro,GRUPO ALLEGUE,23,30/11/2025,0.16,0.16,0.0,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-23-Noviembre
+plaza kentro,GRUPO ALLEGUE,24,29/08/2025,271.32,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-24-Agosto
+plaza kentro,GRUPO ALLEGUE,24,29/09/2025,397.36,271.32,126.04,Septiembre,si,74.0,9326.96,1492.31,10819.27,Costo m3 por contaminantes: ,L-24-Septiembre
+plaza kentro,GRUPO ALLEGUE,24,01/11/2025,511.83,397.36,114.47,Octubre,si,74.0,8470.78,1355.32,9826.1,Costo m3 por contaminantes: ,L-24-Octubre
+plaza kentro,GRUPO ALLEGUE,24,30/11/2025,636.83,511.83,125.0,Noviembre,si,74.0,9250.0,1480.0,10730.0,Costo m3 por contaminantes: ,L-24-Noviembre
+plaza kentro,BUFALO WILD WINS,104,29/08/2025,235.76,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-104-Agosto
+plaza kentro,BUFALO WILD WINS,104,29/09/2025,477.39,235.76,241.63,Septiembre,si,74.0,17880.62,2860.9,20741.52,Costo m3 por contaminantes: ,L-104-Septiembre
+plaza kentro,BUFALO WILD WINS,104,01/11/2025,635.09,477.39,157.7,Octubre,si,74.0,11669.8,1867.17,13536.97,Costo m3 por contaminantes: ,L-104-Octubre
+plaza kentro,BUFALO WILD WINS,104,30/11/2025,835.09,635.09,200.0,Noviembre,si,74.0,14800.0,2368.0,17168.0,Costo m3 por contaminantes: ,L-104-Noviembre
+plaza kentro,LABORATORIO,105,29/08/2025,131.09,,,Agosto,no,,,,,,L-105-Agosto
+plaza kentro,LABORATORIO,105,29/09/2025,131.86,131.09,0.77,Septiembre,no,,,,,,L-105-Septiembre
+plaza kentro,LABORATORIO,105,01/11/2025,134.38,131.86,2.52,Octubre,no,,,,,,L-105-Octubre
+plaza kentro,FAJAS COLOMBIANAS,106,29/08/2025,101.1,,,Agosto,no,,,,,,L-106-Agosto
+plaza kentro,FAJAS COLOMBIANAS,106,29/09/2025,101.82,101.1,0.72,Septiembre,no,,,,,,L-106-Septiembre
+plaza kentro,FAJAS COLOMBIANAS,106,01/11/2025,102.83,101.82,1.01,Octubre,no,,,,,,L-106-Octubre
+plaza kentro,MUSICAL FAMA,107,29/08/2025,52.58,,,Agosto,no,,,,,,L-107-Agosto
+plaza kentro,MUSICAL FAMA,107,29/09/2025,55.6,52.58,3.02,Septiembre,no,,,,,,L-107-Septiembre
+plaza kentro,MUSICAL FAMA,107,01/11/2025,58.33,55.6,2.73,Octubre,no,,,,,,L-107-Octubre
+plaza kentro,MONZANI,108,29/08/2025,247.84,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-108-Agosto
+plaza kentro,MONZANI,108,29/09/2025,250.54,247.84,2.7,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-108-Septiembre
+plaza kentro,MONZANI,108,01/11/2025,253.78,250.54,3.24,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-108-Octubre
+plaza kentro,MONZANI,108,30/11/2025,256.78,253.78,3.0,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-108-Noviembre
+plaza kentro,INMOBILIARIA JPAZ,109,29/08/2025,31.41,,,Agosto,no,,,,,,L-109-Agosto
+plaza kentro,INMOBILIARIA JPAZ,109,29/09/2025,33.93,31.41,2.52,Septiembre,no,,,,,,L-109-Septiembre
+plaza kentro,INMOBILIARIA JPAZ,109,01/11/2025,35.71,33.93,1.78,Octubre,no,,,,,,L-109-Octubre
+plaza kentro,GRUPO PEDIATRICO DE PUEBLA SC,110,29/08/2025,48.42,,,Agosto,no,,,,,,L-110-Agosto
+plaza kentro,GRUPO PEDIATRICO DE PUEBLA SC,110,29/09/2025,48.65,48.42,0.23,Septiembre,no,,,,,,L-110-Septiembre
+plaza kentro,GRUPO PEDIATRICO DE PUEBLA SC,110,01/11/2025,49.44,48.65,0.79,Octubre,no,,,,,,L-110-Octubre
+plaza kentro,IDEAS EKA,111,29/08/2025,36.49,,,Agosto,no,,,,,,L-111-Agosto
+plaza kentro,IDEAS EKA,111,29/09/2025,38.15,36.49,1.66,Septiembre,no,,,,,,L-111-Septiembre
+plaza kentro,IDEAS EKA,111,01/11/2025,39.95,38.15,1.8,Octubre,no,,,,,,L-111-Octubre
+plaza kentro,LUIS MANUEL ORTIZ,112,29/08/2025,325.01,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-112-Agosto
+plaza kentro,LUIS MANUEL ORTIZ,112,29/09/2025,336.8,325.01,11.79,Septiembre,si,74.0,872.46,139.59,1012.05,Costo m3 por contaminantes: ,L-112-Septiembre
+plaza kentro,LUIS MANUEL ORTIZ,112,01/11/2025,348.2,336.8,11.4,Octubre,si,74.0,843.6,134.98,978.58,Costo m3 por contaminantes: ,L-112-Octubre
+plaza kentro,LUIS MANUEL ORTIZ,112,30/11/2025,359.75,348.2,11.55,Noviembre,si,74.0,854.7,136.75,991.45,Costo m3 por contaminantes: ,L-112-Noviembre
+plaza kentro,,113,29/08/2025,7.67,,,Agosto,no,,,,,,L-113-Agosto
+plaza kentro,,113,29/09/2025,8.42,7.67,0.75,Septiembre,no,,,,,,L-113-Septiembre
+plaza kentro,,113,01/11/2025,9.07,8.42,0.65,Octubre,no,,,,,,L-113-Octubre
+plaza kentro,COSMETICOS,114,29/08/2025,48.94,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-114-Agosto
+plaza kentro,COSMETICOS,114,29/09/2025,49.17,48.94,0.23,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-114-Septiembre
+plaza kentro,COSMETICOS,114,01/11/2025,49.27,49.17,0.1,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-114-Octubre
+plaza kentro,COSMETICOS,114,30/11/2025,49.52,49.27,0.25,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-114-Noviembre
+plaza kentro,KEIKO KATAGIRI KATAGIRI,115,29/08/2025,41.47,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-115-Agosto
+plaza kentro,KEIKO KATAGIRI KATAGIRI,115,29/09/2025,43.9,41.47,2.43,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-115-Septiembre
+plaza kentro,KEIKO KATAGIRI KATAGIRI,115,01/11/2025,49.52,43.9,5.62,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-115-Octubre
+plaza kentro,KEIKO KATAGIRI KATAGIRI,115,30/11/2025,49.52,49.52,0.0,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-115-Noviembre
+plaza kentro,ELECTRONICA,116,29/08/2025,29.68,,,Agosto,no,,,,,,L-116-Agosto
+plaza kentro,ELECTRONICA,116,29/09/2025,31.25,29.68,1.57,Septiembre,no,,,,,,L-116-Septiembre
+plaza kentro,ELECTRONICA,116,01/11/2025,32.99,31.25,1.74,Octubre,no,,,,,,L-116-Octubre
+plaza kentro,EMI LEE,117,29/08/2025,493.82,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-117-Agosto
+plaza kentro,EMI LEE,117,29/09/2025,498.99,493.82,5.17,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-117-Septiembre
+plaza kentro,EMI LEE,117,01/11/2025,501.94,498.99,2.95,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-117-Octubre
+plaza kentro,EMI LEE,117,30/11/2025,506.94,501.94,5.0,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-117-Noviembre
+plaza kentro,ESTETICA VIA 33,118,29/08/2025,1832.83,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-118-Agosto
+plaza kentro,ESTETICA VIA 33,118,29/09/2025,1873.36,1832.83,40.53,Septiembre,si,74.0,2999.22,479.88,3479.1,Costo m3 por contaminantes: ,L-118-Septiembre
+plaza kentro,ESTETICA VIA 33,118,01/11/2025,1920.24,1873.36,46.88,Octubre,si,74.0,3469.12,555.06,4024.18,Costo m3 por contaminantes: ,L-118-Octubre
+plaza kentro,ESTETICA VIA 33,118,30/11/2025,1968.14,1920.24,47.9,Noviembre,si,74.0,3544.6,567.14,4111.74,Costo m3 por contaminantes: ,L-118-Noviembre
+plaza kentro,ESTETICA VIA 33,119,29/08/2025,18.78,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-119-Agosto
+plaza kentro,ESTETICA VIA 33,119,29/09/2025,69.28,18.78,50.5,Septiembre,si,74.0,3737.0,597.92,4334.92,Costo m3 por contaminantes: ,L-119-Septiembre
+plaza kentro,ESTETICA VIA 33,119,01/11/2025,123.51,69.28,54.23,Octubre,si,74.0,4013.02,642.08,4655.1,Costo m3 por contaminantes: ,L-119-Octubre
+plaza kentro,ESTETICA VIA 33,119,30/11/2025,176.71,123.51,53.2,Noviembre,si,74.0,3936.8,629.89,4566.69,Costo m3 por contaminantes: ,L-119-Noviembre
+plaza kentro,JERICO AVALOS GRANIEL,120,29/08/2025,12.37,,,Agosto,no,,,,,,L-120-Agosto
+plaza kentro,JERICO AVALOS GRANIEL,120,29/09/2025,12.85,12.37,0.48,Septiembre,no,,,,,,L-120-Septiembre
+plaza kentro,JERICO AVALOS GRANIEL,120,01/11/2025,17.26,12.85,4.41,Octubre,no,,,,,,L-120-Octubre
+plaza kentro,GRACIELA MARQUEZ SANTAMARIA,122,29/08/2025,93.11,,,Agosto,no,,,,,,L-122-Agosto
+plaza kentro,GRACIELA MARQUEZ SANTAMARIA,122,29/09/2025,93.38,93.11,0.27,Septiembre,no,,,,,,L-122-Septiembre
+plaza kentro,GRACIELA MARQUEZ SANTAMARIA,122,01/11/2025,93.8,93.38,0.42,Octubre,no,,,,,,L-122-Octubre
+plaza kentro,OFICINA DE VENTAS,123,29/08/2025,102.34,,,Agosto,no,,,,,,L-123-Agosto
+plaza kentro,OFICINA DE VENTAS,123,29/09/2025,105.54,102.34,3.2,Septiembre,no,,,,,,L-123-Septiembre
+plaza kentro,OFICINA DE VENTAS,123,01/11/2025,109.09,105.54,3.55,Octubre,no,,,,,,L-123-Octubre
+plaza kentro,,125,29/08/2025,0.27,,,Agosto,no,,,,,,L-125-Agosto
+plaza kentro,,125,29/09/2025,2.98,0.27,2.71,Septiembre,no,,,,,,L-125-Septiembre
+plaza kentro,,125,01/11/2025,4.58,2.98,1.6,Octubre,no,,,,,,L-125-Octubre
+plaza kentro,LUIS JORGE GALAN,129,29/08/2025,33.8,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-129-Agosto
+plaza kentro,LUIS JORGE GALAN,129,29/09/2025,51.48,33.8,17.68,Septiembre,si,74.0,1308.32,209.33,1517.65,Costo m3 por contaminantes: ,L-129-Septiembre
+plaza kentro,LUIS JORGE GALAN,129,01/11/2025,67.79,51.48,16.31,Octubre,si,74.0,1206.94,193.11,1400.05,Costo m3 por contaminantes: ,L-129-Octubre
+plaza kentro,LUIS JORGE GALAN,129,30/11/2025,84.59,67.79,16.8,Noviembre,si,74.0,1243.2,198.91,1442.11,Costo m3 por contaminantes: ,L-129-Noviembre
+plaza kentro,SPA INFANTIL,209,29/08/2025,197.53,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-209-Agosto
+plaza kentro,SPA INFANTIL,209,29/09/2025,213.35,197.53,15.82,Septiembre,si,74.0,1170.68,187.31,1357.99,Costo m3 por contaminantes: ,L-209-Septiembre
+plaza kentro,SPA INFANTIL,209,01/11/2025,236.12,213.35,22.77,Octubre,si,74.0,1684.98,269.6,1954.58,Costo m3 por contaminantes: ,L-209-Octubre
+plaza kentro,SPA INFANTIL,209,30/11/2025,256.92,236.12,20.8,Noviembre,si,74.0,1539.2,246.27,1785.47,Costo m3 por contaminantes: ,L-209-Noviembre
+plaza kentro,BARBERIA,210,29/08/2025,18.8,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-210-Agosto
+plaza kentro,BARBERIA,210,29/09/2025,30.04,18.8,11.24,Septiembre,si,74.0,831.76,133.08,964.84,Costo m3 por contaminantes: ,L-210-Septiembre
+plaza kentro,BARBERIA,210,01/11/2025,41.28,30.04,11.24,Octubre,si,74.0,831.76,133.08,964.84,Costo m3 por contaminantes: ,L-210-Octubre
+plaza kentro,BARBERIA,210,30/11/2025,52.28,41.28,11.0,Noviembre,si,74.0,814.0,130.24,944.24,Costo m3 por contaminantes: ,L-210-Noviembre
+plaza kentro,ALBERTO ESCOBAR,211,29/08/2025,762.65,,,Agosto,no,,,,,,L-211-Agosto
+plaza kentro,ALBERTO ESCOBAR,211,29/09/2025,766.52,762.65,3.87,Septiembre,no,,,,,,L-211-Septiembre
+plaza kentro,ALBERTO ESCOBAR,211,01/11/2025,769.64,766.52,3.12,Octubre,no,,,,,,L-211-Octubre
+plaza kentro,FELIPE PALACIOS,212,29/08/2025,2.8,,,Agosto,no,,,,,,L-212-Agosto
+plaza kentro,FELIPE PALACIOS,212,29/09/2025,4.81,2.8,2.01,Septiembre,no,,,,,,L-212-Septiembre
+plaza kentro,FELIPE PALACIOS,212,01/11/2025,6.39,4.81,1.58,Octubre,no,,,,,,L-212-Octubre
+plaza kentro,,213,29/08/2025,3.62,,,Agosto,no,,,,,,L-213-Agosto
+plaza kentro,,213,29/09/2025,4.57,3.62,0.95,Septiembre,no,,,,,,L-213-Septiembre
+plaza kentro,,213,01/11/2025,5.36,4.57,0.79,Octubre,no,,,,,,L-213-Octubre
+plaza kentro,MARIA FERNANDA GARCIA OLIVARES,214,29/08/2025,103.04,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-214-Agosto
+plaza kentro,MARIA FERNANDA GARCIA OLIVARES,214,29/09/2025,103.87,103.04,0.83,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-214-Septiembre
+plaza kentro,MARIA FERNANDA GARCIA OLIVARES,214,01/11/2025,106.65,103.87,2.78,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-214-Octubre
+plaza kentro,MARIA FERNANDA GARCIA OLIVARES,214,30/11/2025,108.65,106.65,2.0,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-214-Noviembre
+plaza kentro,SUNPOWER CAPITAL SAP SA DE CV,215,29/08/2025,18.52,,,Agosto,no,,,,,,L-215-Agosto
+plaza kentro,SUNPOWER CAPITAL SAP SA DE CV,215,29/09/2025,19.91,18.52,1.39,Septiembre,no,,,,,,L-215-Septiembre
+plaza kentro,SUNPOWER CAPITAL SAP SA DE CV,215,01/11/2025,21.36,19.91,1.45,Octubre,no,,,,,,L-215-Octubre
+plaza kentro,DENTISTA,216,29/08/2025,9.9,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-216-Agosto
+plaza kentro,DENTISTA,216,29/09/2025,10.88,9.9,0.98,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-216-Septiembre
+plaza kentro,DENTISTA,216,01/11/2025,20.6,10.88,9.72,Octubre,si,74.0,719.28,115.08,834.36,Costo m3 por contaminantes: ,L-216-Octubre
+plaza kentro,DENTISTA,216,30/11/2025,25.4,20.6,4.8,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-216-Noviembre
+plaza kentro,KARIME CALDERAS,217,29/08/2025,59.11,,,Agosto,no,,,,,,L-217-Agosto
+plaza kentro,KARIME CALDERAS,217,29/09/2025,63.24,59.11,4.13,Septiembre,no,,,,,,L-217-Septiembre
+plaza kentro,KARIME CALDERAS,217,01/11/2025,67.24,63.24,4.0,Octubre,no,,,,,,L-217-Octubre
+plaza kentro,JOSE LUIS OCTAVIO BELLO,218,29/08/2025,8.48,,,Agosto,no,,,,,,L-218-Agosto
+plaza kentro,JOSE LUIS OCTAVIO BELLO,218,29/09/2025,8.86,8.48,0.38,Septiembre,no,,,,,,L-218-Septiembre
+plaza kentro,JOSE LUIS OCTAVIO BELLO,218,01/11/2025,9.34,8.86,0.48,Octubre,no,,,,,,L-218-Octubre
+plaza kentro,GRETHA DANIELLA NIETO GARCIA,219,29/08/2025,63.46,,,Agosto,no,,,,,,L-219-Agosto
+plaza kentro,GRETHA DANIELLA NIETO GARCIA,219,29/09/2025,65.47,63.46,2.01,Septiembre,no,,,,,,L-219-Septiembre
+plaza kentro,GRETHA DANIELLA NIETO GARCIA,219,01/11/2025,67.2,65.47,1.73,Octubre,no,,,,,,L-219-Octubre
+plaza kentro,ESFERA MAGICA,220,29/08/2025,0.0,,,Agosto,no,,,,,,L-220-Agosto
+plaza kentro,ESFERA MAGICA,220,29/09/2025,0.04,0.0,0.04,Septiembre,no,,,,,,L-220-Septiembre
+plaza kentro,ESFERA MAGICA,220,01/11/2025,0.04,0.04,0.0,Octubre,no,,,,,,L-220-Octubre
+plaza kentro,ESFERA MAGICA,221,29/08/2025,17.7,,,Agosto,no,,,,,,L-221-Agosto
+plaza kentro,ESFERA MAGICA,221,29/09/2025,35.55,17.7,17.85,Septiembre,no,,,,,,L-221-Septiembre
+plaza kentro,ESFERA MAGICA,221,01/11/2025,56.13,35.55,20.58,Octubre,no,,,,,,L-221-Octubre
+plaza kentro,MARIA JOSE PICAZO CALATALLUD,222,29/08/2025,15.25,,,Agosto,no,,,,,,L-222-Agosto
+plaza kentro,MARIA JOSE PICAZO CALATALLUD,222,29/09/2025,19.23,15.25,3.98,Septiembre,no,,,,,,L-222-Septiembre
+plaza kentro,MARIA JOSE PICAZO CALATALLUD,222,01/11/2025,22.55,19.23,3.32,Octubre,no,,,,,,L-222-Octubre
+plaza kentro,,224,29/08/2025,100.05,,,Agosto,no,,,,,,L-224-Agosto
+plaza kentro,,224,29/09/2025,108.68,100.05,8.63,Septiembre,no,,,,,,L-224-Septiembre
+plaza kentro,,224,01/11/2025,116.23,108.68,7.55,Octubre,no,,,,,,L-224-Octubre
+plaza kentro,,227,29/08/2025,6.26,,,Agosto,no,,,,,,L-227-Agosto
+plaza kentro,,227,29/09/2025,7.52,6.26,1.26,Septiembre,no,,,,,,L-227-Septiembre
+plaza kentro,,227,01/11/2025,8.09,7.52,0.57,Octubre,no,,,,,,L-227-Octubre
+plaza kentro,LUIS RENE SALAZAR MORENO,230,29/08/2025,12.6,,,Agosto,no,,,,,,L-230-Agosto
+plaza kentro,LUIS RENE SALAZAR MORENO,230,29/09/2025,20.24,12.6,7.64,Septiembre,no,,,,,,L-230-Septiembre
+plaza kentro,LUIS RENE SALAZAR MORENO,230,01/11/2025,27.83,20.24,7.59,Octubre,no,,,,,,L-230-Octubre
+plaza kentro,MERINO JIMENEZ COMPAÑÍA CAFETALERA SA DE CV,302,29/08/2025,58.6,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-302-Agosto
+plaza kentro,MERINO JIMENEZ COMPAÑÍA CAFETALERA SA DE CV,302,29/09/2025,93.46,58.6,34.86,Septiembre,si,74.0,2579.64,412.74,2992.38,Costo m3 por contaminantes: ,L-302-Septiembre
+plaza kentro,MERINO JIMENEZ COMPAÑÍA CAFETALERA SA DE CV,302,01/11/2025,127.22,93.46,33.76,Octubre,si,74.0,2498.24,399.72,2897.96,Costo m3 por contaminantes: ,L-302-Octubre
+plaza kentro,MERINO JIMENEZ COMPAÑÍA CAFETALERA SA DE CV,302,30/11/2025,160.22,127.22,33.0,Noviembre,si,74.0,2442.0,390.72,2832.72,Costo m3 por contaminantes: ,L-302-Noviembre
+plaza kentro,MARIA EUGENIA HERNANDEZ DOMINGUEZ,303,29/08/2025,116.92,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-303-Agosto
+plaza kentro,MARIA EUGENIA HERNANDEZ DOMINGUEZ,303,29/09/2025,119.42,116.92,2.5,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-303-Septiembre
+plaza kentro,MARIA EUGENIA HERNANDEZ DOMINGUEZ,303,01/11/2025,121.89,119.42,2.47,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-303-Octubre
+plaza kentro,MARIA EUGENIA HERNANDEZ DOMINGUEZ,303,30/11/2025,124.29,121.89,2.4,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-303-Noviembre
+plaza kentro,JOSE ERNESTO MAZANTLE CRUZ,304,29/08/2025,15.54,,,Agosto,no,,,,,,L-304-Agosto
+plaza kentro,JOSE ERNESTO MAZANTLE CRUZ,304,29/09/2025,16.43,15.54,0.89,Septiembre,no,,,,,,L-304-Septiembre
+plaza kentro,JOSE ERNESTO MAZANTLE CRUZ,304,01/11/2025,17.74,16.43,1.31,Octubre,no,,,,,,L-304-Octubre
+plaza kentro,JAIME ACCO GIMNASIO,308,29/08/2025,0.0,,,Agosto,no,,,,,,L-308-Agosto
+plaza kentro,JAIME ACCO GIMNASIO,308,29/09/2025,0.0,0.0,0.0,Septiembre,no,,,,,,L-308-Septiembre
+plaza kentro,JAIME ACCO GIMNASIO,308,01/11/2025,0.0,0.0,0.0,Octubre,no,,,,,,L-308-Octubre
+plaza kentro,JAIME ACCO GIMNASIO,309,29/08/2025,2353.01,,,Agosto,no,,,,,,L-309-Agosto
+plaza kentro,JAIME ACCO GIMNASIO,309,29/09/2025,2410.99,2353.01,57.98,Septiembre,no,,,,,,L-309-Septiembre
+plaza kentro,JAIME ACCO GIMNASIO,309,01/11/2025,2478.0,2410.99,67.01,Octubre,no,,,,,,L-309-Octubre
+plaza kentro,ARQUITECTOS,310,29/08/2025,278.6,,,Agosto,no,,,,,,L-310-Agosto
+plaza kentro,ARQUITECTOS,310,29/09/2025,279.18,278.6,0.58,Septiembre,no,,,,,,L-310-Septiembre
+plaza kentro,ARQUITECTOS,310,01/11/2025,279.86,279.18,0.68,Octubre,no,,,,,,L-310-Octubre
+plaza kentro,EDGAR SOSA,311,29/08/2025,183.88,,,Agosto,no,,,,,,L-311-Agosto
+plaza kentro,EDGAR SOSA,311,29/09/2025,195.19,183.88,11.31,Septiembre,no,,,,,,L-311-Septiembre
+plaza kentro,EDGAR SOSA,311,01/11/2025,205.26,195.19,10.07,Octubre,no,,,,,,L-311-Octubre
+plaza kentro,CINTHIA BERNI MELO,312,29/08/2025,104.87,,,Agosto,no,,,,,,L-312-Agosto
+plaza kentro,CINTHIA BERNI MELO,312,29/09/2025,106.48,104.87,1.61,Septiembre,no,,,,,,L-312-Septiembre
+plaza kentro,CINTHIA BERNI MELO,312,01/11/2025,132.1,106.48,25.62,Octubre,no,,,,,,L-312-Octubre
+plaza kentro,GALINDO,313,29/08/2025,2.79,,,Agosto,no,,,,,,L-313-Agosto
+plaza kentro,GALINDO,313,29/09/2025,4.28,2.79,1.49,Septiembre,no,,,,,,L-313-Septiembre
+plaza kentro,GALINDO,313,01/11/2025,5.61,4.28,1.33,Octubre,no,,,,,,L-313-Octubre
+plaza kentro,GALINDO,314,29/08/2025,94.98,,,Agosto,no,,,,,,L-314-Agosto
+plaza kentro,GALINDO,314,29/09/2025,96.67,94.98,1.69,Septiembre,no,,,,,,L-314-Septiembre
+plaza kentro,GALINDO,314,01/11/2025,99.12,96.67,2.45,Octubre,no,,,,,,L-314-Octubre
+plaza kentro,EUGENIO GALINDO,315,29/08/2025,131.72,,,Agosto,no,,,,,,L-315-Agosto
+plaza kentro,EUGENIO GALINDO,315,29/09/2025,135.63,131.72,3.91,Septiembre,no,,,,,,L-315-Septiembre
+plaza kentro,EUGENIO GALINDO,315,01/11/2025,140.42,135.63,4.79,Octubre,no,,,,,,L-315-Octubre
+plaza kentro,MARIA GUADALUPE CAMPOS,316,29/08/2025,104.98,,,Agosto,no,,,,,,L-316-Agosto
+plaza kentro,MARIA GUADALUPE CAMPOS,316,29/09/2025,105.54,104.98,0.56,Septiembre,no,,,,,,L-316-Septiembre
+plaza kentro,MARIA GUADALUPE CAMPOS,316,01/11/2025,106.28,105.54,0.74,Octubre,no,,,,,,L-316-Octubre
+plaza kentro,MARIA INES WILLIAMS,318,29/08/2025,33.52,,,Agosto,no,,,,,,L-318-Agosto
+plaza kentro,MARIA INES WILLIAMS,318,29/09/2025,34.37,33.52,0.85,Septiembre,no,,,,,,L-318-Septiembre
+plaza kentro,MARIA INES WILLIAMS,318,01/11/2025,35.39,34.37,1.02,Octubre,no,,,,,,L-318-Octubre
+plaza kentro,,319,29/08/2025,93.3,,,Agosto,no,,,,,,L-319-Agosto
+plaza kentro,,319,29/09/2025,101.02,93.3,7.72,Septiembre,no,,,,,,L-319-Septiembre
+plaza kentro,,319,01/11/2025,107.52,101.02,6.5,Octubre,no,,,,,,L-319-Octubre
+plaza kentro,BEATRIZ ALEJANDRA REMES,320,29/08/2025,8.59,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-320-Agosto
+plaza kentro,BEATRIZ ALEJANDRA REMES,320,29/09/2025,12.92,8.59,4.33,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-320-Septiembre
+plaza kentro,BEATRIZ ALEJANDRA REMES,320,01/11/2025,17.69,12.92,4.77,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-320-Octubre
+plaza kentro,BEATRIZ ALEJANDRA REMES,320,30/11/2025,21.89,17.69,4.2,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-320-Noviembre
+plaza kentro,GIRONA ANDROLIGIC,321,29/08/2025,49.83,,,Agosto,no,,,,,,L-321-Agosto
+plaza kentro,GIRONA ANDROLIGIC,321,29/09/2025,50.14,49.83,0.31,Septiembre,no,,,,,,L-321-Septiembre
+plaza kentro,GIRONA ANDROLIGIC,321,01/11/2025,54.45,50.14,4.31,Octubre,no,,,,,,L-321-Octubre
+plaza kentro,SPA UÑAS,322,29/08/2025,255.12,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-322-Agosto
+plaza kentro,SPA UÑAS,322,29/09/2025,259.13,255.12,4.01,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-322-Septiembre
+plaza kentro,SPA UÑAS,322,01/11/2025,273.83,259.13,14.7,Octubre,si,74.0,1087.8,174.05,1261.85,Costo m3 por contaminantes: ,L-322-Octubre
+plaza kentro,SPA UÑAS,322,30/11/2025,287.63,273.83,13.8,Noviembre,si,74.0,1021.2,163.39,1184.59,Costo m3 por contaminantes: ,L-322-Noviembre
+plaza kentro,OPERADORA REDUCE NUTRICION DAY SPA SCHIEDECK SA CV,323,29/08/2025,821.32,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-323-Agosto
+plaza kentro,OPERADORA REDUCE NUTRICION DAY SPA SCHIEDECK SA CV,323,29/09/2025,829.45,821.32,8.13,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-323-Septiembre
+plaza kentro,OPERADORA REDUCE NUTRICION DAY SPA SCHIEDECK SA CV,323,01/11/2025,837.62,829.45,8.17,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-323-Octubre
+plaza kentro,OPERADORA REDUCE NUTRICION DAY SPA SCHIEDECK SA CV,323,30/11/2025,845.62,837.62,8.0,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-323-Noviembre
+plaza kentro,ARMANDO UROIEL GARCIA,324,29/08/2025,26.01,,,Agosto,no,,,,,,L-324-Agosto
+plaza kentro,ARMANDO UROIEL GARCIA,324,29/09/2025,26.68,26.01,0.67,Septiembre,no,,,,,,L-324-Septiembre
+plaza kentro,ARMANDO UROIEL GARCIA,324,01/11/2025,27.08,26.68,0.4,Octubre,no,,,,,,L-324-Octubre
+plaza kentro,ALBERTO RODRIGUEZ,325,29/08/2025,536.08,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-325-Agosto
+plaza kentro,ALBERTO RODRIGUEZ,325,29/09/2025,540.37,536.08,4.29,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-325-Septiembre
+plaza kentro,ALBERTO RODRIGUEZ,325,01/11/2025,544.44,540.37,4.07,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-325-Octubre
+plaza kentro,ALBERTO RODRIGUEZ,325,30/11/2025,548.64,544.44,4.2,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-325-Noviembre
+plaza kentro,RISE UP STUDIO SA DE CV,326,29/08/2025,275.19,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-326-Agosto
+plaza kentro,RISE UP STUDIO SA DE CV,326,29/09/2025,279.39,275.19,4.2,Septiembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-326-Septiembre
+plaza kentro,RISE UP STUDIO SA DE CV,326,01/11/2025,283.24,279.39,3.85,Octubre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-326-Octubre
+plaza kentro,RISE UP STUDIO SA DE CV,326,30/11/2025,287.14,283.24,3.9,Noviembre,si,74.0,650.0,104.0,754.0,Tarifa Mínima Fija: ,L-326-Noviembre
+plaza kentro,JUAN MANUEL BAEZ,327,29/08/2025,,,,Agosto,no,,,,,,L-327-Agosto
+plaza kentro,JUAN MANUEL BAEZ,327,29/09/2025,1.19,,,Septiembre,no,,,,,,L-327-Septiembre
+plaza kentro,JUAN MANUEL BAEZ,327,01/11/2025,1.67,1.19,0.48,Octubre,no,,,,,,L-327-Octubre
+plaza kentro,BAÑOS,401,29/08/2025,816.51,,,Agosto,si,74.0,,,,Costo m3 por contaminantes: ,L-401-Agosto
+plaza kentro,BAÑOS,401,29/09/2025,856.31,816.51,39.8,Septiembre,si,74.0,2945.2,471.23,3416.43,Costo m3 por contaminantes: ,L-401-Septiembre
+plaza kentro,BAÑOS,401,01/11/2025,895.67,856.31,39.36,Octubre,si,74.0,2912.64,466.02,3378.66,Costo m3 por contaminantes: ,L-401-Octubre
+plaza kentro,BAÑOS,401,30/11/2025,934.67,895.67,39.0,Noviembre,si,74.0,2886.0,461.76,3347.76,Costo m3 por contaminantes: ,L-401-Noviembre

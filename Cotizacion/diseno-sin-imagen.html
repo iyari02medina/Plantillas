@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotización de Servicios - Gestión Hidráulica</title>
+
+    <!-- Fuentes (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+    <!-- Botón Flotante -->
+    <div class="print-btn-container">
+        <button onclick="window.print()" class="btn-print">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Imprimir / PDF
+        </button>
+    </div>
+
+    <!-- Contenedor Principal (Hoja) -->
+    <div class="page-container">
+
+        <!-- Barra Superior -->
+        <div class="top-bar"></div>
+
+        <div class="content-wrapper">
+
+            <!-- Encabezado -->
+            <header>
+                <div class="logo-section">
+                    <div class="logo-box">
+                        <img style="margin-bottom: .5rem;" src="../logo-cophi-negro.jpg" alt="Logo Cophi">
+                        <p>CONTROL DE PROCESOS<br>HIDRAULICOS S.A. DE C.V.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="header-info">
+                    <h1>COTIZACIÓN</h1>
+                    <p class="subtitle" style="overflow-wrap: break-word;">{{ nombre_cot }}</p>
+                    <div class="meta-data">
+                        <div>Folio: <span style="font-weight: 600;">{{ folio_cot }}</span></div>
+                        <div>Fecha: <span style="font-weight: 600;">{{ fecha_cot }}</span></div>
+                        <div><span style="font-weight: normal; color: #C0392B;">Fecha de Vencimiento:</span> <span
+                                style="font-weight: 600;">30 días
+                                naturales
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sección Cliente -->
+            <section class="client-card">
+
+                <div class="client-grid">
+                    <div>
+                        <p class="label">Empresa: </p>
+                        <p class="value-lg">{{ nombre_cliente }}</p>
+                        <p class="value-text">{{ direccion_cliente }}</p>
+                    </div>
+                    <div class="client-right-col">
+                        <div style="margin-bottom: 0.75rem;">
+                            <p class="label">Atención a</p>
+                            <p class="value-md">{{ nombre_contacto }}</p>
+                        </div>
+                        <div>
+                            <p class="label">Contacto</p>
+                            <p class="value-text">{{ telefono_contacto }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Detalles del Servicio -->
+            <!-- Imágenes -->
+            <div class="images-column" style="margin-bottom: 1rem;">
+                {% for image_data in unique_images %}
+                <div class="image-wrapper">
+                    <img src="../img/{{ image_data.filename }}" alt="Imagen Referencia"
+                        onerror="this.src='https://placehold.co/600x400/f1f5f9/94a3b8?text=Sin+Imagen';">
+                    <div class="image-caption">{{ image_data.caption }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Detalles del Servicio (Convertido a Tabla para Paginación) -->
+            <div class="table-container-alcance-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                ALCANCE DEL SERVICIO:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for line in alcance_lines %}
+                        <tr style="border-bottom: none;">
+                            <td>
+                                {{ line }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr style="border-bottom: none;">
+                            <td style="padding-bottom: 1rem; border-bottom: none;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tabla de Costos -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 18%;">NOMBRE</th>
+                            <th style="width: 33%;">DESCRIPCIÓN TÉCNICA</th>
+                            <th class="center" style="width: 10%;">UNIDAD</th>
+                            <th class="center" style="width: 8%;">CANT.</th>
+                            <th class="center" style="width: 15.5%;">PRECIO</th>
+                            <th class="center" style="width: 15.5%;">IMPORTE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>
+                                <span class="item-title">{{ item.nombre_item }}</span>
+                            </td>
+                            <td>
+                                <span class="item-desc">
+                                    {{ item.descripcion_item }}
+                                </span>
+                            </td>
+                            <td class="td-center">{{ item.unidad_item }}</td>
+                            <td class="td-bold-center">{{ item.cantidad_item }}</td>
+                            <td class="td-right">$ {{ item.precio_unitario_item }}MXN</td>
+                            <td class="td-bold-right">$ {{ item.importe_item }}MXN</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Resumen Financiero -->
+            <!-- Grupo Financiero Indivisible -->
+            <div class="financial-group">
+                <div class="financial-legal-text">
+                    <div class="legal-text">
+                        <p>Términos y Condiciones</p>
+                        <p>{{ terminos }}</p>
+                    </div>
+                </div>
+                <div class="financial-summary">
+                    <div class="summary-box">
+                        <div class="summary-row">
+                            <span class="font-medium">Subtotal</span>
+                            <span>$ {{ subtotal }}MXN</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="font-medium">IVA (16%)MXN</span>
+                            <span>$ {{ iva }}MXN</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">TOTAL MXN</span>
+                            <span class="total-amount">$ {{ total }}MXN</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="financial-summary">
+                <div class="signature-area">
+                    <div class="signature-line"></div>
+                    <p class="signer-name">{{ gestor }}</p>
+                    <p class="signer-role">{{ puesto_gestor }}</p>
+                </div>
+            </div>
+            <!-- Footer -->
+            <footer>
+                <div class="footer-line">
+                </div>
+                <div class="footer-content">
+                    <div>CONTROL DE PROCESOS
+                        HIDRAULICOS S.A.
+                        DE C.V.</div>
+                    <div>(222)-889-4469</div>
+                    <div>ejecutivo@cophi.mx</div>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateElement = document.getElementById('current-date');
+            if (dateElement) {
+                const today = new Date();
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                // Capitalizar primera letra del mes
+                const dateStr = today.toLocaleDateString('es-MX', options);
+                dateElement.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+            }
+
+            // Ejecutar Paginación con un retraso para asegurar carga de estilos
+            setTimeout(paginateContent, 1000);
+        });
+
+        function paginateContent() {
+            // console.log("Iniciando paginación...");
+            const firstPage = document.querySelector('.page-container');
+            if (!firstPage) return;
+
+            checkPageOverflow(firstPage, 1);
+        }
+
+        function checkPageOverflow(page, pageNum) {
+            if (!pageNum) pageNum = 1;
+
+            // Safety limit
+            if (pageNum > 20) {
+                console.warn("Límite de páginas alcanzado.");
+                return;
+            }
+
+            // console.log(`Verificando desbordamiento en página ${pageNum}...`);
+            const contentWrapper = page.querySelector('.content-wrapper');
+            const footer = page.querySelector('footer');
+            if (!contentWrapper || !footer) return;
+
+            // Constantes para tamaño Carta (27.94cm a 96dpi ~= 1056px)
+            const PAGE_HEIGHT_PX = 1056;
+
+            // Altura real ocupada por el footer
+            const footerHeight = footer.offsetHeight || 150;
+
+            // El límite donde el contenido DEBE detenerse
+            // Footer está posicionado 'bottom: 1rem' (16px) desde el borde inferior
+            // Calculamos el límite más ajustado para aprovechar todo el espacio disponible
+            // Dejamos un buffer de 80px para evitar solapamientos y tener buen espaciado
+            // Verificar si hay imagenes en esta página
+            const hasImages = contentWrapper.querySelector('.images-column img');
+
+            // Si hay imágenes, usamos el margen ajustado que pidió el usuario (-5 -10)
+            // Si no, usamos un margen estándar más seguro (-16 -20)
+            const buffer = hasImages ? 15 : 36;
+            const limit = PAGE_HEIGHT_PX - footerHeight - buffer;
+
+            // console.log(`Límite de corte calculado: ${limit}px`);
+
+            // Obtener elementos de contenido
+            // IMPORTANT: Excluir explícitamente el footer de esta lista para no moverlo
+            const children = Array.from(contentWrapper.children).filter(el => el !== footer && el.tagName !== 'SCRIPT');
+            const pageRect = page.getBoundingClientRect();
+
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                // Ignorar elementos de estructura fijos
+                if (child.classList.contains('top-bar') || child.tagName === 'HEADER') continue;
+
+                // getBoundingClientRect es relativo al viewport. Restamos pageRect.top para tener 'top' relativo a la página.
+                const childRect = child.getBoundingClientRect();
+                const relativeBottom = childRect.bottom - pageRect.top;
+
+                // CASO 1: Tabla (puede dividirse)
+                if (child.classList.contains('table-container')) {
+                    const table = child.querySelector('table');
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                    // Revisar cada fila
+                    for (let r = 0; r < rows.length; r++) {
+                        const row = rows[r];
+                        const rowRect = row.getBoundingClientRect();
+                        const rowRelativeBottom = rowRect.bottom - pageRect.top;
+
+                        if (rowRelativeBottom > limit) {
+                            console.log(`Desbordamiento detectado en fila ${r} de ${rows.length}. Creando página ${pageNum + 1}`);
+
+                            // Si es la PRIMERA fila la que no cabe:
+                            // 1. Si NO estamos al principio de la página (i > 0), movemos la TABLA ENTERA a una nueva página para probar suerte.
+                            if (r === 0 && i > 0) {
+                                console.log('La primera fila no cabe y no estamos al inicio. Moviendo tabla completa a la siguiente página.');
+                                const newPage = createNewPageFrom(page);
+                                const elementsToMove = children.slice(i);
+                                moveSiblingsToPage(elementsToMove, newPage);
+                                setTimeout(() => checkPageOverflow(newPage, pageNum + 1), 100);
+                                return;
+                            }
+
+                            // 2. Si r > 0, O si estamos al principio (i==0) y la fila 0 es enorme:
+                            // Dividimos la tabla.
+                            // Si r=0 y i=0, forzamos dejar la fila 0 aquí para evitar bucle infinito de mover la tabla entera eternamente.
+                            let splitIndex = r;
+                            if (r === 0 && i === 0) {
+                                console.warn('Fila 0 desborda al inicio de página. Forzando corte en fila 1.');
+                                splitIndex = 1;
+                                // Si solo hay 1 fila y es enorme, no movemos nada (dejamos que desborde) para no crear página vacía
+                                if (splitIndex >= rows.length) return;
+                            }
+
+                            const newPage = createNewPageFrom(page);
+
+                            // PASO 3: Mover filas restantes
+                            const remainingRows = rows.slice(splitIndex);
+                            console.log(`Moviendo ${remainingRows.length} filas restantes`);
+                            moveTableRowsToPage(remainingRows, newPage, child);
+
+                            // PASO 4: Mover TODO el contenido que sigue a esta tabla
+                            // (Incluyendo otras tablas, grupo financiero, etc.)
+                            const nextSiblings = children.slice(i + 1);
+                            if (nextSiblings.length > 0) {
+                                console.log(`Moviendo ${nextSiblings.length} elementos hermanos siguientes a la nueva página.`);
+                                moveSiblingsToPage(nextSiblings, newPage);
+                            }
+
+                            // Verificar recursivamente la nueva página
+                            setTimeout(() => checkPageOverflow(newPage, pageNum + 1), 100);
+                            return;
+                        }
+                    }
+                }
+                // CASO 1.5: Imágenes (puede dividirse)
+                if (child.classList.contains('images-column')) {
+                    const wrappers = Array.from(child.children);
+                    for (let w = 0; w < wrappers.length; w++) {
+                        const wrapper = wrappers[w];
+                        const rect = wrapper.getBoundingClientRect();
+                        const bottom = rect.bottom - pageRect.top;
+
+                        if (bottom > limit) {
+                            console.log(`Desbordamiento de imagen ${w}.`);
+
+                            // Determinar si es el primer elemento significativo de la página
+                            const startOfContent = children.findIndex(c => !c.classList.contains('top-bar') && c.tagName !== 'HEADER');
+                            const isAtTop = (i === startOfContent);
+
+                            // Si es la primera imagen y no estamos al inicio, movemos todo el bloque
+                            if (w === 0 && !isAtTop) {
+                                console.log('Moviendo columna de imágenes completa');
+                                const newPage = createNewPageFrom(page);
+                                const elementsToMove = children.slice(i);
+                                moveSiblingsToPage(elementsToMove, newPage);
+                                setTimeout(() => checkPageOverflow(newPage, pageNum + 1), 100);
+                                return;
+                            }
+
+                            // Si es la primera imagen y ESTAMOS al inicio, forzamos dividir en la siguiente
+                            // Nota: Si solo hay 1 imagen y es gigante, w=0, isAtTop=true -> split=1. 1 >= length -> return.
+                            // Esto evita bucle infinito para imágenes gigantes.
+                            const splitIndex = (w === 0 && isAtTop) ? 1 : w;
+
+                            if (splitIndex >= wrappers.length) {
+                                console.warn("Imagen gigante al inicio no se puede dividir más.");
+                                return;
+                            }
+
+                            console.log(`Dividiendo columna de imágenes en índice ${splitIndex}`);
+                            const newPage = createNewPageFrom(page);
+
+                            // 1. Crear nueva columna de imágenes en la nueva página
+                            const contentWrapper = newPage.querySelector('.content-wrapper');
+                            const footer = contentWrapper.querySelector('footer');
+
+                            // Clonar contenedor vacío
+                            const newImagesColumn = child.cloneNode(false); // false = no clonar hijos deep
+                            contentWrapper.insertBefore(newImagesColumn, footer);
+
+                            // 2. Mover wrappers restantes
+                            const remainingWrappers = wrappers.slice(splitIndex);
+                            remainingWrappers.forEach(r => newImagesColumn.appendChild(r));
+
+                            // 3. Mover hermanos siguientes
+                            const nextSiblings = children.slice(i + 1);
+                            if (nextSiblings.length > 0) {
+                                moveSiblingsToPage(nextSiblings, newPage);
+                            }
+
+                            setTimeout(() => checkPageOverflow(newPage, pageNum + 1), 100);
+                            return;
+                        }
+                    }
+                }
+                // CASO 2: Bloques Normales (Totales, Notas, etc.)
+                else {
+                    if (relativeBottom > limit) {
+                        // PREVENCIÓN DE BUCLE INFINITO PARA BLOQUES NORMALES
+                        // Si este bloque es el primero de la página (más allá del header), y aún así desborda,
+                        // NO intentamos moverlo, porque en la nueva página pasará exactamente lo mismo.
+                        const startOfContent = children.findIndex(c => !c.classList.contains('top-bar') && c.tagName !== 'HEADER');
+                        if (i === startOfContent) {
+                            console.warn(`Bloque ${child.className || child.tagName} desborda al inicio de página. No se puede mover. Deteniendo paginación.`);
+                            return;
+                        }
+
+                        // console.log(`Desbordamiento detectado en bloque ${child.className}. Creando página ${pageNum + 1}`);
+                        const newPage = createNewPageFrom(page);
+
+                        // ESPECIAL: Si el bloque que se mueve es financial-group (o un summary suelto antiguo), 
+                        // también mover la última fila de la tabla para que vayan juntos
+                        let elementsToMove = children.slice(i);
+
+                        const isFinancialBlock = child.classList.contains('financial-group') || child.classList.contains('financial-summary');
+
+                        if (isFinancialBlock) {
+                            // Buscar la tabla anterior
+                            const tableContainer = children.slice(0, i).reverse().find(el => el.classList.contains('table-container'));
+                            if (tableContainer) {
+                                const tbody = tableContainer.querySelector('tbody');
+                                const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                                // Si hay al menos una fila, mover la última
+                                if (rows.length > 0) {
+                                    console.log('Financial Group forzando movimiento de última fila de tabla.');
+                                    const lastRow = rows[rows.length - 1];
+
+                                    // Preparar nueva página con tabla
+                                    const targetContentWrapper = newPage.querySelector('.content-wrapper');
+                                    const targetFooter = targetContentWrapper.querySelector('footer');
+
+                                    let targetTableContainer = targetContentWrapper.querySelector('.table-container');
+                                    if (!targetTableContainer) {
+                                        targetTableContainer = tableContainer.cloneNode(true);
+                                        targetTableContainer.querySelector('tbody').innerHTML = '';
+                                        targetContentWrapper.insertBefore(targetTableContainer, targetFooter);
+                                    }
+
+                                    // Mover la última fila a la nueva página
+                                    const targetTbody = targetTableContainer.querySelector('tbody');
+                                    targetTbody.appendChild(lastRow);
+                                }
+                            }
+                        }
+
+                        // Mover este bloque y todos los siguientes
+                        moveSiblingsToPage(elementsToMove, newPage);
+
+                        setTimeout(() => checkPageOverflow(newPage, pageNum + 1), 100);
+                        return;
+                    }
+                }
+            }
+            // console.log(`Página ${pageNum} verificada, sin más desbordamientos.`);
+        }
+
+        function createNewPageFrom(originalPage) {
+            const newPage = originalPage.cloneNode(true);
+            const contentWrapper = newPage.querySelector('.content-wrapper');
+
+            // Limpiar contenido principal para recibir solo lo movido
+            // Mantenemos Header y Footer intactos
+            const contentSelectors = ['.client-card', '.main-section', '.table-container', '.financial-summary', '.financial-group', '.images-column', '.table-container-alcance-table'];
+            contentSelectors.forEach(sel => {
+                const els = contentWrapper.querySelectorAll(sel);
+                els.forEach(e => e.remove());
+            });
+
+            document.body.appendChild(newPage);
+            return newPage;
+        }
+
+        function moveTableRowsToPage(rows, targetPage, originalTableContainer) {
+            const contentWrapper = targetPage.querySelector('.content-wrapper');
+            const footer = contentWrapper.querySelector('footer');
+
+            // Crear wrapper de tabla si no existe
+            let targetTableContainer = contentWrapper.querySelector('.table-container');
+            if (!targetTableContainer) {
+                targetTableContainer = originalTableContainer.cloneNode(true);
+                // Limpiar tbody
+                targetTableContainer.querySelector('tbody').innerHTML = '';
+                // Insertar ANTES del footer
+                contentWrapper.insertBefore(targetTableContainer, footer);
+            }
+
+            const tbody = targetTableContainer.querySelector('tbody');
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function moveSiblingsToPage(elements, targetPage) {
+            const contentWrapper = targetPage.querySelector('.content-wrapper');
+            const footer = contentWrapper.querySelector('footer');
+
+            elements.forEach(el => {
+                // Verificar que sea un nodo elemento y no el footer ni script
+                if (el.nodeType === 1 && el.tagName !== 'SCRIPT' && el !== footer) {
+                    contentWrapper.insertBefore(el, footer);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
