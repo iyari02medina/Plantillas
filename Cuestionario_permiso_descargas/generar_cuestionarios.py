@@ -16,7 +16,7 @@ TEMPLATES_CONFIG = [
     {'filename': 'carta-poder.html',     'prefix': 'Carta_Poder'}
 ]
 CSV_FILE = 'cuestionario_variables.csv'
-OUTPUT_DIR = 'cuestionarios_generados'
+OUTPUT_DIR = os.path.join('..', '..', 'Documentos_generados', 'Cuestionarios_permiso_descarga')
 HEADER_IMAGE = 'header.JPG'
 
 def sanitize_filename(name):
@@ -57,7 +57,7 @@ def main():
         return
 
     # 3. Preparar directorio de salida
-    output_path_dir = os.path.join(BASE_DIR, OUTPUT_DIR)
+    output_path_dir = os.path.normpath(os.path.join(BASE_DIR, OUTPUT_DIR))
     if not os.path.exists(output_path_dir):
         try:
             os.makedirs(output_path_dir)
