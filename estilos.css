@@ -488,21 +488,18 @@
             display: flex;
             justify-content: space-between;
             padding-left: 1rem;
+            gap: 1rem;
         }
 
         .financial-summary {
             display: flex;
             justify-content: flex-end;
-            margin-top: 1rem;
-        }
-
-        .financial-legal-text {
             width: 50%;
         }
 
+
         .summary-box {
             width: 100%;
-            max-width: 21rem;
             background: var(--white);
 
             border: 1px solid var(--slate-200);
