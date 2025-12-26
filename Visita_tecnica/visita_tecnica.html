@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="../estilos.css">
 </head>
 
 <body>
@@ -39,17 +39,17 @@
             <!-- Encabezado -->
             <header>
                 <div class="logo-section">
-                    <img src="../logo-cophi-negro.jpg" alt="Logo Cophi">
+                    <img src="../img/logo-cophi-negro.jpg" alt="Logo Cophi">
                     <p>CONTROL DE PROCESOS<br>HIDRAULICOS S.A. DE C.V.
                     </p>
                 </div>
 
                 <div class="header-info">
-                    <h1>Diagnóstico de Visita Técnica</h1>
-                    <p class="subtitle" style="overflow-wrap: break-word;">{{ nombre_cliente }}</p>
+                    <h1>Visita Técnica</h1>
+                    <p class="subtitle" style="overflow-wrap: break-word;">Instalaciones hidráulicas y sanitarias</p>
                     <div class="meta-data">
-                        <div>Folio: <span style="font-weight: 600;">{{ folio_ot }}</span></div>
-                        <div>Fecha: <span style="font-weight: 600;">{{ fecha_ot }}</span></div>
+                        <div>Folio: <span style="font-weight: 600;">{{ folio_vt }}</span></div>
+                        <div>Fecha: <span style="font-weight: 600;">{{ fecha_vt }}</span></div>
                     </div>
                 </div>
             </header>
@@ -65,12 +65,8 @@
                     </div>
                     <div class="client-right-col">
                         <div style="margin-bottom: 0.75rem;">
-                            <p class="label">Atención a</p>
-                            <p class="value-md">{{ nombre_contacto }}</p>
-                        </div>
-                        <div>
-                            <p class="label">Contacto</p>
-                            <p class="value-text">{{ telefono_contacto }}</p>
+                            <p class="label">no. cliente:</p>
+                            <p class="value-md">{{ no_cliente }}</p>
                         </div>
                     </div>
                 </div>
@@ -79,7 +75,7 @@
             <!-- 1. Inventario de Equipos Principales -->
             <div class="form-section force-break">
                 <div class="section-title-bar">
-                    <span class="section-header-text">1. Inventario de Equipos Principales (Registro de Activos)</span>
+                    <span class="section-header-text">Inventario de Equipos Principales (Registro de Activos)</span>
                 </div>
 
                 <span class="form-subtitle">Almacenamiento y Suministro</span>
@@ -191,7 +187,7 @@
             <!-- 2. Matriz de Inspección Detallada -->
             <div class="table-container">
                 <div class="section-title-bar">
-                    <span class="section-header-text">2. Matriz de Inspección Detallada</span>
+                    <span class="section-header-text">Matriz de Inspección Detallada</span>
                 </div>
                 <table>
                     <thead>
@@ -284,7 +280,7 @@
             <!-- 3. Evidencia Fotográfica y Hallazgos -->
             <div class="form-section">
                 <div class="section-title-bar">
-                    <span class="section-header-text">3. Evidencia Fotográfica</span>
+                    <span class="section-header-text">Evidencia Fotográfica</span>
                 </div>
                 <div class="photo-grid">
                     <div class="photo-placeholder">
@@ -312,7 +308,7 @@
             </div>
             <div class="form-section">
                 <div class="section-title-bar">
-                    <span class="section-header-text">4. Comentarios adicionales</span>
+                    <span class="section-header-text">Comentarios adicionales</span>
                 </div>
                 <div class="form-group mt-4">
                     <label class="form-label">Comentarios:</label>

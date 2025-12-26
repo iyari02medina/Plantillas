@@ -398,6 +398,7 @@
             table-layout: fixed;
             border-collapse: collapse;
             font-size: 12px;
+            margin-bottom: .5rem;
         }
 
         thead {
@@ -434,10 +435,6 @@
 
         tr:last-child td {
             border-bottom: none;
-        }
-
-        tr:hover {
-            background-color: var(--slate-50);
         }
 
         /* Alternar colores de fila */
@@ -495,6 +492,7 @@
             display: flex;
             justify-content: flex-end;
             width: 50%;
+            margin-left: auto;
         }
 
 
