@@ -78,6 +78,32 @@
                     </div>
                 </div>
             </section>
+
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">INFORME DE RESULTADOS</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Laboratorio:</label>
+                        <input type="text" class="form-input" value="{{ laboratorio }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha de muestreo:</label>
+                        <input type="text" class="form-input" value="{{ fecha_muestreo }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de muestreo:</label>
+                        <input type="text" class="form-input" value="{{ tipo_muestreo }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">No. de Informe:</label>
+                        <input type="text" class="form-input" value="{{ no_informe }}">
+                    </div>
+                </div>
+            </div>
             <div class="form-section">
                 <div class="section-title-bar">
                     <span class="section-header-text">VOLUMEN PROMEDIO DESCARGADO</span>
@@ -104,82 +130,81 @@
                     <tbody>
                         <tr>
                             <td><span class="item-title">SÓLIDOS SUSPENDIDOS TOTALES</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ sst_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ sst_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ sst_precio }}</td>
                         </tr>
                         <tr>
                             <td><span class="item-title">DEMANDA BIOQUÍMICA DE OXÍGENO</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ dbo_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ dbo_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ dbo_precio }}</td>
                         </tr>
                         <tr>
                             <td><span class="item-title">GRASA Y ACEITES</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ gya_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ gya_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ gya_precio }}</td>
                         </tr>
                         <tr>
                             <td><span class="item-title">SÓLIDOS SEDIMENTABLES</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ ss_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ ss_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ ss_precio }}</td>
                         </tr>
                         <tr>
                             <td><span class="item-title">MATERIA FLOTANTE</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ mf_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ mf_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ mf_precio }}</td>
                         </tr>
                         <tr>
                             <td><span class="item-title">TEMPERATURA</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ temp_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ temp_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ temp_precio }}</td>
                         </tr>
                         <tr>
                             <td><span class="item-title">SUSTANCIA ACTIVAS AL AZUL DE METILENO</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ saam_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ saam_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ saam_precio }}</td>
                         </tr>
                         <tr>
                             <td><span class="item-title">DEMANDA QUÍMICA DE OXÍGENO</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ dqo_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ dqo_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ dqo_precio }}</td>
                         </tr>
                         <tr>
                             <td><span class="item-title">NITROGENO TOTAL</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ nt_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ nt_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ nt_precio }}</td>
                         </tr>
                         <tr>
                             <td><span class="item-title">FENOLES</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ fen_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ fen_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ fen_precio }}</td>
                         </tr>
                         <tr>
                             <td><span class="item-title">COLOR</span></td>
-                            <td></td>
-                            <td style="font-size: 11px;" class="td-center"></td>
-                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                            <td class="td-center" style="font-size: 11px;">{{ color_resultado }}</td>
+                            <td class="td-center" style="font-size: 11px;">{{ color_lmp }}</td>
+                            <td class="td-bold-center" style="font-size: 11px;">{{ color_precio }}</td>
                         </tr>
-
                     </tbody>
                 </table>
                 <div class="financial-summary">
                     <div class="summary-box">
                         <div class="summary-row">
                             <span class="font-medium">PRECIO m³</span>
-                            <span>$ 95.57 MXN</span>
+                            <span>{{ precio_m3_total }}</span>
                         </div>
                         <div class="total-row">
                             <span class="total-label">TOTAL A PAGAR</span>
-                            <span class="total-amount">$ 8,123.45 MXN</span>
+                            <span class="total-amount">{{ total_pagar }}</span>
                         </div>
                     </div>
                 </div>
