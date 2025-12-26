@@ -226,6 +226,7 @@
             font-size: .80rem;
             font-weight: 600;
             color: var(--slate-800);
+            margin-bottom: .25rem;
         }
 
         .value-md {
@@ -236,7 +237,6 @@
 
         .value-text {
             color: var(--slate-500);
-            margin-top: 0.25rem;
             font-size: .75rem;
         }
 
