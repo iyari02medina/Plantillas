@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="../estilos.css">
 </head>
 
 <body>
@@ -39,14 +39,14 @@
             <!-- Encabezado -->
             <header>
                 <div class="logo-section">
-                    <img src="../logo-cophi-negro.jpg" alt="Logo Cophi">
+                    <img src="../img/logo-cophi-negro.jpg" alt="Logo Cophi">
                     <p>CONTROL DE PROCESOS<br>HIDRAULICOS S.A. DE C.V.
                     </p>
                 </div>
 
                 <div class="header-info">
-                    <h1>Limpieza de Trampa de Grasa</h1>
-                    <p class="subtitle" style="overflow-wrap: break-word;">{{ nombre_cliente }}</p>
+                    <h1>mantenimiento </h1>
+                    <p class="subtitle" style="overflow-wrap: break-word;">Limpieza de Trampa de Grasa</p>
                     <div class="meta-data">
                         <div>Folio: <span style="font-weight: 600;">{{ folio_ot }}</span></div>
                         <div>Fecha: <span style="font-weight: 600;">{{ fecha_ot }}</span></div>
@@ -65,12 +65,8 @@
                     </div>
                     <div class="client-right-col">
                         <div style="margin-bottom: 0.75rem;">
-                            <p class="label">Atención a</p>
-                            <p class="value-md">{{ nombre_contacto }}</p>
-                        </div>
-                        <div>
-                            <p class="label">Contacto</p>
-                            <p class="value-text">{{ telefono_contacto }}</p>
+                            <p class="label">no. cliente:</p>
+                            <p class="value-md">{{ no_cliente}}</p>
                         </div>
                     </div>
                 </div>
@@ -79,7 +75,7 @@
             <!-- 2. Datos del Equipo -->
             <div class="form-section">
                 <div class="section-title-bar">
-                    <span class="section-header-text">2. Datos del Equipo (La Trampa)</span>
+                    <span class="section-header-text">Datos del Equipo</span>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -109,7 +105,7 @@
             <!-- 4. Detalle del Servicio -->
             <div class="form-section">
                 <div class="section-title-bar">
-                    <span class="section-header-text">4. Detalle del Servicio</span>
+                    <span class="section-header-text">Detalle del Servicio</span>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -153,7 +149,7 @@
             <!-- 5. Registro de Residuos -->
             <div class="form-section">
                 <div class="section-title-bar">
-                    <span class="section-header-text">5. Registro de Residuos</span>
+                    <span class="section-header-text">Registro de Residuos</span>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -171,7 +167,7 @@
             <!-- 6. Diagnóstico Técnico -->
             <div class="form-section">
                 <div class="section-title-bar">
-                    <span class="section-header-text">6. Diagnóstico Técnico y Recomendaciones</span>
+                    <span class="section-header-text">Diagnóstico Técnico y Recomendaciones</span>
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Estado físico de la trampa:</label>
@@ -194,38 +190,21 @@
             <!-- 7. Evidencia Fotográfica -->
             <div class="form-section">
                 <div class="section-title-bar">
-                    <span class="section-header-text">7. Evidencia Fotográfica</span>
+                    <span class="section-header-text">Evidencia Fotográfica</span>
                 </div>
                 <div class="photo-grid">
                     <div class="photo-placeholder">
                         <span class="photo-icon">📷</span>
                         <span>Trampa Llena (Antes)</span>
+                        <div class="image-caption">{{ obs_evidencia_01 }}</div>
                     </div>
                     <div class="photo-placeholder">
                         <span class="photo-icon">✨</span>
                         <span>Trampa Vacía y Limpia (Después)</span>
+                        <div class="image-caption">{{ obs_evidencia_02 }}</div>
                     </div>
                 </div>
             </div>
-
-            <!-- 8. Cierre y Lineas de Drenaje -->
-            <div class="closing-section">
-                <p class="legal-note">
-                    "El cliente acepta que el servicio se realizó a satisfacción y el área quedó limpia."
-                </p>
-
-                <div class="signatures-body">
-                    <div class="signature-box">
-                        <div class="signature-line-body"></div>
-                        <p class="signer-name">Firma del Técnico</p>
-                    </div>
-                    <div class="signature-box">
-                        <div class="signature-line-body"></div>
-                        <p class="signer-name">Nombre y Firma del Cliente</p>
-                    </div>
-                </div>
-            </div>
-
             <footer>
                 <div class="page-counter">Página <span class="page-val">1</span>-<span class="total-pages">1</span>
                 </div>
