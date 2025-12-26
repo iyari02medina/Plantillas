@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orden de Trabajo - Desazolve - Gestión Hidráulica</title>
+
+    <!-- Fuentes (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../estilos.css">
+</head>
+
+<body>
+
+    <!-- Botón Flotante -->
+    <div class="print-btn-container">
+        <button onclick="window.print()" class="btn-print">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Imprimir / PDF
+        </button>
+    </div>
+
+    <!-- Contenedor Principal (Hoja) -->
+    <div class="page-container">
+
+        <!-- Barra Superior -->
+        <div class="top-bar"></div>
+
+        <div class="content-wrapper">
+
+            <!-- Encabezado (Preservado) -->
+            <header>
+                <div class="logo-section">
+                    <div class="logo-box">
+                        <img style="margin-bottom: .5rem;" src="logo-cophi-negro.jpg" alt="Logo Cophi">
+                        <p>CONTROL DE PROCESOS<br>HIDRAULICOS S.A. DE C.V.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="header-info">
+                    <h1>COTIZACIÓN</h1>
+                    <p class="subtitle" style="overflow-wrap: break-word;">ORDEN DE TRABAJO DE DESAZOLVE</p>
+                    <div class="meta-data">
+                        <div>Folio: <span style="font-weight: 600;">{{ folio_cot }}</span></div>
+                        <div>Fecha: <span style="font-weight: 600;">{{ fecha_cot }}</span></div>
+
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sección Cliente (Preservado) -->
+            <section class="client-card">
+
+                <div class="client-grid">
+                    <div>
+                        <p class="label">Empresa: </p>
+                        <p class="value-lg">{{ nombre_cliente }}</p>
+                        <p class="value-text">{{ direccion_cliente }}</p>
+                    </div>
+                    <div class="client-right-col">
+                        <div style="margin-bottom: 0.75rem;">
+                            <p class="label">Atención a</p>
+                            <p class="value-md">{{ nombre_contacto }}</p>
+                        </div>
+                        <div>
+                            <p class="label">Contacto</p>
+                            <p class="value-text">{{ telefono_contacto }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="form-section">
+                <div class="section-title-bar">
+                    <span class="section-header-text">VOLUMEN PROMEDIO DESCARGADO</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Volumen Promedio Descargado (m³):</label>
+                    <input type="text" class="form-input" id="volumen_promedio_descargado"
+                        name="volumen_promedio_descargado" value="{{ volumen_promedio_descargado }}">
+                </div>
+            </div>
+            <div class="table-container">
+                <div class="section-title-bar">
+                    <span class="section-header-text">resultados de análisis de laboratorio tarificados</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">PARÁMETRO</th>
+                            <th style="width: 18%;">RESULTADO</th>
+                            <th class="center" style="width: 18%;">LMP</th>
+                            <th class="center" style="width: 24%;">PRECIO m³.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td>
+                                <span class="item-title">{{ item.nombre_item }}</span>
+                            </td>
+                            <td>
+                                <span class="item-desc">
+                                    {{ item.descripcion_item }}
+                                </span>
+                            </td>
+                            <td style="font-size: 11px;" class="td-center">{{ item.unidad_item }}</td>
+                            <td style="font-size: 11px;" class="td-bold-center">{{ item.cantidad_item }}</td>
+
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">SÓLIDOS SUSPENDIDOS TOTALES</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">DEMANDA BIOQUÍMICA DE OXÍGENO</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">GRASA Y ACEITES</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">SÓLIDOS SEDIMENTABLES</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">MATERIA FLOTANTE</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">TEMPERATURA</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">SUSTANCIA ACTIVAS AL AZUL DE METILENO</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">DEMANDA QUÍMICA DE OXÍGENO</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">NITROGENO TOTAL</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">FENOLES</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+                        <tr>
+                            <td><span class="item-title">COLOR</span></td>
+                            <td></td>
+                            <td style="font-size: 11px;" class="td-center"></td>
+                            <td style="font-size: 11px;" class="td-bold-center"></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer (Preservado) -->
+            <footer>
+                <div class="page-counter">
+                    PÁGINA <span class="page-val">1</span> de <span class="total-pages">1</span>
+                </div>
+                <div class="footer-line">
+                </div>
+                <div class="footer-content">
+                    <div>CONTROL DE PROCESOS
+                        HIDRAULICOS S.A.
+                        DE C.V.</div>
+                    <div>(222)-889-4469</div>
+                    <div>ejecutivo@cophi.mx</div>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <script src="paginacion.js"></script>
+</body>
+
+</html>
