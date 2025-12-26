@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="../estilos.css">
 </head>
 
 <body>
@@ -40,18 +40,18 @@
             <header>
                 <div class="logo-section">
                     <div class="logo-box">
-                        <img style="margin-bottom: .5rem;" src="logo-cophi-negro.jpg" alt="Logo Cophi">
+                        <img style="margin-bottom: .5rem;" src="../img/logo-cophi-negro.jpg" alt="Logo Cophi">
                         <p>CONTROL DE PROCESOS<br>HIDRAULICOS S.A. DE C.V.
                         </p>
                     </div>
                 </div>
 
                 <div class="header-info">
-                    <h1>COTIZACIÓN</h1>
-                    <p class="subtitle" style="overflow-wrap: break-word;">ORDEN DE TRABAJO DE DESAZOLVE</p>
+                    <h1>MANTENIMIENTO</h1>
+                    <p class="subtitle" style="overflow-wrap: break-word;">DESAZOLVE</p>
                     <div class="meta-data">
-                        <div>Folio: <span style="font-weight: 600;">{{ folio_cot }}</span></div>
-                        <div>Fecha: <span style="font-weight: 600;">{{ fecha_cot }}</span></div>
+                        <div>Folio: <span style="font-weight: 600;">{{ folio_ot }}</span></div>
+                        <div>Fecha: <span style="font-weight: 600;">{{ fecha_ot }}</span></div>
 
                     </div>
                 </div>
@@ -68,12 +68,8 @@
                     </div>
                     <div class="client-right-col">
                         <div style="margin-bottom: 0.75rem;">
-                            <p class="label">Atención a</p>
-                            <p class="value-md">{{ nombre_contacto }}</p>
-                        </div>
-                        <div>
-                            <p class="label">Contacto</p>
-                            <p class="value-text">{{ telefono_contacto }}</p>
+                            <p class="label">no. cliente</p>
+                            <p class="value-md">{{ no_cliente }}</p>
                         </div>
                     </div>
                 </div>
