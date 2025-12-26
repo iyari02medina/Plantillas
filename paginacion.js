@@ -276,6 +276,14 @@ function moveTableRowsToPage(rows, targetPage, originalContainer) {
         targetContainer = originalContainer.cloneNode(true);
         targetContainer.querySelector('tbody').innerHTML = '';
         cw.insertBefore(targetContainer, footer);
+
+        // Fix: Evitar duplicidad del financial-summary.
+        // Al clonar, el summary pasa a la nueva página. Lo eliminamos de la página anterior
+        // para que solo aparezca al final de la tabla (en la última página).
+        const oldSummary = originalContainer.querySelector('.financial-summary');
+        if (oldSummary) {
+            oldSummary.remove();
+        }
     }
 
     const tbody = targetContainer.querySelector('tbody');

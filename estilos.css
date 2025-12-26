@@ -493,7 +493,7 @@
         .financial-summary {
             display: flex;
             justify-content: flex-end;
-            width: 50%;
+            margin-top: 1rem;
         }
 
         .financial-legal-text {
