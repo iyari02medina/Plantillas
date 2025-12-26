@@ -87,29 +87,36 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Ubicación</label>
-                        <input type="text" class="form-input" placeholder="Registro, tarja, bajadas, wc, coladera...">
+                        <input type="text" class="form-input" placeholder="Registro, tarja, bajadas, wc, coladera..."
+                            value="{{ ubicacion_area }}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Tipo de Tubería</label>
-                        <input type="text" class="form-input" placeholder="Concreto, PVC, Albañal...">
+                        <input type="text" class="form-input" placeholder="Concreto, PVC, Albañal..."
+                            value="{{ tipo_tuberia }}">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Diámetro Aprox.</label>
-                        <input type="text" class="form-input" placeholder="4&quot;, 6&quot;, 8&quot;...">
+                        <input type="text" class="form-input" placeholder="4&quot;, 6&quot;, 8&quot;..."
+                            value="{{ diametro_tuberia }}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Longitud Sondeada (m)</label>
-                        <input type="text" class="form-input" placeholder="Metros lineales trabajados">
+                        <input type="text" class="form-input" placeholder="Metros lineales trabajados"
+                            value="{{ longitud_sondeada }}">
                     </div>
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Nivel de Flujo Inicial:</label>
                     <div class="checklist-grid grid-cols-3">
-                        <label class="checklist-item"><input type="checkbox"> Nulo / Tapado total</label>
-                        <label class="checklist-item"><input type="checkbox"> Lento</label>
-                        <label class="checklist-item"><input type="checkbox"> Normal / Preventivo</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if flujo_nulo }}> Nulo /
+                            Tapado total</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if flujo_lento }}>
+                            Lento</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if flujo_normal }}> Normal /
+                            Preventivo</label>
                     </div>
                 </div>
             </div>
@@ -122,9 +129,12 @@
                 <div class="mb-2">
                     <label class="form-label">Equipo Utilizado:</label>
                     <div class="checklist-grid grid-cols-3">
-                        <label class="checklist-item"><input type="checkbox"> Guía Eléctrica (K-50/1500)</label>
-                        <label class="checklist-item"><input type="checkbox"> Hidrolavadora / Jet</label>
-                        <label class="checklist-item"><input type="checkbox"> Camión Succión (Vactor)</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if equipo_guia }}> Guía
+                            Eléctrica (K-50/1500)</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if equipo_hidro }}>
+                            Hidrolavadora / Jet</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if equipo_vactor }}> Camión
+                            Succión (Vactor)</label>
                     </div>
                 </div>
             </div>
@@ -137,12 +147,14 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Tipo de Obstrucción Encontrada</label>
-                        <input type="text" class="form-input" placeholder="Grasa, raíces, objetos, azolve...">
+                        <input type="text" class="form-input" placeholder="Grasa, raíces, objetos, azolve..."
+                            value="{{ tipo_obstruccion }}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Volumen de azolve retirado</label>
-                    <input type="text" class="form-input" placeholder="Litros / Cubetas / m³">
+                    <input type="text" class="form-input" placeholder="Litros / Cubetas / m³"
+                        value="{{ volumen_azolve }}">
                 </div>
             </div>
 
@@ -154,15 +166,18 @@
                 <div class="mb-2">
                     <label class="form-label">Estado de la Tubería:</label>
                     <div class="checklist-grid grid-cols-3">
-                        <label class="checklist-item"><input type="checkbox"> Bueno</label>
-                        <label class="checklist-item"><input type="checkbox"> Fracturada / Dañada</label>
-                        <label class="checklist-item"><input type="checkbox"> Obstrucción Persistente</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if estado_bueno }}>
+                            Bueno</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if estado_danado }}>
+                            Fracturada / Dañada</label>
+                        <label class="checklist-item"><input type="checkbox" {{ 'checked' if estado_obstruido }}>
+                            Obstrucción Persistente</label>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Observaciones</label>
                     <textarea class="form-input" rows="3"
-                        placeholder="Comentarios adicionales del técnico..."></textarea>
+                        placeholder="Comentarios adicionales del técnico...">{{ observaciones }}</textarea>
                 </div>
             </div>
 
@@ -193,7 +208,8 @@
                     <span class="section-header-text">Comentarios Adicionales</span>
                 </div>
                 <div class="form-group mb-3">
-                    <textarea class="form-input" rows="2" placeholder="Espacio para notas del cliente..."></textarea>
+                    <textarea class="form-input" rows="2"
+                        placeholder="Espacio para notas del cliente...">{{ comentarios_cliente }}</textarea>
                 </div>
             </div>
 
