@@ -60,13 +60,13 @@
             <!-- Sección Cliente (Preservado) -->
             <section class="client-card">
 
-                <div class="client-grid">
+                <div class="client-grid" style="grid-template-columns: 1fr 1fr 1fr;">
                     <div>
                         <p class="label">Empresa: </p>
                         <p class="value-lg">{{ nombre_cliente }}</p>
                         <p class="value-text">{{ direccion_cliente }}</p>
                     </div>
-                    <div class="client-right-col">
+                    <div class="client-center-col" style="text-align: center;">
                         <div style="margin-bottom: 0.75rem;">
                             <p class="label">no. permiso de descargas</p>
                             <p class="value-text">{{ no_permiso_descargas }}</p>
@@ -76,6 +76,11 @@
                             <p class="value-text">{{ vigencia_permiso_descargas }}</p>
                         </div>
                     </div>
+                    <div class="client-right-col" style="text-align: right;">
+                        <p class="label">no. cliente</p>
+                        <p class="value-text">{{ no_cliente }}</p>
+                    </div>
+
                 </div>
             </section>
 
