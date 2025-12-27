@@ -32,33 +32,16 @@ async function checkPageOverflow(page, pageNum) {
     const footer = page.querySelector('footer');
     if (!contentWrapper || !footer) return;
 
-    // Use getBoundingClientRect so we cope with relative positioning accurately
+    // Constantes para tamaño Carta (27.94cm a 96dpi ~= 1056px)
+    const PAGE_HEIGHT_PX = 1056;
+    const footerHeight = footer.offsetHeight || 150;
     const pageRect = page.getBoundingClientRect();
-    const footerRect = footer.getBoundingClientRect();
 
-    // Calculate footer top relative to the page container
-    let relativeFooterTop = footerRect.top - pageRect.top;
-
-    // IMPORTANT: Fix for "Touching Footer" issue.
-    // Screen view allows .page-container to expand (min-height). 
-    // Print view forces fixed height (27.94cm -> ~1056px).
-    // If container expanded, footer is pushed down, so we must clamp the limit to valid Print area.
-    const MAX_PRINT_HEIGHT = 1050; // Approx 27.94cm minus safety
-    if (pageRect.height > MAX_PRINT_HEIGHT) {
-        // Simulate footer position on a fixed-height page
-        // Footer is bottom: 1rem (approx 16px).
-        const estimatedFooterBottom = MAX_PRINT_HEIGHT - 16;
-        const estimatedFooterTop = estimatedFooterBottom - footerRect.height;
-        relativeFooterTop = Math.min(relativeFooterTop, estimatedFooterTop);
-    }
-
-    // Determine buffer.
-    // Added .photo-placeholder to check since actual images might be missing in templates
-    const hasImages = contentWrapper.querySelector('.images-column, .photo-grid, .photo-placeholder');
-    const buffer = 50; // Maintain a healthy buffer (approx 1.3cm)
-
-    // Define the limit where content must stop
-    const limit = relativeFooterTop - buffer;
+    // Límites DINÁMICOS dependiendo del contenido
+    // Safe: Para texto y formularios (Buffer 50px)
+    const limitSafe = PAGE_HEIGHT_PX - footerHeight - 50;
+    // Tight: Para imágenes que necesitan espacio extra (Buffer 15px)
+    const limitTight = PAGE_HEIGHT_PX - footerHeight - 15;
 
     const children = Array.from(contentWrapper.children).filter(el =>
         el.nodeType === 1 && el !== footer && el.tagName !== 'SCRIPT' && !el.classList.contains('top-bar')
@@ -74,6 +57,13 @@ async function checkPageOverflow(page, pageNum) {
         const childRect = child.getBoundingClientRect();
         const relativeBottom = childRect.bottom - pageRect.top;
 
+        // Determinar qué límite usa ESTE elemento hijo
+        const childHasImages = child.querySelector('.images-column, .photo-grid, .photo-placeholder') ||
+            child.classList.contains('images-column') ||
+            child.classList.contains('photo-grid');
+        // Si tiene fotos, usamos el límite ajustado (buffer 15). Si no, el seguro (buffer 50).
+        let currentLimit = childHasImages ? limitTight : limitSafe;
+
         // Caso: Salto de página forzado
         if (child.classList.contains('force-break')) {
             const nextSiblings = children.slice(i + 1);
@@ -88,7 +78,7 @@ async function checkPageOverflow(page, pageNum) {
             }
         }
 
-        if (relativeBottom > limit) {
+        if (relativeBottom > currentLimit) {
             // CASO: Tablas (pueden dividirse)
             if (child.classList.contains('table-container') || child.classList.contains('table-container-alcance-table')) {
                 const table = child.querySelector('table');
@@ -97,7 +87,7 @@ async function checkPageOverflow(page, pageNum) {
 
                 for (let r = 0; r < rows.length; r++) {
                     const rowRect = rows[r].getBoundingClientRect();
-                    if ((rowRect.bottom - pageRect.top) > limit) {
+                    if ((rowRect.bottom - pageRect.top) > limitSafe) {
                         if (r === 0 && i > firstContentIdx) {
                             // Mover bloque completo
                             const newPage = createNewPageFrom(page);
@@ -135,26 +125,46 @@ async function checkPageOverflow(page, pageNum) {
                     const elRect = innerEl.getBoundingClientRect();
 
                     if ((elRect.bottom - pageRect.top) > limit) {
-                        // Si es el primer elemento del form-section y no estamos al inicio de la página, mover SECCIÓN COMPLETA
-                        if (e === 0 && i > firstContentIdx) {
+
+                        // ESTRATEGIA: Mover bloque completo si no estamos al inicio
+                        // Si la sección no es la primera de la página, preferimos moverla ENTERA a la siguiente
+                        // para darle su propia hoja limpia.
+                        if (i > firstContentIdx) {
+                            console.log("Moviendo form-section completa a nueva página para evitar corte.");
                             const newPage = createNewPageFrom(page);
                             const nextNum = pageNum + 1;
                             updatePageCounter(newPage, nextNum);
                             moveSiblingsToPage(children.slice(i), newPage);
+
                             await new Promise(r => setTimeout(r, 50));
                             await checkPageOverflow(newPage, nextNum);
                             return;
                         }
 
-                        // Si el elemento interno es un GRID o IMAGE COLUMN, intentar dividirlo
+                        // Si estamos AQUÍ, significa que la sección YA está al inicio de la página (hoja limpia)
+                        // y AÚN ASÍ el script detecta desborde.
+
+                        // Si el elemento interno es un GRID o IMAGE COLUMN
                         const isGrid = innerEl.classList.contains('photo-grid') || innerEl.classList.contains('images-column');
                         if (isGrid) {
+                            // REGLA USUARIO: "Si en una página solo hay imagenes haz que quepan las 4"
+                            // Si estamos al inicio de la página (hoja limpia) y es un grid, 
+                            // FORZAMOS a que se quede unido ignorando el límite matemático.
+                            // Solo aplicamos esto si el grid no es masivo (ej. <= 6 items).
+                            if (innerEl.children.length <= 6) {
+                                console.warn("Grid desborda en hoja limpia. Forzando mantener unido (USER RULE).");
+                                // Rompemos el bucle de elementos internos para dejar de revisar este grid
+                                // y pasamos a revisar los siguientes elementos (si los hay)
+                                break;
+                            }
+
+                            // Si es un grid gigante (>6), sí intentamos dividirlo
                             const gridItems = Array.from(innerEl.children);
                             for (let j = 0; j < gridItems.length; j++) {
                                 const itemRect = gridItems[j].getBoundingClientRect();
                                 if ((itemRect.bottom - pageRect.top) > limit) {
                                     let splitGridIdx = (j === 0) ? 1 : j;
-                                    if (splitGridIdx >= gridItems.length) break; // Si no se puede dividir el grid, se moverá el bloque según lógica siguiente
+                                    if (splitGridIdx >= gridItems.length) break;
 
                                     const newPage = createNewPageFrom(page);
                                     const nextNum = pageNum + 1;
@@ -163,7 +173,6 @@ async function checkPageOverflow(page, pageNum) {
                                     const targetCW = newPage.querySelector('.content-wrapper');
                                     const targetFooter = targetCW.querySelector('footer');
 
-                                    // Clonar la estructura de la sección en la nueva página
                                     const newSection = child.cloneNode(true);
                                     Array.from(newSection.children).forEach(nc => {
                                         if (nc.classList.contains('section-title-bar')) {
@@ -172,14 +181,11 @@ async function checkPageOverflow(page, pageNum) {
                                     });
                                     targetCW.insertBefore(newSection, targetFooter);
 
-                                    // Crear nuevo contenedor de grid dentro de la nueva sección
                                     const newGrid = innerEl.cloneNode(false);
                                     newSection.appendChild(newGrid);
                                     gridItems.slice(splitGridIdx).forEach(item => newGrid.appendChild(item));
 
-                                    // Mover elementos restantes del form-section
                                     innerElements.slice(e + 1).forEach(rem => newSection.appendChild(rem));
-                                    // Mover hermanos del form-section original
                                     moveSiblingsToPage(children.slice(i + 1), newPage);
 
                                     await new Promise(r => setTimeout(r, 50));
@@ -189,7 +195,9 @@ async function checkPageOverflow(page, pageNum) {
                             }
                         }
 
-                        // Fallback: Dividir la sección moviendo este elemento y los siguientes
+                        // Si no es un grid (es un input, textarea, etc.) y estamos al inicio, tenemos que dividir
+                        // porque no podemos hacer nada más.
+                        console.log("Dividiendo form-section al inicio de página.");
                         const newPage = createNewPageFrom(page);
                         const nextNum = pageNum + 1;
                         updatePageCounter(newPage, nextNum);
