@@ -44,7 +44,7 @@ async function checkPageOverflow(page, pageNum) {
     // Límite absoluto en píxeles desde el tope de la hoja.
     // Footer empieza aprox en 1020px-1074px (dependiendo del zoom/render).
     // Dejamos un buffer masivo: NADA debe pasar del pixel 850.
-    const PIXEL_DE_LA_MUERTE = 850;
+    const PIXEL_DE_LA_MUERTE = 900;
 
     // Para Grids de Imágenes aislados, permitimos un poco más de espacio
     const LIMITE_PERMISIVO_IMAGENES = 940;
@@ -94,9 +94,83 @@ async function checkPageOverflow(page, pageNum) {
                 }
             }
 
-            // ESTRATEGIA PRINCIPAL: Si no es el primero, MOVER TODO
+            // ESTRATEGIA 1: Intentar dividir internamente si es un contenedor divisible
+            // (Incluso si no es el primer elemento, si cabe una parte, la dejamos)
+
+            // Sub-caso: Tablas
+            if (child.classList.contains('table-container') || child.classList.contains('table-container-alcance-table')) {
+                const table = child.querySelector('table');
+                const rows = Array.from(table.tBodies[0].rows);
+                let splitIndex = -1;
+
+                for (let r = 0; r < rows.length; r++) {
+                    if ((rows[r].getBoundingClientRect().bottom - pageRect.top) > limiteActual) {
+                        splitIndex = r;
+                        break;
+                    }
+                }
+
+                // Si al menos un renglón cabe, dividimos
+                if (splitIndex > 0) {
+                    console.log(`Dividiendo tabla en renglón ${splitIndex}.`);
+                    const newPage = createNewPageFrom(page);
+                    const nextNum = pageNum + 1;
+                    updatePageCounter(newPage, nextNum);
+                    moveTableRowsToPage(rows.slice(splitIndex), newPage, child);
+                    moveSiblingsToPage(children.slice(i + 1), newPage);
+                    await new Promise(r => setTimeout(r, 50));
+                    await checkPageOverflow(newPage, nextNum);
+                    return;
+                }
+            }
+
+            // Sub-caso: Form Section
+            if (child.classList.contains('form-section')) {
+                const innerElements = Array.from(child.children).filter(el => !el.classList.contains('section-title-bar'));
+                let splitIndex = -1;
+
+                for (let e = 0; e < innerElements.length; e++) {
+                    if ((innerElements[e].getBoundingClientRect().bottom - pageRect.top) > limiteActual) {
+                        splitIndex = e;
+                        break;
+                    }
+                }
+
+                // Si al menos un elemento interno cabe, dividimos
+                if (splitIndex > 0) {
+                    console.log(`Dividiendo form-section en elemento ${splitIndex}.`);
+                    const newPage = createNewPageFrom(page);
+                    const nextNum = pageNum + 1;
+                    updatePageCounter(newPage, nextNum);
+
+                    const targetCW = newPage.querySelector('.content-wrapper');
+                    const targetFooter = targetCW.querySelector('footer');
+                    const newSection = child.cloneNode(true);
+
+                    // Limpiar clon
+                    Array.from(newSection.children).forEach(nc => {
+                        if (nc.classList.contains('section-title-bar')) {
+                            nc.querySelector('.section-header-text').textContent += " (Cont.)";
+                        } else {
+                            nc.remove();
+                        }
+                    });
+                    targetCW.insertBefore(newSection, targetFooter);
+
+                    // Mover hijos desde el punto de corte
+                    innerElements.slice(splitIndex).forEach(item => newSection.appendChild(item));
+                    // Mover hermanos del bloque padre
+                    moveSiblingsToPage(children.slice(i + 1), newPage);
+
+                    await new Promise(r => setTimeout(r, 50));
+                    await checkPageOverflow(newPage, nextNum);
+                    return;
+                }
+            }
+
+            // ESTRATEGIA 2: Si no es divisible o no cabía ni el primer elemento, MOVER TODO
             if (i > firstContentIdx) {
-                console.log(`Elemento ${child.className} toca ${relativeBottom.toFixed(0)}px. Moviendo bloque completo.`);
+                console.log(`Elemento ${child.className || child.tagName} toca ${relativeBottom.toFixed(0)}px y no es divisible o no cabe inicio. Moviendo bloque completo.`);
                 const newPage = createNewPageFrom(page);
                 const nextNum = pageNum + 1;
                 updatePageCounter(newPage, nextNum);
@@ -106,74 +180,8 @@ async function checkPageOverflow(page, pageNum) {
                 return;
             }
 
-            // ESTRATEGIA SECUNDARIA: Dividir internamente (porque está al inicio)
-
-            // Sub-caso: Tablas
-            if (child.classList.contains('table-container') || child.classList.contains('table-container-alcance-table')) {
-                const table = child.querySelector('table');
-                const rows = Array.from(table.tBodies[0].rows);
-                for (let r = 0; r < rows.length; r++) {
-                    if ((rows[r].getBoundingClientRect().bottom - pageRect.top) > limiteActual) {
-                        const splitIndex = r === 0 ? 1 : r;
-                        if (splitIndex >= rows.length) break;
-
-                        const newPage = createNewPageFrom(page);
-                        const nextNum = pageNum + 1;
-                        updatePageCounter(newPage, nextNum);
-                        moveTableRowsToPage(rows.slice(splitIndex), newPage, child);
-                        moveSiblingsToPage(children.slice(i + 1), newPage);
-                        await new Promise(r => setTimeout(r, 50));
-                        await checkPageOverflow(newPage, nextNum);
-                        return;
-                    }
-                }
-            }
-
-            // Sub-caso: Form Section (dividir hijos)
-            if (child.classList.contains('form-section')) {
-                const innerElements = Array.from(child.children).filter(el => !el.classList.contains('section-title-bar'));
-                for (let e = 0; e < innerElements.length; e++) {
-                    if ((innerElements[e].getBoundingClientRect().bottom - pageRect.top) > limiteActual) {
-
-                        // PROTECCIÓN CONTRA BUCLE INFINITO
-                        // Si es el PRIMER elemento interno el que se sale, y estamos en el PRIMER bloque de la página:
-                        // Significa que este elemento por sí solo es más grande que el espacio permitido (850px).
-                        // No podemos moverlo a la siguiente página porque pasará exactamente lo mismo.
-                        // Debemos permitir que desborde (break) o intentar dividirlo si fuera un grid (ya manejado arriba).
-                        if (e === 0) {
-                            console.warn("Elemento interno gigante al inicio de página. No se puede dividir más. Aceptando desborde.");
-                            break;
-                        }
-
-                        const newPage = createNewPageFrom(page);
-                        const nextNum = pageNum + 1;
-                        updatePageCounter(newPage, nextNum);
-
-                        // Clonar estructura y mover
-                        const targetCW = newPage.querySelector('.content-wrapper');
-                        const targetFooter = targetCW.querySelector('footer');
-                        const newSection = child.cloneNode(true);
-                        // Limpiar clon
-                        Array.from(newSection.children).forEach(nc => {
-                            if (nc.classList.contains('section-title-bar')) nc.querySelector('.section-header-text').textContent += " (Cont.)";
-                            else nc.remove();
-                        });
-                        targetCW.insertBefore(newSection, targetFooter);
-
-                        // Mover hijos desde el punto de corte
-                        innerElements.slice(e).forEach(item => newSection.appendChild(item));
-                        // Mover hermanos del bloque padre
-                        moveSiblingsToPage(children.slice(i + 1), newPage);
-
-                        await new Promise(r => setTimeout(r, 50));
-                        await checkPageOverflow(newPage, nextNum);
-                        return;
-                    }
-                }
-            }
-
-            // Si llegamos aquí, es un bloque gigante indivisible al inicio.
-            console.warn("Bloque irreductible gigante al inicio. Nada que hacer.");
+            // Si llegamos aquí, es un bloque gigante indivisible al inicio o ya manejado.
+            console.warn("Bloque irreductible gigante al inicio o sin opciones de división. Aceptando desborde.");
         }
     }
 }
@@ -206,6 +214,13 @@ function moveTableRowsToPage(rows, targetPage, originalContainer) {
     if (!targetContainer) {
         targetContainer = originalContainer.cloneNode(true);
         targetContainer.querySelector('tbody').innerHTML = '';
+
+        // Agregar " (Cont.)" al título si existe
+        const headerText = targetContainer.querySelector('.section-header-text');
+        if (headerText && !headerText.textContent.includes('(Cont.)')) {
+            headerText.textContent += ' (Cont.)';
+        }
+
         cw.insertBefore(targetContainer, footer);
         const oldSummary = originalContainer.querySelector('.financial-summary');
         if (oldSummary) oldSummary.remove();
