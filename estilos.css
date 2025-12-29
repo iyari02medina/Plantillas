@@ -222,6 +222,7 @@
         .value-text {
             color: var(--slate-500);
             font-size: .75rem;
+            margin-bottom: .25rem;
         }
 
         /* --- VOLUMEN SECCIÓN --- */
