@@ -687,7 +687,7 @@
             }*/
 
             .client-right-col {
-                text-align: right;
+                text-align: end;
                 align-items: flex-end;
             }
         }
