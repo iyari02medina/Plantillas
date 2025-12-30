@@ -11,6 +11,7 @@ st.set_page_config(page_title="Generador de Cotizaciones", layout="wide")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_COTIZACIONES = os.path.join(BASE_DIR, "cotizaciones.csv")
 CSV_PRODUCTOS = os.path.join(os.path.dirname(BASE_DIR), "inventario", "productos_servicios.csv")
+CSV_EMPRESAS = os.path.join(os.path.dirname(BASE_DIR), "inventario", "empresas.csv")
 SCRIPT_GENERADOR = os.path.join(BASE_DIR, "generar_cotizaciones.py")
 
 # Función para cargar productos/servicios
@@ -18,6 +19,12 @@ def cargar_productos():
     if os.path.exists(CSV_PRODUCTOS):
         return pd.read_csv(CSV_PRODUCTOS)
     return pd.DataFrame(columns=["Nombre", "Unidad", "Precio"])
+
+# Función para cargar empresas
+def cargar_empresas():
+    if os.path.exists(CSV_EMPRESAS):
+        return pd.read_csv(CSV_EMPRESAS)
+    return pd.DataFrame(columns=["ID", "nombre_empresa", "telefono_empresa", "direccion_empresa", "tipo_empresa"])
 
 # Función para cargar cotizaciones existentes
 def cargar_cotizaciones():
@@ -52,12 +59,33 @@ with tab1:
         alcance_cot = st.text_area("Alcance General / Observaciones")
 
     with col2:
-        id_cliente = st.text_input("ID Cliente")
-        nombre_cliente = st.text_input("Nombre Comercial Cliente")
-        razon_social = st.text_input("Razón Social")
-        direccion = st.text_area("Dirección Fiscal/Entrega")
+        # Cargar catálogo de clientes
+        df_empresas = cargar_empresas()
+        lista_empresas = df_empresas["nombre_empresa"].tolist() if not df_empresas.empty else []
+        
+        cliente_seleccionado = st.selectbox("Seleccionar Cliente (Opcional)", [""] + lista_empresas)
+
+        # Variables para pre-llenar
+        id_cli_val = ""
+        nom_cli_val = ""
+        raz_soc_val = ""
+        dir_cli_val = ""
+        tel_cli_val = ""
+
+        if cliente_seleccionado and not df_empresas.empty:
+            datos_cliente = df_empresas[df_empresas["nombre_empresa"] == cliente_seleccionado].iloc[0]
+            id_cli_val = str(datos_cliente.get("ID", ""))
+            nom_cli_val = str(datos_cliente.get("nombre_empresa", ""))
+            raz_soc_val = str(datos_cliente.get("nombre_empresa", "")) # Por defecto la misma, si no hay columna especifica
+            dir_cli_val = str(datos_cliente.get("direccion_empresa", ""))
+            tel_cli_val = str(datos_cliente.get("telefono_empresa", ""))
+
+        id_cliente = st.text_input("ID Cliente", value=id_cli_val)
+        nombre_cliente = st.text_input("Nombre Comercial Cliente", value=nom_cli_val)
+        razon_social = st.text_input("Razón Social", value=raz_soc_val)
+        direccion = st.text_area("Dirección Fiscal/Entrega", value=dir_cli_val)
         contacto = st.text_input("Nombre Contacto")
-        telefono = st.text_input("Teléfono Contacto")
+        telefono = st.text_input("Teléfono Contacto", value=tel_cli_val)
 
     st.markdown("---")
     st.header("Partidas (Items)")

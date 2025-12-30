@@ -1,3 +1,0 @@
-sku:
-P-001 "P" para Productos
-S-001 "S" para Servicios

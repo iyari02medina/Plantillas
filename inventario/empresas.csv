@@ -1,0 +1,11 @@
+ID,nombre_empresa,telefono_empresa,direccion_empresa,tipo_empresa
+CLI-001,Restaurante El Sabor Mexicano,55-1234-5678,"Av. Reforma 123, Col. Centro, CDMX",Restaurante
+CLI-002,Inmobiliaria Residencial Verde,55-8765-4321,"Calle Pino 45, Col. Del Valle, CDMX",Residencial
+CLI-003,Hotel Plaza Central,55-5555-0000,"Blvd. Kukulcan Km 12, Zona Hotelera, Cancún",Hotel
+CLI-004,Industrias Químicas del Norte,81-8300-1122,"Parque Industrial Mitras, Nave 4, Monterrey",Industrial
+CLI-005,Condominio Los Álamos,33-3600-9988,"Av. Vallarta 2500, Guadalajara",Residencial
+CLI-006,Plaza Comercial Santa Fe,55-9090-8080,"Av. Santa Fe 400, CDMX",Comercial
+CLI-007,Hospital General del Sur,55-5060-7080,"Calz. de Tlalpan 3000, CDMX",Salud
+CLI-008,Colegio Internacional,55-4030-2010,"Camino al Desierto 88, CDMX",Educación
+CLI-009,Fabrica de Autos La Tuerca,44-2211-3344,"Parque Industrial Querétaro, Qro",Industrial
+CLI-010,Club Deportivo San Angel,55-1525-3545,"Av. Toluca 500, CDMX",Recreativo
