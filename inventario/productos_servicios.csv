@@ -1,0 +1,21 @@
+ID,Nombre,Categoría,Unidad,Precio
+P-001,Cloro Líquido Concentrado (Bidón 20L),Químicos,Pieza,450.00
+P-002,Pastillas de Tricloro (Bote 1kg),Químicos,Bote,180.00
+P-003,Sulfato de Aluminio (Saco 25kg),Químicos,Saco,350.00
+P-004,Bio-enzimas para Trampas de Grasa (Galón),Químicos,Galón,850.00
+P-005,Kit de Medición de pH y Cloro,Equipos,Pieza,650.00
+P-006,Bomba Dosificadora de Químicos,Equipos,Pieza,4200.00
+P-007,Cartucho Filtrante 20 Micras,Refacciones,Pieza,120.00
+P-008,Válvula de Pie 1.5 pulgadas,Refacciones,Pieza,350.00
+P-009,Medidor de Flujo Digital,Equipos,Pieza,5500.00
+P-010,Sacos de Arena Silica (50kg),Consumibles,Saco,180.00
+S-001,Servicio de Desazolve de Drenaje (Camión Vactor),Limpieza,Hora,2500.00
+S-002,Limpieza y Mantenimiento de Trampa de Grasa,Limpieza,Servicio,1800.00
+S-003,Análisis de Agua Residual (NOM-001),Laboratorio,Muestra,3500.00
+S-004,Análisis de Agua Potable (NOM-127),Laboratorio,Muestra,2800.00
+S-005,Mantenimiento Preventivo de Sistema de Bombeo,Mantenimiento,Servicio,1500.00
+S-006,Visita Técnica y Diagnóstico en Sitio,Consultoría,Evento,1200.00
+S-007,Desinfección de Cisternas y Tinacos,Limpieza,m3,150.00
+S-008,Gestoría de Trámites ante CFE/Agua,Gestoría,Trámite,4500.00
+S-009,Capacitación de Personal en PTAR,Capacitación,Sesión,3000.00
+S-010,Instalación de Equipo de Dosificación,Instalación,Evento,2500.00
