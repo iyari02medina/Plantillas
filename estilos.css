@@ -169,6 +169,11 @@
             margin-bottom: .5rem;
         }
 
+        .client-right-col {
+            text-align: end;
+            align-items: flex-end;
+        }
+
         .section-header {
             display: flex;
             align-items: center;
@@ -688,7 +693,7 @@
             }*/
 
             .client-right-col {
-                text-align: right;
+                text-align: end;
                 align-items: flex-end;
             }
         }
