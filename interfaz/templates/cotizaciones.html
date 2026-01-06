@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<header class="flex justify-between aligh-center">
+<header class="flex justify-between items-center">
     <div>
         <h1>Cotizaciones</h1>
         <p class="subtitle">Historial completo de cotizaciones realizadas.</p>
@@ -30,14 +30,14 @@
                 <td>${{ data.total }}</td>
                 <td>{{ data.items_count }}</td>
                 <td>
-                    <a href="{{ url_for('detalle_cotizacion', folio=data.folio) }}" class="btn btn-secondary"
-                        style="padding: 0.25rem 0.5rem; font-size: 0.8em;">Ver Cotización</a>
+                    <a href="{{ url_for('detalle_cotizacion', folio=data.folio) }}"
+                        class="btn btn-secondary btn-small">Ver Cotización</a>
                     <!-- Later link to generate PDF or HTML view -->
                 </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay cotizaciones
+                <td colspan="6" class="text-center text-muted p-8">No hay cotizaciones
                     registradas.</td>
             </tr>
             {% endfor %}
@@ -45,33 +45,26 @@
     </table>
 
     {% if total_pages > 1 %}
-    <div
-        style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 1rem; border-top: 1px solid var(--border-color, #e2e8f0);">
-
+    <div class="pagination">
         <!-- Previous Button -->
         {% if page > 1 %}
-        <a href="{{ url_for('cotizaciones', page=page-1) }}" class="btn btn-secondary"
-            style="padding: 0.25rem 0.75rem;">&laquo; Anterior</a>
+        <a href="{{ url_for('cotizaciones', page=page-1) }}" class="btn btn-secondary btn-small">&laquo; Anterior</a>
         {% else %}
-        <span class="btn btn-secondary" style="opacity: 0.5; padding: 0.25rem 0.75rem; cursor: not-allowed;">&laquo;
-            Anterior</span>
+        <span class="btn btn-secondary btn-small disabled-link">&laquo; Anterior</span>
         {% endif %}
 
         <!-- Page Numbers -->
         {% for p in range(1, total_pages + 1) %}
         <a href="{{ url_for('cotizaciones', page=p) }}"
-            class="btn {% if p == page %}btn-primary{% else %}btn-secondary{% endif %}"
-            style="padding: 0.25rem 0.75rem; min-width: 32px; text-align: center;">{{ p }}</a>
+            class="btn {% if p == page %}btn-primary{% else %}btn-secondary{% endif %} page-link">{{ p }}</a>
         {% endfor %}
 
         <!-- Next Button -->
-        {% if page < total_pages %} <a href="{{ url_for('cotizaciones', page=page+1) }}" class="btn btn-secondary"
-            style="padding: 0.25rem 0.75rem;">Siguiente &raquo;</a>
+        {% if page < total_pages %} <a href="{{ url_for('cotizaciones', page=page+1) }}"
+            class="btn btn-secondary btn-small">Siguiente &raquo;</a>
             {% else %}
-            <span class="btn btn-secondary"
-                style="opacity: 0.5; padding: 0.25rem 0.75rem; cursor: not-allowed;">Siguiente &raquo;</span>
+            <span class="btn btn-secondary btn-small disabled-link">Siguiente &raquo;</span>
             {% endif %}
-
     </div>
     {% endif %}
 </div>

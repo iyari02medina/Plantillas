@@ -1,15 +1,17 @@
 {% extends 'base.html' %}
 
+{% block extra_head %}
+{% endblock %}
+
 {% block content %}
-<header class="flex justify-between items-center"
-    style="display: flex; align-items: center; justify-content: space-between;">
+<header class="flex justify-between items-center">
     <div>
         <h1>{{ 'Detalle Cotización' if cotizacion else 'Nueva Cotización' }}</h1>
         <p class="subtitle">{{ 'Consulta y edita los detalles.' if cotizacion else 'Complete el formulario para
             registrar una nueva cotización.' }}</p>
     </div>
     {% if cotizacion %}
-    <div style="display: flex; gap: 1rem;">
+    <div class="flex gap-4">
         <a href="{{ url_for('ver_cotizacion', folio=cotizacion.folio_cot) }}" target="_blank"
             class="btn btn-secondary">Ver PDF</a>
         <button type="button" class="btn btn-primary" onclick="enableEdit()" id="btn-editar">Editar</button>
@@ -19,12 +21,11 @@
 
 <form action="{{ url_for('nueva_cotizacion') }}" method="POST" class="card">
     <input type="hidden" name="original_folio" value="{{ cotizacion.folio_cot if cotizacion else '' }}">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="grid-2 mb-4">
         <div class="form-group">
             <label for="folio_cot">Folio Cotización</label>
             <input type="text" id="folio_cot" name="folio_cot" placeholder="Ej. COT-COPHI-001"
-                value="{{ suggested_folio }}" required {% if cotizacion %}readonly style="background-color: #eee;" {%
-                endif %}>
+                value="{{ suggested_folio }}" required {% if cotizacion %}readonly class="readonly-bg" {% endif %}>
         </div>
         <div class="form-group">
             <label for="fecha_cot">Fecha</label>
@@ -33,8 +34,8 @@
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-        <div class="form-group" style="position: relative;">
+    <div class="grid-2 mb-4">
+        <div class="form-group relative">
             <label for="nombre_cliente">Cliente</label>
             <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar o escribir nuevo..."
                 autocomplete="off" oninput="fillClient(this)" required
@@ -47,7 +48,7 @@
                 value="{{ cotizacion.razon_social_cliente if cotizacion else '' }}" {% if cotizacion %}disabled{% endif
                 %}>
         </div>
-        <div class="form-group" style="grid-column: span 2;">
+        <div class="form-group col-span-2">
             <label for="direccion_cliente">Dirección</label>
             <input type="text" id="direccion_cliente" name="direccion_cliente"
                 value="{{ cotizacion.direccion_cliente if cotizacion else '' }}" {% if cotizacion %}disabled{% endif %}>
@@ -77,39 +78,39 @@
         {% for item in cotizacion.conceptos %}
         <div class="items-section item-row">
             <div>
-                <label style="font-size: 0.8em">Nombre Item</label>
+                <label class="label-small">Nombre Item</label>
                 <input type="text" name="nombre_item[]" list="inventory_list" onchange="fillItem(this)" required
                     placeholder="Buscar item..." value="{{ item.nombre_item }}" disabled>
             </div>
             <div>
-                <label style="font-size: 0.8em">Descripción</label>
+                <label class="label-small">Descripción</label>
                 <input type="text" name="descripcion_item[]" value="{{ item.descripcion_item }}" disabled>
             </div>
             <div>
-                <label style="font-size: 0.8em">Unidad</label>
+                <label class="label-small">Unidad</label>
                 <input type="text" name="unidad_item[]" placeholder="pza, servicio..." value="{{ item.unidad_item }}"
                     disabled>
             </div>
             <div>
-                <label style="font-size: 0.8em">Cant.</label>
+                <label class="label-small">Cant.</label>
                 <input type="number" step="1" name="cantidad_item[]" required value="{{ item.cantidad_item }}" disabled>
             </div>
             <div>
-                <label style="font-size: 0.8em">Precio U.</label>
+                <label class="label-small">Precio U.</label>
                 <input type="number" step="0.01" name="precio_unitario_item[]" required
                     value="{{ item.precio_unitario_item }}" disabled>
             </div>
-            <div style="padding-top: 1.5rem;">
-                <span class="remove-item" onclick="this.parentElement.parentElement.remove()"
-                    style="cursor: pointer; {% if cotizacion %}display: none;{% endif %}">✕</span>
+            <div class="pt-6">
+                <span class="remove-item {% if cotizacion %}hidden{% endif %}"
+                    onclick="this.parentElement.parentElement.remove()">✕</span>
             </div>
         </div>
         {% endfor %}
         {% endif %}
     </div>
 
-    <button type="button" class="btn btn-secondary mb-4" onclick="addItem()" id="btn-add-item" {% if cotizacion
-        %}style="display: none;" {% endif %}>+ Agregar Item</button>
+    <button type="button" class="btn btn-secondary mb-4 {% if cotizacion %}hidden{% endif %}" onclick="addItem()"
+        id="btn-add-item">+ Agregar Item</button>
 
     <h3>Términos y Condiciones</h3>
     <div class="form-group">
@@ -118,10 +119,10 @@
             %}>{{ cotizacion.terminos if cotizacion else 'El pago se realizará 50% anticipo y 50% contra entrega. Precios más IVA. Validez de la oferta: 15 días.' }}</textarea>
     </div>
 
-    <div style="text-align: right; margin-top: 2rem;">
-        <a href="{{ url_for('cotizaciones') }}" class="btn btn-secondary" style="margin-right: 1rem;">Cancelar</a>
-        <button type="submit" class="btn btn-primary" id="btn-submit" {% if cotizacion %}style="display: none;" {% endif
-            %}>Guardar Cotización</button>
+    <div class="text-right mt-8 flex justify-end gap-4">
+        <a href="{{ url_for('cotizaciones') }}" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary {% if cotizacion %}hidden{% endif %}" id="btn-submit">Guardar
+            Cotización</button>
     </div>
 </form>
 
@@ -133,8 +134,10 @@
     {% endfor %}
 </datalist>
 
+<script id="clients-data" type="application/json">{{ clientes|tojson|safe }}</script>
+
 <script>
-    const clientsData = {{ clientes| tojson }};
+    const clientsData = JSON.parse(document.getElementById('clients-data').textContent);
 
     function enableEdit() {
         // Enable all inputs
@@ -143,22 +146,22 @@
         // Unlock Readonly inputs (Folio)
         document.querySelectorAll('input[readonly]').forEach(el => {
             el.readOnly = false;
-            el.style.backgroundColor = '';
+            el.classList.remove('readonly-bg');
         });
 
         // Show buttons
         const btnAdd = document.getElementById('btn-add-item');
-        if (btnAdd) btnAdd.style.display = 'inline-block';
+        if (btnAdd) btnAdd.classList.remove('hidden');
 
         const btnSubmit = document.getElementById('btn-submit');
-        if (btnSubmit) btnSubmit.style.display = 'inline-block';
+        if (btnSubmit) btnSubmit.classList.remove('hidden');
 
         // Show delete icons
-        document.querySelectorAll('.remove-item').forEach(el => el.style.display = 'inline');
+        document.querySelectorAll('.remove-item').forEach(el => el.classList.remove('hidden'));
 
-        // Hide Edit button itself? Optional.
+        // Hide Edit button itself
         const btnEdit = document.getElementById('btn-editar');
-        if (btnEdit) btnEdit.style.display = 'none';
+        if (btnEdit) btnEdit.classList.add('hidden');
     }
 </script>
 <script src="{{ url_for('static', filename='crear_cotizacion.js') }}"></script>

@@ -7,6 +7,8 @@
     <title>Sist. Gestión - Cophi</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style></style>
+    {% block extra_head %}{% endblock %}
 </head>
 
 <body>
@@ -29,8 +31,7 @@
         {% if messages %}
         <div class="messages mb-4">
             {% for category, message in messages %}
-            <div class="card"
-                style="padding: 1rem; border-left: 4px solid {% if category=='error' %}var(--danger-color){% else %}var(--success-color){% endif %};">
+            <div class="card {% if category=='error' %}msg-error{% else %}msg-success{% endif %}">
                 {{ message }}
             </div>
             {% endfor %}
