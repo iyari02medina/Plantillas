@@ -6,7 +6,15 @@
     <p class="subtitle">Historial de órdenes de desazolve y servicios.</p>
 </header>
 
-<div class="card table-container">
+<div style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+    <button onclick="showTab('desazolve')" id="btn-desazolve" class="btn btn-primary">Desazolves</button>
+    <button onclick="showTab('trampas')" id="btn-trampas" class="btn btn-secondary">Trampas de Grasa</button>
+    <button onclick="showTab('visitas')" id="btn-visitas" class="btn btn-secondary">Visitas Técnicas</button>
+</div>
+
+<!-- DESAZOLVES -->
+<div id="tab-desazolve" class="card table-container">
+    <h3>Ordenes de Desazolve</h3>
     <table>
         <thead>
             <tr>
@@ -19,7 +27,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for orden in ordenes|reverse %}
+            {% for orden in desazolves|reverse %}
             {% if orden.folio_cot %}
             <tr>
                 <td><strong>{{ orden.folio_cot }}</strong></td>
@@ -44,11 +52,101 @@
             {% endif %}
             {% else %}
             <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay órdenes
-                    registradas.</td>
+                <td colspan="6" class="text-center text-muted p-8">No hay órdenes de desazolve registradas.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<!-- TRAMPAS -->
+<div id="tab-trampas" class="card table-container hidden">
+    <h3>Limpieza de Trampas</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Folio</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Ubicación</th>
+                <th>Tipo</th>
+                <th>Capacidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for orden in trampas|reverse %}
+            {% if orden.folio_ot %}
+            <tr>
+                <td><strong>{{ orden.folio_ot }}</strong></td>
+                <td>{{ orden.fecha_ot }}</td>
+                <td>{{ orden.nombre_cliente }}</td>
+                <td>{{ orden.ubicacion_equipo }}</td>
+                <td>{{ orden.tipo_trampa }}</td>
+                <td>{{ orden.capacidad_trampa }}</td>
+            </tr>
+            {% endif %}
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center text-muted p-8">No hay órdenes de trampas registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- VISITAS -->
+<div id="tab-visitas" class="card table-container hidden">
+    <h3>Visitas Técnicas</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Folio VT</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Dirección</th>
+                <th>No. Cliente</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for orden in visitas|reverse %}
+            {% if orden.folio_vt %}
+            <tr>
+                <td><strong>{{ orden.folio_vt }}</strong></td>
+                <td>{{ orden.fecha_vt }}</td>
+                <td>{{ orden.nombre_cliente }}</td>
+                <td>{{ orden.direccion_cliente }}</td>
+                <td>{{ orden.no_cliente }}</td>
+            </tr>
+            {% endif %}
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center text-muted p-8">No hay visitas técnicas registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function showTab(tabName) {
+        // Hide all
+        document.getElementById('tab-desazolve').classList.add('hidden');
+        document.getElementById('tab-trampas').classList.add('hidden');
+        document.getElementById('tab-visitas').classList.add('hidden');
+
+        // Show selected
+        document.getElementById('tab-' + tabName).classList.remove('hidden');
+
+        // Update buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-secondary');
+        });
+
+        // Highlight active btn
+        const activeBtn = document.getElementById('btn-' + tabName);
+        activeBtn.classList.remove('btn-secondary');
+        activeBtn.classList.add('btn-primary');
+    }
+</script>
 {% endblock %}

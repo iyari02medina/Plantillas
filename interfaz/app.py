@@ -11,6 +11,8 @@ app.secret_key = 'supersecretkey'  # Needed for flash messages
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 COTIZACIONES_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cotizacion', 'cotizaciones.csv'))
 ORDENES_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Orden de trabajo', 'ordenes_desazolve.csv'))
+TRAMPAS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Orden de trabajo', 'ordenes_trampas.csv'))
+VISITAS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Visita_tecnica', 'datos_visita_tecnica.csv'))
 INVENTARIO_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'productos_servicios.csv'))
 CLIENTES_CSV = r"C:\Users\DELL\Desktop\Cophi\Recursos\Programa_cophi\Plantillas\inventario\empresas.csv"
 COTIZACIONES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'cotizaciones'))
@@ -374,8 +376,10 @@ def nueva_cotizacion():
 
 @app.route('/ordenes')
 def ordenes():
-    raw_data = read_csv(ORDENES_CSV)
-    return render_template('ordenes.html', ordenes=raw_data)
+    desazolves = read_csv(ORDENES_CSV)
+    trampas = read_csv(TRAMPAS_CSV)
+    visitas = read_csv(VISITAS_CSV)
+    return render_template('ordenes.html', desazolves=desazolves, trampas=trampas, visitas=visitas)
 
 @app.route('/ver_cotizacion/<folio>')
 def ver_cotizacion(folio):
