@@ -21,18 +21,11 @@
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-        <div class="form-group">
+        <div class="form-group" style="position: relative;">
             <label for="nombre_cliente">Cliente</label>
-            <input type="text" id="nombre_cliente" name="nombre_cliente" list="clientes_list"
-                placeholder="Buscar o escribir nuevo..." autocomplete="off" oninput="fillClient(this)" required>
-            <datalist id="clientes_list">
-                {% for c in clientes %}
-                <option value="{{ c.nombre_empresa }}" data-razon="{{ c.nombre_empresa }}"
-                    data-direccion="{{ c.direccion_empresa }}" data-contacto=""
-                    data-telefono="{{ c.telefono_empresa }}">
-                </option>
-                {% endfor %}
-            </datalist>
+            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar o escribir nuevo..."
+                autocomplete="off" oninput="fillClient(this)" required>
+            <div id="suggestions-box"></div>
         </div>
         <div class="form-group">
             <label for="razon_social_cliente">Razón Social</label>
@@ -87,100 +80,7 @@
 </datalist>
 
 <script>
-    function normalizeStr(str) {
-        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    }
-
-    // Prepare functionality to fill client data
-    function fillClient(input) {
-        const val = normalizeStr(input.value);
-        const list = document.getElementById('clientes_list');
-        const options = list.options;
-
-        // Reset fields first - if we don't match, we assume it's a new client or manual entry
-        // We do NOT clear the fields immediately to avoid annoying the user if they are just correcting a typo
-        // But if a match IS found, we overwrite.
-
-        if (!val) return;
-
-        for (let i = 0; i < options.length; i++) {
-            const optVal = normalizeStr(options[i].value);
-
-            // Check for exact match (loose accents) to trigger autofill
-            if (val === optVal) {
-                // Found a match!
-                document.getElementById('razon_social_cliente').value = options[i].getAttribute('data-razon') || options[i].value;
-                document.getElementById('direccion_cliente').value = options[i].getAttribute('data-direccion');
-                document.getElementById('telefono_contacto').value = options[i].getAttribute('data-telefono');
-
-                // Visual feedback
-                input.style.borderColor = 'var(--success-color)';
-                setTimeout(() => input.style.borderColor = '', 1000);
-                return;
-            }
-        }
-    }
-
-    function addItem() {
-        const container = document.getElementById('items-container');
-        const index = container.children.length;
-
-        const row = document.createElement('div');
-        row.className = 'items-section item-row';
-        row.innerHTML = `
-            <div>
-                <label style="font-size: 0.8em">Nombre Item</label>
-                <input type="text" name="nombre_item[]" list="inventory_list" onchange="fillItem(this)" required placeholder="Buscar item...">
-            </div>
-            <div>
-                <label style="font-size: 0.8em">Descripción</label>
-                <input type="text" name="descripcion_item[]">
-            </div>
-            <div>
-                <label style="font-size: 0.8em">Unidad</label>
-                <input type="text" name="unidad_item[]" placeholder="pza, servicio...">
-            </div>
-            <div>
-                <label style="font-size: 0.8em">Cant.</label>
-                <input type="number" step="0.01" name="cantidad_item[]" required value="1">
-            </div>
-            <div>
-                <label style="font-size: 0.8em">Precio U.</label>
-                <input type="number" step="0.01" name="precio_unitario_item[]" required>
-            </div>
-            <div style="padding-top: 1.5rem;">
-                <span class="remove-item" onclick="this.parentElement.parentElement.remove()">✕</span>
-            </div>
-        `;
-        container.appendChild(row);
-    }
-
-    function fillItem(input) {
-        const val = input.value;
-        const list = document.getElementById('inventory_list');
-        const options = list.options;
-        // Find the parent row to update its sibling inputs
-        const row = input.parentElement.parentElement;
-
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].value === val) {
-                // Found the item in the datalist
-                const desc = options[i].getAttribute('data-desc');
-                const unit = options[i].getAttribute('data-unit');
-                const price = options[i].getAttribute('data-price');
-
-                // Update inputs
-                row.querySelector('input[name="descripcion_item[]"]').value = desc;
-                row.querySelector('input[name="unidad_item[]"]').value = unit;
-                row.querySelector('input[name="precio_unitario_item[]"]').value = price;
-                break;
-            }
-        }
-    }
-
-    // Add one item by default
-    document.addEventListener('DOMContentLoaded', () => {
-        addItem();
-    });
+    const clientsData = {{ clientes| tojson }};
 </script>
+<script src="{{ url_for('static', filename='crear_cotizacion.js') }}"></script>
 {% endblock %}
