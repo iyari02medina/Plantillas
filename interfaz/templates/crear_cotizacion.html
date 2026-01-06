@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header>
+    <h1>Nueva Cotización</h1>
+    <p class="subtitle">Complete el formulario para registrar una nueva cotización.</p>
+</header>
+
+<form action="{{ url_for('nueva_cotizacion') }}" method="POST" class="card">
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="form-group">
+            <label for="folio_cot">Folio Cotización</label>
+            <input type="text" id="folio_cot" name="folio_cot" placeholder="Ej. COT-COPHI-001"
+                value="{{ suggested_folio }}" required>
+        </div>
+        <div class="form-group">
+            <label for="fecha_cot">Fecha</label>
+            <input type="date" id="fecha_cot" name="fecha_cot">
+        </div>
+    </div>
+
+    <h3>Datos del Cliente</h3>
+    <div class="form-group">
+        <label for="search_cliente">Buscar Cliente (Existente)</label>
+        <input type="text" list="clientes_list" id="search_cliente" placeholder="Escribe para buscar..."
+            oninput="fillClient(this)">
+        <datalist id="clientes_list">
+            {% for c in clientes %}
+            <option value="{{ c.nombre_empresa }}" data-razon="{{ c.nombre_empresa }}"
+                data-direccion="{{ c.direccion_empresa }}" data-contacto="" data-telefono="{{ c.telefono_empresa }}">{{
+                c.nombre_empresa }}</option>
+            {% endfor %}
+        </datalist>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="form-group">
+            <label for="nombre_cliente">Nombre Cliente (Corto)</label>
+            <input type="text" id="nombre_cliente" name="nombre_cliente" required>
+        </div>
+        <div class="form-group">
+            <label for="razon_social_cliente">Razón Social</label>
+            <input type="text" id="razon_social_cliente" name="razon_social_cliente">
+        </div>
+        <div class="form-group" style="grid-column: span 2;">
+            <label for="direccion_cliente">Dirección</label>
+            <input type="text" id="direccion_cliente" name="direccion_cliente">
+        </div>
+        <div class="form-group">
+            <label for="nombre_contacto">Contacto</label>
+            <input type="text" id="nombre_contacto" name="nombre_contacto">
+        </div>
+        <div class="form-group">
+            <label for="telefono_contacto">Teléfono</label>
+            <input type="text" id="telefono_contacto" name="telefono_contacto">
+        </div>
+    </div>
+
+    <h3>Detalles del Servicio</h3>
+    <div class="form-group">
+        <label for="alcance_cot">Alcance (Descripción General)</label>
+        <textarea id="alcance_cot" name="alcance_cot" rows="3"></textarea>
+    </div>
+
+    <h3>Items / Conceptos</h3>
+    <div id="items-container">
+        <!-- Javascript will populate this -->
+    </div>
+
+    <button type="button" class="btn btn-secondary mb-4" onclick="addItem()">+ Agregar Item</button>
+
+    <h3>Términos y Condiciones</h3>
+    <div class="form-group">
+        <label for="terminos">Texto de Términos</label>
+        <textarea id="terminos" name="terminos"
+            rows="4">El pago se realizará 50% anticipo y 50% contra entrega. Precios más IVA. Validez de la oferta: 15 días.</textarea>
+    </div>
+
+    <div style="text-align: right; margin-top: 2rem;">
+        <a href="{{ url_for('cotizaciones') }}" class="btn btn-secondary" style="margin-right: 1rem;">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Guardar Cotización</button>
+    </div>
+</form>
+
+<!-- Datalist for items (hidden, used by JS) -->
+<datalist id="inventory_list">
+    {% for item in inventario %}
+    <option value="{{ item.Nombre }}" data-desc="{{ item.Nombre }}" data-unit="{{ item.Unidad }}"
+        data-price="{{ item.Precio }}">{{ item.Nombre }}</option>
+    {% endfor %}
+</datalist>
+
+<script>
+    // Prepare functionality to fill client data
+    function fillClient(input) {
+        const val = input.value;
+        const list = document.getElementById('clientes_list');
+        const options = list.options;
+
+        // Clear fields first if empty
+        if (!val) {
+            return;
+        }
+
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === val) {
+                // Found the exact match in the list
+                document.getElementById('nombre_cliente').value = options[i].value;
+                document.getElementById('razon_social_cliente').value = options[i].getAttribute('data-razon') || options[i].value;
+                document.getElementById('direccion_cliente').value = options[i].getAttribute('data-direccion');
+
+                // If the CSV doesn't have contact person, we leave it or clear it
+                // document.getElementById('nombre_contacto').value = options[i].getAttribute('data-contacto'); 
+
+                document.getElementById('telefono_contacto').value = options[i].getAttribute('data-telefono');
+
+                // Visual feedback
+                input.style.borderColor = 'var(--success-color)';
+                setTimeout(() => input.style.borderColor = '', 1000);
+                break;
+            }
+        }
+    }
+
+    function addItem() {
+        const container = document.getElementById('items-container');
+        const index = container.children.length;
+
+        const row = document.createElement('div');
+        row.className = 'items-section item-row';
+        row.innerHTML = `
+            <div>
+                <label style="font-size: 0.8em">Nombre Item</label>
+                <input type="text" name="nombre_item[]" list="inventory_list" onchange="fillItem(this)" required placeholder="Buscar item...">
+            </div>
+            <div>
+                <label style="font-size: 0.8em">Descripción</label>
+                <input type="text" name="descripcion_item[]">
+            </div>
+            <div>
+                <label style="font-size: 0.8em">Unidad</label>
+                <input type="text" name="unidad_item[]" placeholder="pza, servicio...">
+            </div>
+            <div>
+                <label style="font-size: 0.8em">Cant.</label>
+                <input type="number" step="0.01" name="cantidad_item[]" required value="1">
+            </div>
+            <div>
+                <label style="font-size: 0.8em">Precio U.</label>
+                <input type="number" step="0.01" name="precio_unitario_item[]" required>
+            </div>
+            <div style="padding-top: 1.5rem;">
+                <span class="remove-item" onclick="this.parentElement.parentElement.remove()">✕</span>
+            </div>
+        `;
+        container.appendChild(row);
+    }
+
+    function fillItem(input) {
+        const val = input.value;
+        const list = document.getElementById('inventory_list');
+        const options = list.options;
+        // Find the parent row to update its sibling inputs
+        const row = input.parentElement.parentElement;
+
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === val) {
+                // Found the item in the datalist
+                const desc = options[i].getAttribute('data-desc');
+                const unit = options[i].getAttribute('data-unit');
+                const price = options[i].getAttribute('data-price');
+
+                // Update inputs
+                row.querySelector('input[name="descripcion_item[]"]').value = desc;
+                row.querySelector('input[name="unidad_item[]"]').value = unit;
+                row.querySelector('input[name="precio_unitario_item[]"]').value = price;
+                break;
+            }
+        }
+    }
+
+    // Add one item by default
+    document.addEventListener('DOMContentLoaded', () => {
+        addItem();
+    });
+</script>
+{% endblock %}

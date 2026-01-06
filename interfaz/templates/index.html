@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header>
+    <h1>Dashboard</h1>
+    <p class="subtitle">Bienvenido al sistema de gestión de Cophi.</p>
+</header>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ total_cotizaciones }}</div>
+        <div class="stat-label">Cotizaciones Registradas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_ordenes }}</div>
+        <div class="stat-label">Órdenes de Trabajo</div>
+    </div>
+    <!-- Placeholder for more stats -->
+    <div class="stat-card">
+        <div class="stat-value">--</div>
+        <div class="stat-label">Próximos Vencimientos</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Acciones Rápidas</h2>
+    <div class="flex" style="gap: 1rem;">
+        <a href="{{ url_for('nueva_cotizacion') }}" class="btn btn-primary">Crear Nueva Cotización</a>
+        <a href="{{ url_for('ordenes') }}" class="btn btn-secondary">Ver Órdenes Recientes</a>
+    </div>
+</div>
+{% endblock %}

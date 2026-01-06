@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header>
+    <h1>Órdenes de Trabajo</h1>
+    <p class="subtitle">Historial de órdenes de desazolve y servicios.</p>
+</header>
+
+<div class="card table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Folio</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Ubicación</th>
+                <th>Servicio</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for orden in ordenes|reverse %}
+            {% if orden.folio_cot %}
+            <tr>
+                <td><strong>{{ orden.folio_cot }}</strong></td>
+                <td>{{ orden.fecha_cot }}</td>
+                <td>{{ orden.nombre_cliente }}</td>
+                <td>{{ orden.ubicacion_area }}</td>
+                <td>
+                    {% if orden.equipo_vactor == 'x' %}Vactor{% endif %}
+                    {% if orden.equipo_hidro == 'x' %}Hidro{% endif %}
+                    {% if orden.equipo_guia == 'x' %}Guía{% endif %}
+                </td>
+                <td>
+                    {% if orden.estado_bueno == 'x' %}
+                    <span class="badge badge-success">Bueno</span>
+                    {% elif orden.estado_danado == 'x' %}
+                    <span class="badge badge-warning">Dañado</span>
+                    {% else %}
+                    <span class="badge">--</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay órdenes
+                    registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

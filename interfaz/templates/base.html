@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sist. Gestión - Cophi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="brand">
+            Cophi Panel
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index') }}"
+                    class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Dashboard</a></li>
+            <li><a href="{{ url_for('cotizaciones') }}"
+                    class="nav-link {% if request.endpoint == 'cotizaciones' %}active{% endif %}">Cotizaciones</a></li>
+            <li><a href="{{ url_for('nueva_cotizacion') }}"
+                    class="nav-link {% if request.endpoint == 'nueva_cotizacion' %}active{% endif %}">+ Nueva
+                    Cotización</a></li>
+            <li><a href="{{ url_for('ordenes') }}"
+                    class="nav-link {% if request.endpoint == 'ordenes' %}active{% endif %}">Órdenes de Trabajo</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for category, message in messages %}
+            <div class="card"
+                style="padding: 1rem; border-left: 4px solid {% if category=='error' %}var(--danger-color){% else %}var(--success-color){% endif %};">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Simple script to handle dynamic add/remove items could go here if global
+    </script>
+</body>
+
+</html>

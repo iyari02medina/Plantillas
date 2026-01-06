@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="flex justify-between aligh-center">
+    <div>
+        <h1>Cotizaciones</h1>
+        <p class="subtitle">Historial completo de cotizaciones realizadas.</p>
+    </div>
+    <a href="{{ url_for('nueva_cotizacion') }}" class="btn btn-primary">Nueva Cotización</a>
+</header>
+
+<div class="card table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Folio</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Items</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for folio, data in cotizaciones.items()|reverse %}
+            <tr>
+                <td><strong>{{ data.folio }}</strong></td>
+                <td>{{ data.cliente }}</td>
+                <td>{{ data.fecha }}</td>
+                <td>${{ data.total }}</td>
+                <td>{{ data.items_count }}</td>
+                <td>
+                    <a href="{{ url_for('ver_cotizacion', folio=data.folio) }}" target="_blank"
+                        class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8em;">Ver Cotización</a>
+                    <!-- Later link to generate PDF or HTML view -->
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay cotizaciones
+                    registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
