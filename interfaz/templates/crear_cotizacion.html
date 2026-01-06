@@ -93,16 +93,16 @@
             </div>
             <div>
                 <label class="label-small">Cant.</label>
-                <input type="number" step="1" name="cantidad_item[]" required value="{{ item.cantidad_item }}" disabled>
+                <input type="number" step="1" name="cantidad_item[]" required value="{{ item.cantidad_item }}" disabled
+                    oninput="calculateTotals()">
             </div>
             <div>
                 <label class="label-small">Precio U.</label>
                 <input type="number" step="0.01" name="precio_unitario_item[]" required
-                    value="{{ item.precio_unitario_item }}" disabled>
+                    value="{{ item.precio_unitario_item }}" disabled oninput="calculateTotals()">
             </div>
             <div class="pt-6">
-                <span class="remove-item {% if cotizacion %}hidden{% endif %}"
-                    onclick="this.parentElement.parentElement.remove()">✕</span>
+                <span class="remove-item {% if cotizacion %}hidden{% endif %}" onclick="removeItem(this)">✕</span>
             </div>
         </div>
         {% endfor %}
@@ -111,6 +111,24 @@
 
     <button type="button" class="btn btn-secondary mb-4 {% if cotizacion %}hidden{% endif %}" onclick="addItem()"
         id="btn-add-item">+ Agregar Item</button>
+
+    <div class="card bg-gray-50 mt-4 p-4">
+        <div class="flex flex-col items-end gap-2">
+            <div class="flex justify-between w-64">
+                <span class="font-bold">Subtotal:</span>
+                <span id="subtotal-display">$0.00</span>
+            </div>
+            <div class="flex justify-between w-64 text-gray-600">
+                <span>IVA (16%):</span>
+                <span id="iva-display">$0.00</span>
+            </div>
+            <div class="flex justify-between w-64 text-xl font-bold border-t pt-2 mt-2">
+                <span>Total:</span>
+                <span id="total-display" class="text-primary">$0.00</span>
+            </div>
+        </div>
+    </div>
+
 
     <h3>Términos y Condiciones</h3>
     <div class="form-group">

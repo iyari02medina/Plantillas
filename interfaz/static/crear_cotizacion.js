@@ -59,6 +59,40 @@ document.addEventListener('click', function (e) {
     }
 });
 
+// Add one item by default
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('items-container');
+    if (container && container.children.length === 0) {
+        addItem();
+    }
+    // Calculate initial totals if there are existing items (e.g., when viewing/editing)
+    calculateTotals();
+});
+
+function calculateTotals() {
+    const rows = document.querySelectorAll('.item-row');
+    let subtotal = 0;
+
+    rows.forEach(row => {
+        const qty = parseFloat(row.querySelector('input[name="cantidad_item[]"]').value) || 0;
+        const price = parseFloat(row.querySelector('input[name="precio_unitario_item[]"]').value) || 0;
+        subtotal += qty * price;
+    });
+
+    const iva = subtotal * 0.16;
+    const total = subtotal + iva;
+
+    // Update display
+    const formatter = new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN'
+    });
+
+    document.getElementById('subtotal-display').textContent = formatter.format(subtotal);
+    document.getElementById('iva-display').textContent = formatter.format(iva);
+    document.getElementById('total-display').textContent = formatter.format(total);
+}
+
 function addItem() {
     const container = document.getElementById('items-container');
     const row = document.createElement('div');
@@ -78,17 +112,23 @@ function addItem() {
         </div>
         <div>
             <label style="font-size: 0.8em">Cant.</label>
-            <input type="number" step="1" name="cantidad_item[]" required value="1">
+            <input type="number" step="1" name="cantidad_item[]" required value="1" oninput="calculateTotals()">
         </div>
         <div>
             <label style="font-size: 0.8em">Precio U.</label>
-            <input type="number" step="0.01" name="precio_unitario_item[]" required>
+            <input type="number" step="0.01" name="precio_unitario_item[]" required oninput="calculateTotals()">
         </div>
         <div style="padding-top: 1.5rem;">
-            <span class="remove-item" onclick="this.parentElement.parentElement.remove()">✕</span>
+            <span class="remove-item" onclick="removeItem(this)">✕</span>
         </div>
     `;
     container.appendChild(row);
+    calculateTotals();
+}
+
+function removeItem(span) {
+    span.parentElement.parentElement.remove();
+    calculateTotals();
 }
 
 function fillItem(input) {
@@ -109,15 +149,11 @@ function fillItem(input) {
             row.querySelector('input[name="descripcion_item[]"]').value = desc;
             row.querySelector('input[name="unidad_item[]"]').value = unit;
             row.querySelector('input[name="precio_unitario_item[]"]').value = price;
+
+            // Recalculate totals after filling item details
+            calculateTotals();
             break;
         }
     }
 }
 
-// Add one item by default
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('items-container');
-    if (container && container.children.length === 0) {
-        addItem();
-    }
-});
