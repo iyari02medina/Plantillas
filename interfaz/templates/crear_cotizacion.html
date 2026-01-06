@@ -20,24 +20,19 @@
         </div>
     </div>
 
-    <h3>Datos del Cliente</h3>
-    <div class="form-group">
-        <label for="search_cliente">Buscar Cliente (Existente)</label>
-        <input type="text" list="clientes_list" id="search_cliente" placeholder="Escribe para buscar..."
-            oninput="fillClient(this)">
-        <datalist id="clientes_list">
-            {% for c in clientes %}
-            <option value="{{ c.nombre_empresa }}" data-razon="{{ c.nombre_empresa }}"
-                data-direccion="{{ c.direccion_empresa }}" data-contacto="" data-telefono="{{ c.telefono_empresa }}">{{
-                c.nombre_empresa }}</option>
-            {% endfor %}
-        </datalist>
-    </div>
-
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
         <div class="form-group">
-            <label for="nombre_cliente">Nombre Cliente (Corto)</label>
-            <input type="text" id="nombre_cliente" name="nombre_cliente" required>
+            <label for="nombre_cliente">Cliente</label>
+            <input type="text" id="nombre_cliente" name="nombre_cliente" list="clientes_list"
+                placeholder="Buscar o escribir nuevo..." autocomplete="off" oninput="fillClient(this)" required>
+            <datalist id="clientes_list">
+                {% for c in clientes %}
+                <option value="{{ c.nombre_empresa }}" data-razon="{{ c.nombre_empresa }}"
+                    data-direccion="{{ c.direccion_empresa }}" data-contacto=""
+                    data-telefono="{{ c.telefono_empresa }}">
+                </option>
+                {% endfor %}
+            </datalist>
         </div>
         <div class="form-group">
             <label for="razon_social_cliente">Razón Social</label>
@@ -92,33 +87,36 @@
 </datalist>
 
 <script>
+    function normalizeStr(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
     // Prepare functionality to fill client data
     function fillClient(input) {
-        const val = input.value;
+        const val = normalizeStr(input.value);
         const list = document.getElementById('clientes_list');
         const options = list.options;
 
-        // Clear fields first if empty
-        if (!val) {
-            return;
-        }
+        // Reset fields first - if we don't match, we assume it's a new client or manual entry
+        // We do NOT clear the fields immediately to avoid annoying the user if they are just correcting a typo
+        // But if a match IS found, we overwrite.
+
+        if (!val) return;
 
         for (let i = 0; i < options.length; i++) {
-            if (options[i].value === val) {
-                // Found the exact match in the list
-                document.getElementById('nombre_cliente').value = options[i].value;
+            const optVal = normalizeStr(options[i].value);
+
+            // Check for exact match (loose accents) to trigger autofill
+            if (val === optVal) {
+                // Found a match!
                 document.getElementById('razon_social_cliente').value = options[i].getAttribute('data-razon') || options[i].value;
                 document.getElementById('direccion_cliente').value = options[i].getAttribute('data-direccion');
-
-                // If the CSV doesn't have contact person, we leave it or clear it
-                // document.getElementById('nombre_contacto').value = options[i].getAttribute('data-contacto'); 
-
                 document.getElementById('telefono_contacto').value = options[i].getAttribute('data-telefono');
 
                 // Visual feedback
                 input.style.borderColor = 'var(--success-color)';
                 setTimeout(() => input.style.borderColor = '', 1000);
-                break;
+                return;
             }
         }
     }
