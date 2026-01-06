@@ -350,17 +350,23 @@ def nueva_cotizacion():
     cotizaciones_existentes = read_csv(COTIZACIONES_CSV)
     next_folio_num = 1
     if cotizaciones_existentes:
-        try:
-            # Try to extract number from last folio (assuming format COT-...-XXX)
-            # This is a naive heuristic, can be improved
-            last_folio = cotizaciones_existentes[-1]['folio_cot']
-            parts = last_folio.replace('-', ' ').split()
-            for p in reversed(parts):
-                if p.isdigit():
-                    next_folio_num = int(p) + 1
-                    break
-        except:
-            pass
+        max_num = 0
+        for row in cotizaciones_existentes:
+            try:
+                folio = row.get('folio_cot', '')
+                # Assuming format COT-COPHI-XXX or similar standard ending in digits
+                # Split by delimiters to be safe
+                parts = folio.replace('-', ' ').split()
+                # Look for the last numeric part
+                for p in reversed(parts):
+                    if p.isdigit():
+                        num = int(p)
+                        if num > max_num:
+                            max_num = num
+                        break
+            except:
+                pass
+        next_folio_num = max_num + 1
     
     suggested_folio = f"COT-COPHI-{next_folio_num:03d}"
 
