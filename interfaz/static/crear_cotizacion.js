@@ -78,7 +78,7 @@ function addItem() {
         </div>
         <div>
             <label style="font-size: 0.8em">Cant.</label>
-            <input type="number" step="0.01" name="cantidad_item[]" required value="1">
+            <input type="number" step="1" name="cantidad_item[]" required value="1">
         </div>
         <div>
             <label style="font-size: 0.8em">Precio U.</label>
