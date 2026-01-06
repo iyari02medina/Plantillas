@@ -13,6 +13,82 @@ ORDENES_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Orden de trabajo', '
 INVENTARIO_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'productos_servicios.csv'))
 CLIENTES_CSV = r"C:\Users\DELL\Desktop\Cophi\Recursos\Programa_cophi\Plantillas\inventario\empresas.csv"
 COTIZACIONES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'cotizaciones'))
+TEMPLATE_COT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cotizacion'))
+
+def generate_quotation_html(folio):
+    """Genera el archivo HTML de la cotización usando el script logic."""
+    try:
+        from jinja2 import Environment, FileSystemLoader
+        env = Environment(loader=FileSystemLoader(TEMPLATE_COT_DIR))
+        template = env.get_template('plantilla_cotizacion.html')
+        
+        # Leer el CSV para obtener los datos de ese folio
+        all_rows = read_csv(COTIZACIONES_CSV)
+        folio_rows = [r for r in all_rows if r.get('folio_cot') == folio]
+        
+        if not folio_rows:
+            return False
+            
+        row = folio_rows[0]
+        subtotal = float(row.get('subtotal', 0).replace(',', ''))
+        iva = float(row.get('iva', 0).replace(',', ''))
+        total = float(row.get('total', 0).replace(',', ''))
+        
+        data = {
+            'folio_cot': folio,
+            'nombre_cot': row.get('nombre_cot', ''),
+            'fecha_cot': row.get('fecha_cot', ''),
+            'nombre_cliente': row.get('nombre_cliente', ''),
+            'direccion_cliente': row.get('direccion_cliente', ''),
+            'nombre_contacto': row.get('nombre_contacto', ''),
+            'telefono_contacto': row.get('telefono_contacto', ''),
+            'alcance_cot': row.get('alcance_cot', ''),
+            'terminos': row.get('terminos', ''),
+            'gestor': 'ING. EJEMPLO GESTOR', 
+            'puesto_gestor': 'GERENTE DE PROYECTOS',
+            'subtotal': f"{subtotal:,.2f}",
+            'iva': f"{iva:,.2f}",
+            'total': f"{total:,.2f}",
+            'items': [],
+            'unique_images': [],
+            'seen_images': set(),
+            'alcance_lines': row.get('alcance_cot', '').split('\n')
+        }
+        
+        for r in folio_rows:
+            item_total = float(r.get('importe_item', 0).replace(',', ''))
+            data['items'].append({
+                'nombre_item': r.get('nombre_item', ''),
+                'descripcion_item': r.get('descripcion_item', ''),
+                'unidad_item': r.get('unidad_item', ''),
+                'cantidad_item': r.get('cantidad_item', ''),
+                'precio_unitario_item': f"{float(r.get('precio_unitario_item', 0)):,.2f}",
+                'importe_item': f"{item_total:,.2f}",
+                'imagen_item': r.get('imagen_item', '')
+            })
+            
+            img = r.get('imagen_item', '')
+            if img and img not in data['seen_images']:
+                data['seen_images'].add(img)
+                data['unique_images'].append({'filename': img, 'caption': r.get('nombre_item', '')})
+
+        output = template.render(data)
+        
+        # Ajustar rutas para el servidor local (opcional, pero ayuda a la consistencia)
+        output = output.replace('href="../estilos.css"', 'href="../../Plantillas/estilos.css"')
+        output = output.replace('src="../img/logo-cophi-negro.jpg"', 'src="../../Plantillas/img/logo-cophi-negro.jpg"')
+        output = output.replace('src="../paginacion.js"', 'src="../../Plantillas/paginacion.js"')
+        
+        if not os.path.exists(COTIZACIONES_GEN_DIR):
+            os.makedirs(COTIZACIONES_GEN_DIR)
+            
+        output_filename = os.path.join(COTIZACIONES_GEN_DIR, f'cotizacion_{folio}.html')
+        with open(output_filename, 'w', encoding='utf-8') as f:
+            f.write(output)
+        return True
+    except Exception as e:
+        print(f"Error generando HTML para {folio}: {e}")
+        return False
 
 def read_csv(filepath):
     items = []
@@ -112,6 +188,25 @@ def nueva_cotizacion():
         items_price = request.form.getlist('precio_unitario_item[]')
         
         rows_to_save = []
+        subtotal_acumulado = 0.0
+        
+        # Primero calcular el subtotal total de la cotización
+        for i in range(len(items_names)):
+            try:
+                qty = float(items_qty[i])
+                price = float(items_price[i])
+                subtotal_acumulado += (qty * price)
+            except:
+                pass
+        
+        iva_total = subtotal_acumulado * 0.16
+        total_total = subtotal_acumulado + iva_total
+        
+        # Actualizar base_data con los totales calculados
+        base_data['subtotal'] = f"{subtotal_acumulado:.2f}"
+        base_data['iva'] = f"{iva_total:.2f}"
+        base_data['total'] = f"{total_total:.2f}"
+
         for i in range(len(items_names)):
             row = base_data.copy()
             row['nombre_item'] = items_names[i]
@@ -119,9 +214,8 @@ def nueva_cotizacion():
             row['unidad_item'] = items_units[i]
             row['cantidad_item'] = items_qty[i]
             row['precio_unitario_item'] = items_price[i]
-            row['imagen_item'] = '' # TODO: Handle image upload if needed
+            row['imagen_item'] = '' 
             
-            # Simple calculation for CSV consistency
             try:
                 qty = float(items_qty[i])
                 price = float(items_price[i])
@@ -153,7 +247,13 @@ def nueva_cotizacion():
                     r[h] = ''
 
         append_to_csv(COTIZACIONES_CSV, headers, rows_to_save)
-        flash('Cotización guardada exitosamente.', 'success')
+        
+        # Generar el HTML automáticamente después de guardar
+        if generate_quotation_html(folio):
+            flash('Cotización guardada y generada exitosamente.', 'success')
+        else:
+            flash('Cotización guardada en CSV, pero hubo un error al generar el archivo visual.', 'warning')
+            
         return redirect(url_for('cotizaciones'))
 
     # Load inventory and clients for the form
