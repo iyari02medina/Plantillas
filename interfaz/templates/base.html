@@ -19,9 +19,6 @@
                     class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Dashboard</a></li>
             <li><a href="{{ url_for('cotizaciones') }}"
                     class="nav-link {% if request.endpoint == 'cotizaciones' %}active{% endif %}">Cotizaciones</a></li>
-            <li><a href="{{ url_for('nueva_cotizacion') }}"
-                    class="nav-link {% if request.endpoint == 'nueva_cotizacion' %}active{% endif %}">+ Nueva
-                    Cotización</a></li>
             <li><a href="{{ url_for('ordenes') }}"
                     class="nav-link {% if request.endpoint == 'ordenes' %}active{% endif %}">Órdenes de Trabajo</a></li>
         </ul>

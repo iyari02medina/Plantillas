@@ -22,7 +22,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for folio, data in cotizaciones.items()|reverse %}
+            {% for data in cotizaciones %}
             <tr>
                 <td><strong>{{ data.folio }}</strong></td>
                 <td>{{ data.cliente }}</td>
@@ -43,5 +43,36 @@
             {% endfor %}
         </tbody>
     </table>
+
+    {% if total_pages > 1 %}
+    <div
+        style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 1rem; border-top: 1px solid var(--border-color, #e2e8f0);">
+
+        <!-- Previous Button -->
+        {% if page > 1 %}
+        <a href="{{ url_for('cotizaciones', page=page-1) }}" class="btn btn-secondary"
+            style="padding: 0.25rem 0.75rem;">&laquo; Anterior</a>
+        {% else %}
+        <span class="btn btn-secondary" style="opacity: 0.5; padding: 0.25rem 0.75rem; cursor: not-allowed;">&laquo;
+            Anterior</span>
+        {% endif %}
+
+        <!-- Page Numbers -->
+        {% for p in range(1, total_pages + 1) %}
+        <a href="{{ url_for('cotizaciones', page=p) }}"
+            class="btn {% if p == page %}btn-primary{% else %}btn-secondary{% endif %}"
+            style="padding: 0.25rem 0.75rem; min-width: 32px; text-align: center;">{{ p }}</a>
+        {% endfor %}
+
+        <!-- Next Button -->
+        {% if page < total_pages %} <a href="{{ url_for('cotizaciones', page=page+1) }}" class="btn btn-secondary"
+            style="padding: 0.25rem 0.75rem;">Siguiente &raquo;</a>
+            {% else %}
+            <span class="btn btn-secondary"
+                style="opacity: 0.5; padding: 0.25rem 0.75rem; cursor: not-allowed;">Siguiente &raquo;</span>
+            {% endif %}
+
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, sen
 import csv
 import os
 import datetime
+import math
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # Needed for flash messages
@@ -190,7 +191,27 @@ def cotizaciones():
             }
         grouped_cotizaciones[folio]['items_count'] += 1
     
-    return render_template('cotizaciones.html', cotizaciones=grouped_cotizaciones)
+    # Convert to list and reverse to show newest first
+    all_cots = list(grouped_cotizaciones.values())[::-1]
+    
+    # Pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    total_items = len(all_cots)
+    total_pages = math.ceil(total_items / per_page)
+    
+    # Correct page bounds
+    if page < 1: page = 1
+    if page > total_pages and total_pages > 0: page = total_pages
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_cots = all_cots[start:end]
+    
+    return render_template('cotizaciones.html', 
+                         cotizaciones=paginated_cots,
+                         page=page,
+                         total_pages=total_pages)
 
 @app.route('/nueva_cotizacion', methods=['GET', 'POST'])
 def nueva_cotizacion():
