@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<header>
-    <h1>Nueva Cotización</h1>
-    <p class="subtitle">Complete el formulario para registrar una nueva cotización.</p>
+<header class="flex justify-between items-center"
+    style="display: flex; align-items: center; justify-content: space-between;">
+    <div>
+        <h1>{{ 'Detalle Cotización' if cotizacion else 'Nueva Cotización' }}</h1>
+        <p class="subtitle">{{ 'Consulta y edita los detalles.' if cotizacion else 'Complete el formulario para
+            registrar una nueva cotización.' }}</p>
+    </div>
+    {% if cotizacion %}
+    <div style="display: flex; gap: 1rem;">
+        <a href="{{ url_for('ver_cotizacion', folio=cotizacion.folio_cot) }}" target="_blank"
+            class="btn btn-secondary">Ver PDF</a>
+        <button type="button" class="btn btn-primary" onclick="enableEdit()" id="btn-editar">Editar</button>
+    </div>
+    {% endif %}
 </header>
 
 <form action="{{ url_for('nueva_cotizacion') }}" method="POST" class="card">
@@ -12,11 +23,12 @@
         <div class="form-group">
             <label for="folio_cot">Folio Cotización</label>
             <input type="text" id="folio_cot" name="folio_cot" placeholder="Ej. COT-COPHI-001"
-                value="{{ suggested_folio }}" required>
+                value="{{ suggested_folio }}" required {% if cotizacion %}disabled{% endif %}>
         </div>
         <div class="form-group">
             <label for="fecha_cot">Fecha</label>
-            <input type="date" id="fecha_cot" name="fecha_cot">
+            <input type="date" id="fecha_cot" name="fecha_cot" value="{{ cotizacion.fecha_cot if cotizacion else '' }}"
+                {% if cotizacion %}disabled{% endif %}>
         </div>
     </div>
 
@@ -24,50 +36,91 @@
         <div class="form-group" style="position: relative;">
             <label for="nombre_cliente">Cliente</label>
             <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar o escribir nuevo..."
-                autocomplete="off" oninput="fillClient(this)" required>
+                autocomplete="off" oninput="fillClient(this)" required
+                value="{{ cotizacion.nombre_cliente if cotizacion else '' }}" {% if cotizacion %}disabled{% endif %}>
             <div id="suggestions-box"></div>
         </div>
         <div class="form-group">
             <label for="razon_social_cliente">Razón Social</label>
-            <input type="text" id="razon_social_cliente" name="razon_social_cliente">
+            <input type="text" id="razon_social_cliente" name="razon_social_cliente"
+                value="{{ cotizacion.razon_social_cliente if cotizacion else '' }}" {% if cotizacion %}disabled{% endif
+                %}>
         </div>
         <div class="form-group" style="grid-column: span 2;">
             <label for="direccion_cliente">Dirección</label>
-            <input type="text" id="direccion_cliente" name="direccion_cliente">
+            <input type="text" id="direccion_cliente" name="direccion_cliente"
+                value="{{ cotizacion.direccion_cliente if cotizacion else '' }}" {% if cotizacion %}disabled{% endif %}>
         </div>
         <div class="form-group">
             <label for="nombre_contacto">Contacto</label>
-            <input type="text" id="nombre_contacto" name="nombre_contacto">
+            <input type="text" id="nombre_contacto" name="nombre_contacto"
+                value="{{ cotizacion.nombre_contacto if cotizacion else '' }}" {% if cotizacion %}disabled{% endif %}>
         </div>
         <div class="form-group">
             <label for="telefono_contacto">Teléfono</label>
-            <input type="text" id="telefono_contacto" name="telefono_contacto">
+            <input type="text" id="telefono_contacto" name="telefono_contacto"
+                value="{{ cotizacion.telefono_contacto if cotizacion else '' }}" {% if cotizacion %}disabled{% endif %}>
         </div>
     </div>
 
     <h3>Detalles del Servicio</h3>
     <div class="form-group">
         <label for="alcance_cot">Alcance (Descripción General)</label>
-        <textarea id="alcance_cot" name="alcance_cot" rows="3"></textarea>
+        <textarea id="alcance_cot" name="alcance_cot" rows="3" {% if cotizacion %}disabled{% endif
+            %}>{{ cotizacion.alcance_cot if cotizacion else '' }}</textarea>
     </div>
 
     <h3>Items / Conceptos</h3>
     <div id="items-container">
-        <!-- Javascript will populate this -->
+        {% if cotizacion and cotizacion.conceptos %}
+        {% for item in cotizacion.conceptos %}
+        <div class="items-section item-row">
+            <div>
+                <label style="font-size: 0.8em">Nombre Item</label>
+                <input type="text" name="nombre_item[]" list="inventory_list" onchange="fillItem(this)" required
+                    placeholder="Buscar item..." value="{{ item.nombre_item }}" disabled>
+            </div>
+            <div>
+                <label style="font-size: 0.8em">Descripción</label>
+                <input type="text" name="descripcion_item[]" value="{{ item.descripcion_item }}" disabled>
+            </div>
+            <div>
+                <label style="font-size: 0.8em">Unidad</label>
+                <input type="text" name="unidad_item[]" placeholder="pza, servicio..." value="{{ item.unidad_item }}"
+                    disabled>
+            </div>
+            <div>
+                <label style="font-size: 0.8em">Cant.</label>
+                <input type="number" step="1" name="cantidad_item[]" required value="{{ item.cantidad_item }}" disabled>
+            </div>
+            <div>
+                <label style="font-size: 0.8em">Precio U.</label>
+                <input type="number" step="0.01" name="precio_unitario_item[]" required
+                    value="{{ item.precio_unitario_item }}" disabled>
+            </div>
+            <div style="padding-top: 1.5rem;">
+                <span class="remove-item" onclick="this.parentElement.parentElement.remove()"
+                    style="cursor: pointer; {% if cotizacion %}display: none;{% endif %}">✕</span>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
     </div>
 
-    <button type="button" class="btn btn-secondary mb-4" onclick="addItem()">+ Agregar Item</button>
+    <button type="button" class="btn btn-secondary mb-4" onclick="addItem()" id="btn-add-item" {% if cotizacion
+        %}style="display: none;" {% endif %}>+ Agregar Item</button>
 
     <h3>Términos y Condiciones</h3>
     <div class="form-group">
         <label for="terminos">Texto de Términos</label>
-        <textarea id="terminos" name="terminos"
-            rows="4">El pago se realizará 50% anticipo y 50% contra entrega. Precios más IVA. Validez de la oferta: 15 días.</textarea>
+        <textarea id="terminos" name="terminos" rows="4" {% if cotizacion %}disabled{% endif
+            %}>{{ cotizacion.terminos if cotizacion else 'El pago se realizará 50% anticipo y 50% contra entrega. Precios más IVA. Validez de la oferta: 15 días.' }}</textarea>
     </div>
 
     <div style="text-align: right; margin-top: 2rem;">
         <a href="{{ url_for('cotizaciones') }}" class="btn btn-secondary" style="margin-right: 1rem;">Cancelar</a>
-        <button type="submit" class="btn btn-primary">Guardar Cotización</button>
+        <button type="submit" class="btn btn-primary" id="btn-submit" {% if cotizacion %}style="display: none;" {% endif
+            %}>Guardar Cotización</button>
     </div>
 </form>
 
@@ -81,6 +134,24 @@
 
 <script>
     const clientsData = {{ clientes| tojson }};
+
+    function enableEdit() {
+        // Enable all inputs
+        document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
+        // Show buttons
+        const btnAdd = document.getElementById('btn-add-item');
+        if (btnAdd) btnAdd.style.display = 'inline-block';
+
+        const btnSubmit = document.getElementById('btn-submit');
+        if (btnSubmit) btnSubmit.style.display = 'inline-block';
+
+        // Show delete icons
+        document.querySelectorAll('.remove-item').forEach(el => el.style.display = 'inline');
+
+        // Hide Edit button itself? Optional.
+        const btnEdit = document.getElementById('btn-editar');
+        if (btnEdit) btnEdit.style.display = 'none';
+    }
 </script>
 <script src="{{ url_for('static', filename='crear_cotizacion.js') }}"></script>
 {% endblock %}

@@ -116,5 +116,8 @@ function fillItem(input) {
 
 // Add one item by default
 document.addEventListener('DOMContentLoaded', () => {
-    addItem();
+    const container = document.getElementById('items-container');
+    if (container && container.children.length === 0) {
+        addItem();
+    }
 });

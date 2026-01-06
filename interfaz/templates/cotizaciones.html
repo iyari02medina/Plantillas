@@ -30,8 +30,8 @@
                 <td>${{ data.total }}</td>
                 <td>{{ data.items_count }}</td>
                 <td>
-                    <a href="{{ url_for('ver_cotizacion', folio=data.folio) }}" target="_blank"
-                        class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8em;">Ver Cotización</a>
+                    <a href="{{ url_for('detalle_cotizacion', folio=data.folio) }}" class="btn btn-secondary"
+                        style="padding: 0.25rem 0.5rem; font-size: 0.8em;">Ver Cotización</a>
                     <!-- Later link to generate PDF or HTML view -->
                 </td>
             </tr>

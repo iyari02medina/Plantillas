@@ -113,6 +113,40 @@ def read_csv(filepath):
         print(f"First item keys: {items[0].keys()}")
     return items
 
+def get_cotizacion_data(folio):
+    all_rows = read_csv(COTIZACIONES_CSV)
+    folio_rows = [r for r in all_rows if r.get('folio_cot') == folio]
+    
+    if not folio_rows:
+        return None
+        
+    first = folio_rows[0]
+    data = {
+        'folio_cot': folio,
+        'nombre_cot': first.get('nombre_cot', ''),
+        'fecha_cot': first.get('fecha_cot', ''),
+        'nombre_cliente': first.get('nombre_cliente', ''),
+        'razon_social_cliente': first.get('razon_social_cliente', ''),
+        'direccion_cliente': first.get('direccion_cliente', ''),
+        'nombre_contacto': first.get('nombre_contacto', ''),
+        'telefono_contacto': first.get('telefono_contacto', ''),
+        'alcance_cot': first.get('alcance_cot', ''),
+        'terminos': first.get('terminos', ''),
+        'conceptos': []
+    }
+    
+    for r in folio_rows:
+        data['conceptos'].append({
+            'nombre_item': r.get('nombre_item', ''),
+            'descripcion_item': r.get('descripcion_item', ''),
+            'unidad_item': r.get('unidad_item', ''),
+            'cantidad_item': r.get('cantidad_item', ''),
+            'precio_unitario_item': r.get('precio_unitario_item', ''),
+            'importe_item': r.get('importe_item', '')
+        })
+        
+    return data
+
 def append_to_csv(filepath, fieldnames, rows):
     file_exists = os.path.exists(filepath)
     with open(filepath, mode='a', encoding='utf-8-sig', newline='') as f:
@@ -301,6 +335,22 @@ def ver_cotizacion(folio):
         except:
             pass
         return "Archivo no encontrado", 404
+
+@app.route('/cotizacion/<folio>')
+def detalle_cotizacion(folio):
+    data = get_cotizacion_data(folio)
+    if not data:
+        flash('Cotización no encontrada.', 'error')
+        return redirect(url_for('cotizaciones'))
+        
+    inventario = read_csv(INVENTARIO_CSV)
+    clientes = read_csv(CLIENTES_CSV)
+    
+    return render_template('crear_cotizacion.html', 
+                         cotizacion=data, 
+                         inventario=inventario, 
+                         clientes=clientes,
+                         suggested_folio=folio) # Reuse variable for input value
 
 @app.route('/Plantillas/<path:filename>')
 def serve_plantillas(filename):
