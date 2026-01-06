@@ -18,12 +18,13 @@
 </header>
 
 <form action="{{ url_for('nueva_cotizacion') }}" method="POST" class="card">
-
+    <input type="hidden" name="original_folio" value="{{ cotizacion.folio_cot if cotizacion else '' }}">
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
         <div class="form-group">
             <label for="folio_cot">Folio Cotización</label>
             <input type="text" id="folio_cot" name="folio_cot" placeholder="Ej. COT-COPHI-001"
-                value="{{ suggested_folio }}" required {% if cotizacion %}disabled{% endif %}>
+                value="{{ suggested_folio }}" required {% if cotizacion %}readonly style="background-color: #eee;" {%
+                endif %}>
         </div>
         <div class="form-group">
             <label for="fecha_cot">Fecha</label>
@@ -138,6 +139,13 @@
     function enableEdit() {
         // Enable all inputs
         document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
+
+        // Unlock Readonly inputs (Folio)
+        document.querySelectorAll('input[readonly]').forEach(el => {
+            el.readOnly = false;
+            el.style.backgroundColor = '';
+        });
+
         // Show buttons
         const btnAdd = document.getElementById('btn-add-item');
         if (btnAdd) btnAdd.style.display = 'inline-block';

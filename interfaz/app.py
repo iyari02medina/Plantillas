@@ -155,6 +155,12 @@ def append_to_csv(filepath, fieldnames, rows):
             writer.writeheader()
         writer.writerows(rows)
 
+def overwrite_csv(filepath, fieldnames, rows):
+    with open(filepath, mode='w', encoding='utf-8-sig', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
 @app.route('/')
 def index():
     cotizaciones = read_csv(COTIZACIONES_CSV)
@@ -191,11 +197,23 @@ def nueva_cotizacion():
     if request.method == 'POST':
         # Extract form data
         folio = request.form.get('folio_cot')
-        # Check if folio exists
+        original_folio = request.form.get('original_folio')
+        
+        # Validation/Duplicate check
         existing = read_csv(COTIZACIONES_CSV)
-        if any(row['folio_cot'] == folio for row in existing):
+        
+        # If we are strictly creating new (no original_folio), check exists
+        if not original_folio and any(row['folio_cot'] == folio for row in existing):
             flash(f'El Folio {folio} ya existe.', 'error')
             return redirect(url_for('nueva_cotizacion'))
+            
+        # If we are editing, we ignore the collision with SELF, but check collision with OTHERS
+        if original_folio:
+            # Check if we changed folio to another existing one
+            if folio != original_folio and any(row['folio_cot'] == folio for row in existing):
+                flash(f'El Folio {folio} ya existe (pertenece a otra cotización).', 'error')
+                return redirect(url_for('detalle_cotizacion', folio=original_folio))
+
 
         base_data = {
             'folio_cot': folio,
@@ -241,6 +259,8 @@ def nueva_cotizacion():
         base_data['iva'] = f"{iva_total:.2f}"
         base_data['total'] = f"{total_total:.2f}"
 
+        # Prepare rows to save
+        rows_to_save = []
         for i in range(len(items_names)):
             row = base_data.copy()
             row['nombre_item'] = items_names[i]
@@ -260,19 +280,23 @@ def nueva_cotizacion():
             rows_to_save.append(row)
         
         if not rows_to_save:
-            # Create at least one row if no items? Or block?
             flash('Debes agregar al menos un item.', 'error')
             return redirect(url_for('nueva_cotizacion'))
 
-        # Get headers from existing CSV to ensure order
+        # Get headers
         headers = []
-        if os.path.exists(COTIZACIONES_CSV):
+        if existing and len(existing) > 0:
+             headers = list(existing[0].keys())
+        elif os.path.exists(COTIZACIONES_CSV):
             with open(COTIZACIONES_CSV, 'r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)
-                headers = next(reader)
-        else:
-            # Fallback headers based on what we saw earlier
-            headers = ['folio_cot','nombre_cot','fecha_cot','id_cliente','nombre_cliente','razon_social_cliente','direccion_cliente','nombre_contacto','telefono_contacto','alcance_cot','nombre_item','descripcion_item','imagen_item','unidad_item','cantidad_item','precio_unitario_item','importe_item','subtotal','iva','total','terminos']
+                try:
+                    headers = next(reader)
+                except:
+                     pass
+        
+        if not headers:
+             headers = ['folio_cot','nombre_cot','fecha_cot','id_cliente','nombre_cliente','razon_social_cliente','direccion_cliente','nombre_contacto','telefono_contacto','alcance_cot','nombre_item','descripcion_item','imagen_item','unidad_item','cantidad_item','precio_unitario_item','importe_item','subtotal','iva','total','terminos']
 
         # Ensure all keys exist
         for r in rows_to_save:
@@ -280,7 +304,14 @@ def nueva_cotizacion():
                 if h not in r:
                     r[h] = ''
 
-        append_to_csv(COTIZACIONES_CSV, headers, rows_to_save)
+        if original_folio:
+            # EDIT MODE: Rewrite CSV removing old folio rows and adding new ones
+            updated_rows = [r for r in existing if r.get('folio_cot') != original_folio]
+            updated_rows.extend(rows_to_save)
+            overwrite_csv(COTIZACIONES_CSV, headers, updated_rows)
+        else:
+            # CREATE MODE: Append
+            append_to_csv(COTIZACIONES_CSV, headers, rows_to_save)
         
         # Generar el HTML automáticamente después de guardar
         if generate_quotation_html(folio):
