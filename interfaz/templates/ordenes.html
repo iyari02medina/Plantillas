@@ -32,7 +32,6 @@
                 <th>Cliente</th>
                 <th>Ubicación</th>
                 <th>Servicio</th>
-                <th>Estado</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -48,15 +47,6 @@
                     {% if orden.equipo_vactor == 'x' %}Vactor{% endif %}
                     {% if orden.equipo_hidro == 'x' %}Hidro{% endif %}
                     {% if orden.equipo_guia == 'x' %}Guía{% endif %}
-                </td>
-                <td>
-                    {% if orden.estado_bueno == 'x' %}
-                    <span class="badge badge-success">Bueno</span>
-                    {% elif orden.estado_danado == 'x' %}
-                    <span class="badge badge-warning">Dañado</span>
-                    {% else %}
-                    <span class="badge">--</span>
-                    {% endif %}
                 </td>
                 <td>
                     <a href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_cot) }}"
