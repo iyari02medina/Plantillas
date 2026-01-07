@@ -471,32 +471,41 @@ def detalle_orden(tipo, folio):
 
 @app.route('/ver_orden_pdf/<tipo>/<folio>')
 def ver_orden_pdf(tipo, folio):
-    # This assumes PDFs/HTMLs are generated similarly to quotations
-    # We need to verify where they are stored.
-    # Based on file structure, maybe they are in 'Documentos_generados/ordenes' or similar?
-    # Or maybe they are not generated yet automatically.
-    # The user manual mentioned separate scripts for boletas. 
-    # For now, let's try to find them in a likely location or return a placeholder.
-    
-    # Check potential directories
+    # Define correct subdirectories based on user input
+    # Paths are relative to: C:\Users\DELL\Desktop\Cophi\Recursos\Programa_cophi\Documentos_generados
     base_gen = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados'))
     
-    subfolder = 'boletas' # 'ordenes' or 'boletas'?
-    # Try finding the file
-    search_dirs = [
-        os.path.join(base_gen, 'boletas'),
-        os.path.join(base_gen, 'ordenes'),
-        os.path.join(base_gen, 'visitas') # Hypothesis
-    ]
+    folder = ''
+    if tipo == 'desazolve':
+        # User specified "dezasolves" (sic)
+        folder = 'dezasolves' 
+    elif tipo == 'trampa':
+        folder = 'limpiezas_trampa_grasa'
+    elif tipo == 'visita':
+        folder = 'visitas_tecnicas'
+    else:
+        return "Tipo de orden no válido", 400
+        
+    target_dir = os.path.join(base_gen, folder)
     
-    for d in search_dirs:
-        if os.path.exists(d):
-            files = os.listdir(d)
+    # Robustness: Check for 'desazolves' if 'dezasolves' doesn't exist, just in case
+    if tipo == 'desazolve' and not os.path.exists(target_dir):
+        alt_dir = os.path.join(base_gen, 'desazolves')
+        if os.path.exists(alt_dir):
+            target_dir = alt_dir
+    
+    if os.path.exists(target_dir):
+        try:
+            files = os.listdir(target_dir)
+            # Find file containing folio
             for f in files:
                 if folio in f and f.endswith('.html'):
-                    return send_from_directory(d, f)
-                    
-    return "Archivo PDF/HTML no encontrado para esta orden. Asegúrese de haber generado el documento.", 404
+                    return send_from_directory(target_dir, f)
+        except Exception as e:
+            print(f"Error searching directory {target_dir}: {e}")
+            
+    return f"Archivo no encontrado para el folio {folio} en {folder}. Asegúrese de haber generado el documento.", 404
+
 
 
 @app.route('/cotizacion/<folio>')
