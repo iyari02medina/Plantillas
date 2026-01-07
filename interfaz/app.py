@@ -447,14 +447,41 @@ def nueva_orden(tipo):
         headers = []
         if existing_rows:
             headers = list(existing_rows[0].keys())
-        else:
-            # Fallback headers if file is empty
-            if tipo == 'desazolve':
-                headers = ['folio_cot','fecha_cot','nombre_cliente','direccion_cliente','nombre_contacto','telefono_contacto','ubicacion_area','tipo_tuberia','diametro_tuberia','longitud_sondeada','flujo_nulo','flujo_lento','flujo_normal','equipo_guia','equipo_hidro','equipo_vactor','tipo_obstruccion','volumen_azolve','estado_bueno','estado_danado','estado_obstruido','observaciones','comentarios_cliente']
-            elif tipo == 'trampa':
-                 headers = ['folio_ot','fecha_ot','nombre_cliente','direccion_cliente','nombre_contacto','telefono_contacto','ubicacion_equipo','tipo_trampa','capacidad_trampa','estado_tapa','nivel_saturacion','accion_retiro_solidos','accion_succion_liquidos','accion_raspado_paredes','accion_lavado_presion','accion_aplicacion_bacterias','accion_prueba_flujo','accion_limpieza_perimetral','volumen_extraido','caracteristicas_residuo','estado_bueno','estado_reparacion','estado_faltantes','observaciones_tecnico']
-            elif tipo == 'visita':
-                 headers = ['folio_vt','fecha_vt','nombre_cliente','direccion_cliente','no_cliente','inv_cisterna_no','inv_cisterna_cap','inv_tinacos_no','inv_tinacos_cap','inv_medidor_serie','inv_medidor_lectura','inv_pipas_sn','inv_pipas_m3','inv_bombas','inv_tanque_hidro','inv_tomas_no','inv_registro_no','inv_trampas_no','inv_trampas_cap','inv_wc_no','inv_lavamanos_no','inv_fregaderos_no','inv_ahorro_sn','inv_ahorro_lista','st_cisterna','obs_cisterna','st_tinacos','obs_tinacos','st_tomas','obs_tomas','st_registro','obs_registro','st_trampas','obs_trampas','st_valvulas','obs_valvulas','st_bombas','obs_bombas','st_tuberias','obs_tuberias','st_griferia','obs_griferia','st_medidores','obs_medidores','st_fregadero','obs_fregadero','st_cespol','obs_cespol','st_coladeras','obs_coladeras','st_pluviales','obs_pluviales','st_wc','obs_wc','obs_evidencia_01','obs_evidencia_02','obs_evidencia_03','obs_evidencia_04','hallazgos_comentarios']
+        
+        # Ensure we have the full expected schema for desazolve regardless of existing CSV
+        if tipo == 'desazolve':
+            expected_fields = ['folio_cot','fecha_cot','nombre_cliente','direccion_cliente','no_cliente','nombre_contacto','telefono_contacto','ubicacion_area','tipo_tuberia','diametro_tuberia','longitud_sondeada','flujo_nulo','flujo_lento','flujo_normal','equipo_guia','equipo_hidro','equipo_vactor','tipo_obstruccion','volumen_azolve','estado_bueno','estado_danado','estado_obstruido','observaciones','obs_evidencia_01','obs_evidencia_02','obs_evidencia_03','comentarios_cliente']
+            for f in expected_fields:
+                if f not in headers:
+                    headers.append(f)
+        
+        elif tipo == 'trampa':
+            expected_fields = ['folio_ot','fecha_ot','nombre_cliente','direccion_cliente','no_cliente','ubicacion_equipo','tipo_trampa','capacidad_trampa','estado_tapa','nivel_saturacion','accion_retiro_solidos','accion_succion_liquidos','accion_raspado_paredes','accion_lavado_presion','accion_aplicacion_bacterias','accion_prueba_flujo','accion_limpieza_perimetral','volumen_extraido','caracteristicas_residuo','estado_bueno','estado_reparacion','estado_faltantes','observaciones_tecnico','obs_evidencia_01','obs_evidencia_02']
+            for f in expected_fields:
+                if f not in headers:
+                    headers.append(f)
+                    
+        elif tipo == 'visita':
+            matrix_items = ['cisterna','tinacos','tomas','registro','trampas','valvulas','bombas','tuberias','griferia','medidores','fregadero','cespol','coladeras','pluviales','wc']
+            matrix_fields = []
+            for m in matrix_items:
+                matrix_fields.append(f"st_{m}")
+                matrix_fields.append(f"obs_{m}")
+            
+            expected_fields = ['folio_vt','fecha_vt','nombre_cliente','direccion_cliente','no_cliente',
+                               'inv_cisterna_no','inv_cisterna_cap','inv_tinacos_no','inv_tinacos_cap','inv_medidor_serie',
+                               'inv_medidor_lectura','inv_pipas_sn','inv_pipas_m3','inv_bombas','inv_tanque_hidro',
+                               'inv_tomas_no','inv_registro_no','inv_trampas_no','inv_trampas_cap','inv_wc_no',
+                               'inv_lavamanos_no','inv_fregaderos_no','inv_ahorro_sn','inv_ahorro_lista',
+                               'obs_evidencia_01','obs_evidencia_02','obs_evidencia_03','obs_evidencia_04','hallazgos_comentarios'] + matrix_fields
+                               
+            for f in expected_fields:
+                if f not in headers:
+                    headers.append(f)
+
+        elif not headers:
+            # Fallback headers if file is empty (Logic above handles schema enforcement, this is just legacy fallback for completely empty files if logic above missed something)
+            pass
 
         # Fill with form data
         for h in headers:
@@ -466,7 +493,21 @@ def nueva_orden(tipo):
              'fecha_cot' if tipo == 'desazolve' else 'fecha_ot' if tipo == 'trampa' else 'fecha_vt') or datetime.date.today().strftime('%d/%m/%Y')
         
         try:
-             append_to_csv(filepath, headers, [new_row])
+             # Check if we need to update the file structure (if we added headers)
+             # But append_to_csv usually just appends. If headers changed, we might need to rewriting or DictWriter will handle if we pass the larger header list?
+             # DictWriter writes only what is in fieldnames. If we pass a larger fieldnames list to DictWriter than what is in the file... 
+             # If append mode is used, DictWriter keys order must match file columns if we want to be safe? 
+             # Actually, if we pass new fieldnames, DictWriter doesn't care about the file content, it just writes that row.
+             # BUT new columns won't have headers in the file unless we rewrite it.
+             # Ideally we should rewrite the whole file if headers expanded.
+             
+             if existing_rows and len(headers) > len(existing_rows[0].keys()):
+                 # Headers expanded, rewrite file
+                 existing_rows.append(new_row)
+                 overwrite_csv(filepath, headers, existing_rows)
+             else:
+                 append_to_csv(filepath, headers, [new_row])
+                 
              flash('Orden creada exitosamente.', 'success')
              
              if generate_order_html(tipo, new_row):
@@ -540,28 +581,27 @@ def detalle_orden(tipo, folio):
         # Filter out the old row
         updated_rows = [r for r in all_rows if r.get(id_key) != folio]
         
-        # Create new row from form data
-        # We need to construct the row carefully. 
-        # For simplicity, we can just grab the existing row keys and generic update from form.
-        # But we must be careful with checkboxes ('on' vs 'x') or missing check fields.
-        
+        # Determine Headers
+        headers = []
+        if all_rows:
+            headers = list(all_rows[0].keys())
+            
+        # Ensure we have the full expected schema for desazolve checks
+        if tipo == 'desazolve':
+            expected_fields = ['folio_cot','fecha_cot','nombre_cliente','direccion_cliente','no_cliente','nombre_contacto','telefono_contacto','ubicacion_area','tipo_tuberia','diametro_tuberia','longitud_sondeada','flujo_nulo','flujo_lento','flujo_normal','equipo_guia','equipo_hidro','equipo_vactor','tipo_obstruccion','volumen_azolve','estado_bueno','estado_danado','estado_obstruido','observaciones','obs_evidencia_01','obs_evidencia_02','obs_evidencia_03','comentarios_cliente']
+            for f in expected_fields:
+                if f not in headers:
+                    headers.append(f)
+
         new_row = data.copy() # Start with existing data
         
-        # Create a dictionary of form data
+        # Update from form
         for key in request.form:
-            new_row[key] = request.form[key]
+             new_row[key] = request.form[key]
+             if key not in headers:
+                 headers.append(key)
             
-        # Handle specific checkbox logic if needed (or assume form sends correct values)
-        # Note: HTML checkboxes only send value if checked. 
-        # If we have checkboxes in our form that map to CSV columns, we need to handle the 'unchecked' case.
-        # This is complex without knowing all checkbox fields. 
-        # For now, we will rely on text inputs mostly, or explicit logic if we build the form with checkboxes.
-        # A safer way allows updating only provided keys.
-        
         updated_rows.append(new_row)
-        
-        # We need the header list
-        headers = list(all_rows[0].keys()) if all_rows else list(new_row.keys())
         
         try:
             overwrite_csv(filepath, headers, updated_rows)

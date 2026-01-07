@@ -45,69 +45,58 @@
     <!-- Client Section -->
     <div class="grid-2 mb-4">
         <div class="form-group relative">
-            <label>Cliente</label>
+            <label>Empresa</label>
             <input type="text" id="nombre_cliente" name="nombre_cliente" value="{{ orden.nombre_cliente }}" {% if not
                 is_new %}disabled{% endif %} required autocomplete="off" oninput="fillClient(this)">
             <div id="suggestions-box"></div>
         </div>
-        <div class="form-group col-span-2">
+        <div class="form-group">
             <label>Dirección</label>
             <input type="text" id="direccion_cliente" name="direccion_cliente" value="{{ orden.direccion_cliente }}" {%
                 if not is_new %}disabled{% endif %}>
         </div>
-        {% if tipo != 'visita' %}
         <div class="form-group">
-            <label>Contacto</label>
-            <input type="text" id="nombre_contacto" name="nombre_contacto" value="{{ orden.nombre_contacto }}" {% if not
-                is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Teléfono</label>
-            <input type="text" id="telefono_contacto" name="telefono_contacto" value="{{ orden.telefono_contacto }}" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        {% else %}
-        <div class="form-group">
-            <label>No. Cliente</label>
+            <label>no. cliente</label>
             <input type="text" name="no_cliente" value="{{ orden.no_cliente }}" {% if not is_new %}disabled{% endif %}>
         </div>
-        {% endif %}
     </div>
 
     <hr class="mb-4">
 
     <!-- DESAZOLVE SPECIFIC -->
     {% if tipo == 'desazolve' %}
-    <h3>Detalles del Servicio (Desazolve)</h3>
+
+    <!-- 3. Datos del Área a Tratar -->
+    <h3>Datos del Área a Tratar</h3>
     <div class="grid-2 mb-4">
         <div class="form-group">
-            <label>Ubicación Área</label>
-            <input type="text" name="ubicacion_area" value="{{ orden.ubicacion_area }}" {% if not is_new %}disabled{%
-                endif %}>
+            <label>Ubicación</label>
+            <input type="text" name="ubicacion_area" value="{{ orden.ubicacion_area }}"
+                placeholder="Registro, tarja, bajadas, wc, coladera..." {% if not is_new %}disabled{% endif %}>
         </div>
         <div class="form-group">
-            <label>Tipo Tubería</label>
-            <input type="text" name="tipo_tuberia" value="{{ orden.tipo_tuberia }}" {% if not is_new %}disabled{% endif
-                %}>
+            <label>Tipo de Tubería</label>
+            <input type="text" name="tipo_tuberia" value="{{ orden.tipo_tuberia }}"
+                placeholder="Concreto, PVC, Albañal..." {% if not is_new %}disabled{% endif %}>
         </div>
         <div class="form-group">
-            <label>Diámetro</label>
-            <input type="text" name="diametro_tuberia" value="{{ orden.diametro_tuberia }}" {% if not is_new
-                %}disabled{% endif %}>
+            <label>Diámetro Aprox.</label>
+            <input type="text" name="diametro_tuberia" value="{{ orden.diametro_tuberia }}" placeholder='4", 6", 8"...'
+                {% if not is_new %}disabled{% endif %}>
         </div>
         <div class="form-group">
-            <label>Longitud Sondeada</label>
-            <input type="text" name="longitud_sondeada" value="{{ orden.longitud_sondeada }}" {% if not is_new
-                %}disabled{% endif %}>
+            <label>Longitud Sondeada (m)</label>
+            <input type="text" name="longitud_sondeada" value="{{ orden.longitud_sondeada }}"
+                placeholder="Metros lineales trabajados" {% if not is_new %}disabled{% endif %}>
         </div>
     </div>
 
     <div class="mb-4">
-        <label class="font-bold mb-2 block">Flujo</label>
-        <div class="flex gap-4">
+        <label class="font-bold mb-2 block">Nivel de Flujo Inicial:</label>
+        <div class="flex gap-4 flex-wrap">
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="flujo_nulo" value="x" {% if orden.flujo_nulo=='x' or orden.flujo_nulo==True
-                    %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Nulo
+                    %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Nulo / Tapado total
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="flujo_lento" value="x" {% if orden.flujo_lento=='x' or
@@ -115,129 +104,430 @@
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="flujo_normal" value="x" {% if orden.flujo_normal=='x' or
-                    orden.flujo_normal==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Normal
+                    orden.flujo_normal==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Normal /
+                Preventivo
             </label>
         </div>
     </div>
 
+    <!-- 4. Detalle del Servicio (Técnico) -->
+    <h3>Detalle del Servicio (Técnico)</h3>
     <div class="mb-4">
-        <label class="font-bold mb-2 block">Equipo Utilizado</label>
-        <div class="flex gap-4">
+        <label class="font-bold mb-2 block">Equipo Utilizado:</label>
+        <div class="flex gap-4 flex-wrap">
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="equipo_guia" value="x" {% if orden.equipo_guia=='x' or
-                    orden.equipo_guia==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Guía
+                    orden.equipo_guia==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Guía Eléctrica
+                (K-50/1500)
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="equipo_hidro" value="x" {% if orden.equipo_hidro=='x' or
-                    orden.equipo_hidro==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Hidro
+                    orden.equipo_hidro==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Hidrolavadora
+                / Jet
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="equipo_vactor" value="x" {% if orden.equipo_vactor=='x' or
-                    orden.equipo_vactor==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Vactor
+                    orden.equipo_vactor==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Camión
+                Succión (Vactor)
             </label>
         </div>
     </div>
 
-    <div class="form-group mb-4">
-        <label>Tipo Obstrucción</label>
-        <input type="text" name="tipo_obstruccion" value="{{ orden.tipo_obstruccion }}" {% if not is_new %}disabled{%
-            endif %}>
+    <!-- 5. Hallazgos y Residuos -->
+    <h3>Hallazgos y Residuos</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label>Tipo de Obstrucción Encontrada</label>
+            <input type="text" name="tipo_obstruccion" value="{{ orden.tipo_obstruccion }}"
+                placeholder="Grasa, raíces, objetos, azolve..." {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Volumen de azolve retirado</label>
+            <input type="text" name="volumen_azolve" value="{{ orden.volumen_azolve }}"
+                placeholder="Litros / Cubetas / m³" {% if not is_new %}disabled{% endif %}>
+        </div>
     </div>
 
-    <div class="form-group mb-4">
-        <label>Volumen Azolve</label>
-        <input type="text" name="volumen_azolve" value="{{ orden.volumen_azolve }}" {% if not is_new %}disabled{% endif
-            %}>
+    <!-- 6. Diagnóstico y Recomendaciones -->
+    <h3>Diagnóstico y Recomendaciones</h3>
+    <div class="mb-4">
+        <label class="font-bold mb-2 block">Estado de la Tubería:</label>
+        <div class="flex gap-4 flex-wrap">
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="estado_bueno" value="x" {% if orden.estado_bueno=='x' or
+                    orden.estado_bueno==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Bueno
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="estado_danado" value="x" {% if orden.estado_danado=='x' or
+                    orden.estado_danado==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Fracturada /
+                Dañada
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="estado_obstruido" value="x" {% if orden.estado_obstruido=='x' or
+                    orden.estado_obstruido==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
+                Obstrucción Persistente
+            </label>
+        </div>
     </div>
-
-    <div class="form-group">
+    <div class="form-group mb-4">
         <label>Observaciones</label>
-        <textarea name="observaciones" rows="3" {% if not is_new %}disabled{% endif
-            %}>{{ orden.observaciones }}</textarea>
+        <textarea name="observaciones" rows="3" placeholder="Comentarios adicionales del técnico..." {% if not is_new
+            %}disabled{% endif %}>{{ orden.observaciones }}</textarea>
+    </div>
+
+    <!-- 7. Evidencia Fotográfica -->
+    <h3>Evidencia Fotográfica</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label>Registro saturado / Nivel alto (Antes)</label>
+            <input type="text" name="obs_evidencia_01" value="{{ orden.obs_evidencia_01 }}"
+                placeholder="Descripción evidencia 1" {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Flujo corriente / Limpia (Después)</label>
+            <input type="text" name="obs_evidencia_02" value="{{ orden.obs_evidencia_02 }}"
+                placeholder="Descripción evidencia 2" {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Equipo en operación</label>
+            <input type="text" name="obs_evidencia_03" value="{{ orden.obs_evidencia_03 }}"
+                placeholder="Descripción evidencia 3" {% if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <!-- 8. Comentarios Adicionales -->
+    <h3>Comentarios Adicionales</h3>
+    <div class="form-group mb-4">
+        <textarea name="comentarios_cliente" rows="2" placeholder="Espacio para notas del cliente..." {% if not is_new
+            %}disabled{% endif %}>{{ orden.comentarios_cliente }}</textarea>
     </div>
     {% endif %}
 
     <!-- TRAMPA SPECIFIC -->
     {% if tipo == 'trampa' %}
-    <h3>Detalles de Trampa</h3>
+
+    <!-- 2. Datos del Equipo -->
+    <h3>Datos del Equipo</h3>
     <div class="grid-2 mb-4">
         <div class="form-group">
-            <label>Ubicación Equipo</label>
-            <input type="text" name="ubicacion_equipo" value="{{ orden.ubicacion_equipo }}" {% if not is_new
-                %}disabled{% endif %}>
+            <label>Ubicación</label>
+            <input type="text" name="ubicacion_equipo" value="{{ orden.ubicacion_equipo }}"
+                placeholder="Ej. Cocina, Exterior..." {% if not is_new %}disabled{% endif %}>
         </div>
         <div class="form-group">
-            <label>Tipo Trampa</label>
-            <input type="text" name="tipo_trampa" value="{{ orden.tipo_trampa }}" {% if not is_new %}disabled{% endif
-                %}>
+            <label>Tipo de Trampa</label>
+            <input type="text" name="tipo_trampa" value="{{ orden.tipo_trampa }}" placeholder="Acero, Obra, Plástico..."
+                {% if not is_new %}disabled{% endif %}>
         </div>
         <div class="form-group">
-            <label>Capacidad</label>
-            <input type="text" name="capacidad_trampa" value="{{ orden.capacidad_trampa }}" {% if not is_new
-                %}disabled{% endif %}>
+            <label>Capacidad Estimada</label>
+            <input type="text" name="capacidad_trampa" value="{{ orden.capacidad_trampa }}" placeholder="Kg / Litros" {%
+                if not is_new %}disabled{% endif %}>
         </div>
         <div class="form-group">
-            <label>Nivel Saturación</label>
-            <input type="text" name="nivel_saturacion" value="{{ orden.nivel_saturacion }}" {% if not is_new
-                %}disabled{% endif %}>
+            <label>Estado Inicial de Tapa</label>
+            <input type="text" name="estado_tapa" value="{{ orden.estado_tapa }}"
+                placeholder="Sellada, rota, sin tornillos..." {% if not is_new %}disabled{% endif %}>
         </div>
     </div>
 
+    <!-- 4. Detalle del Servicio -->
+    <h3>Detalle del Servicio</h3>
+    <div class="form-group mb-4">
+        <label>Nivel de Saturación Inicial (%):</label>
+        <input type="text" name="nivel_saturacion" value="{{ orden.nivel_saturacion }}" placeholder="25%, 50%, 90%..."
+            {% if not is_new %}disabled{% endif %}>
+    </div>
+
     <div class="mb-4">
-        <label class="font-bold mb-2 block">Acciones Realizadas</label>
-        <div class="grid-2">
+        <label class="font-bold mb-2 block">Acciones Realizadas:</label>
+        <div class="flex gap-4 flex-wrap">
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="accion_retiro_solidos" value="x" {% if orden.accion_retiro_solidos=='x' or
                     orden.accion_retiro_solidos==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Retiro Sólidos
+                Retiro de sólidos superficiales (Nata)
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="accion_succion_liquidos" value="x" {% if orden.accion_succion_liquidos=='x'
                     or orden.accion_succion_liquidos==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Succión Líquidos
+                Succión de líquidos y lodos (Vaciado)
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="accion_raspado_paredes" value="x" {% if orden.accion_raspado_paredes=='x'
                     or orden.accion_raspado_paredes==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Raspado Paredes
+                Raspado de paredes y difusores
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="accion_lavado_presion" value="x" {% if orden.accion_lavado_presion=='x' or
                     orden.accion_lavado_presion==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Lavado a Presión
+                Lavado a presión interno
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="accion_aplicacion_bacterias" value="x" {% if
                     orden.accion_aplicacion_bacterias=='x' or orden.accion_aplicacion_bacterias==True %}checked{% endif
-                    %} {% if not is_new %}disabled{% endif %}> Aplicación Bacterias
+                    %} {% if not is_new %}disabled{% endif %}> Aplicación de bacterias/enzimas
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="accion_prueba_flujo" value="x" {% if orden.accion_prueba_flujo=='x' or
+                    orden.accion_prueba_flujo==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
+                Prueba de flujo (Grifos abiertos)
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="accion_limpieza_perimetral" value="x" {% if
+                    orden.accion_limpieza_perimetral=='x' or orden.accion_limpieza_perimetral==True %}checked{% endif %}
+                    {% if not is_new %}disabled{% endif %}>
+                Limpieza del área perimetral y desodorización
             </label>
         </div>
     </div>
 
-    <div class="form-group mb-4">
-        <label>Volumen Extraído</label>
-        <input type="text" name="volumen_extraido" value="{{ orden.volumen_extraido }}" {% if not is_new %}disabled{%
-            endif %}>
+    <!-- 5. Registro de Residuos -->
+    <h3>Registro de Residuos</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label>Volumen Total Extraído</label>
+            <input type="text" name="volumen_extraido" value="{{ orden.volumen_extraido }}" placeholder="Litros / m³" {%
+                if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Características del Residuo</label>
+            <input type="text" name="caracteristicas_residuo" value="{{ orden.caracteristicas_residuo }}"
+                placeholder="Ej. Exceso de sólidos, objetos extraños..." {% if not is_new %}disabled{% endif %}>
+        </div>
     </div>
 
+    <!-- 6. Diagnóstico Técnico -->
+    <h3>Diagnóstico Técnico y Recomendaciones</h3>
+    <div class="mb-4">
+        <label class="font-bold mb-2 block">Estado físico de la trampa:</label>
+        <div class="flex gap-4 flex-wrap">
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="estado_bueno" value="x" {% if orden.estado_bueno=='x' or
+                    orden.estado_bueno==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
+                Bueno
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="estado_reparacion" value="x" {% if orden.estado_reparacion=='x' or
+                    orden.estado_reparacion==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
+                Requiere Reparación
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="estado_faltantes" value="x" {% if orden.estado_faltantes=='x' or
+                    orden.estado_faltantes==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
+                Faltan Componentes
+            </label>
+        </div>
+    </div>
     <div class="form-group">
-        <label>Observaciones Técnico</label>
-        <textarea name="observaciones_tecnico" rows="3" {% if not is_new %}disabled{% endif
-            %}>{{ orden.observaciones_tecnico }}</textarea>
+        <label>Observaciones / Recomendaciones</label>
+        <textarea name="observaciones_tecnico" rows="3" placeholder="Comentarios del técnico..." {% if not is_new
+            %}disabled{% endif %}>{{ orden.observaciones_tecnico }}</textarea>
+    </div>
+
+    <!-- 7. Evidencia Fotográfica -->
+    <h3>Evidencia Fotográfica</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label>Trampa Llena (Antes)</label>
+            <input type="text" name="obs_evidencia_01" value="{{ orden.obs_evidencia_01 }}"
+                placeholder="Descripción evidencia 1" {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Trampa Vacía y Limpia (Después)</label>
+            <input type="text" name="obs_evidencia_02" value="{{ orden.obs_evidencia_02 }}"
+                placeholder="Descripción evidencia 2" {% if not is_new %}disabled{% endif %}>
+        </div>
     </div>
     {% endif %}
 
     <!-- VISITA SPECIFIC -->
     {% if tipo == 'visita' %}
-    <h3>Detalles Visita Técnica</h3>
-    <div class="mb-4">
-        <label>Hallazgos / Comentarios</label>
-        <textarea name="hallazgos_comentarios" rows="5" {% if not is_new %}disabled{% endif
-            %}>{{ orden.hallazgos_comentarios }}</textarea>
+
+    <!-- 1. Inventario de Equipos Principales -->
+    <h3>Inventario de Equipos Principales (Registro de Activos)</h3>
+
+    <h4 class="mt-2 font-semibold">Almacenamiento y Suministro</h4>
+    <div class="grid-2 mb-2">
+        <div class="form-group">
+            <label>Cisterna</label>
+            <div class="flex gap-2">
+                <input type="text" name="inv_cisterna_no" placeholder="No." value="{{ orden.inv_cisterna_no }}" {% if
+                    not is_new %}disabled{% endif %}>
+                <input type="text" name="inv_cisterna_cap" placeholder="Capacidad" value="{{ orden.inv_cisterna_cap }}"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Tinaco(s)</label>
+            <div class="flex gap-2">
+                <input type="text" name="inv_tinacos_no" placeholder="No." value="{{ orden.inv_tinacos_no }}" {% if not
+                    is_new %}disabled{% endif %}>
+                <input type="text" name="inv_tinacos_cap" placeholder="Capacidad Unit."
+                    value="{{ orden.inv_tinacos_cap }}" {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
     </div>
-    <div class="text-muted text-sm">
-        <p>Nota: La edición completa de inventario de visita técnica es muy extensa para este formulario rápido.</p>
-        <p>Se recomienda editar directamente en el archivo CSV si se requieren cambios masivos de inventario.</p>
+
+    <div class="grid-2 mb-2">
+        <div class="form-group">
+            <label>Medidor de Agua</label>
+            <div class="flex gap-2">
+                <input type="text" name="inv_medidor_serie" placeholder="No. Serie"
+                    value="{{ orden.inv_medidor_serie }}" {% if not is_new %}disabled{% endif %}>
+                <input type="text" name="inv_medidor_lectura" placeholder="Lectura Actual"
+                    value="{{ orden.inv_medidor_lectura }}" {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Pipas de Agua</label>
+            <div class="flex gap-2">
+                <input type="text" name="inv_pipas_sn" placeholder="Si/No" value="{{ orden.inv_pipas_sn }}" {% if not
+                    is_new %}disabled{% endif %}>
+                <input type="text" name="inv_pipas_m3" placeholder="m3 mensual" value="{{ orden.inv_pipas_m3 }}" {% if
+                    not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-2 font-semibold">Equipos de Bombeo y Red</h4>
+    <div class="grid-2 mb-2">
+        <div class="form-group">
+            <label>Sistema de Bombeo</label>
+            <input type="text" name="inv_bombas" placeholder="Ej. 2 Bombas 3HP Evans" value="{{ orden.inv_bombas }}" {%
+                if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Tanque Hidroneumático</label>
+            <input type="text" name="inv_tanque_hidro" placeholder="Ej. 80L / 40-60 PSI"
+                value="{{ orden.inv_tanque_hidro }}" {% if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-2">
+        <div class="form-group">
+            <label>Tomas Conectadas</label>
+            <input type="text" name="inv_tomas_no" placeholder="No." value="{{ orden.inv_tomas_no }}" {% if not is_new
+                %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Registros</label>
+            <input type="text" name="inv_registro_no" placeholder="No." value="{{ orden.inv_registro_no }}" {% if not
+                is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group col-span-2">
+            <label>Trampa de Grasa</label>
+            <div class="flex gap-2">
+                <input type="text" name="inv_trampas_no" placeholder="No." value="{{ orden.inv_trampas_no }}" {% if not
+                    is_new %}disabled{% endif %}>
+                <input type="text" name="inv_trampas_cap" placeholder="Capacidad" value="{{ orden.inv_trampas_cap }}" {%
+                    if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-2 font-semibold">Muebles Sanitarios y Eficiencia</h4>
+    <div class="grid-3 mb-2">
+        <div class="form-group">
+            <label>WC</label>
+            <input type="text" name="inv_wc_no" placeholder="Cant." value="{{ orden.inv_wc_no }}" {% if not is_new
+                %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Lavamanos</label>
+            <input type="text" name="inv_lavamanos_no" placeholder="Cant." value="{{ orden.inv_lavamanos_no }}" {% if
+                not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Fregaderos</label>
+            <input type="text" name="inv_fregaderos_no" placeholder="Cant." value="{{ orden.inv_fregaderos_no }}" {% if
+                not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="form-group mb-4">
+        <label>Mecanismos para ahorro de agua</label>
+        <div class="flex gap-2">
+            <input type="text" name="inv_ahorro_sn" placeholder="Si/No" value="{{ orden.inv_ahorro_sn }}"
+                style="flex: 0 0 80px;" {% if not is_new %}disabled{% endif %}>
+            <input type="text" name="inv_ahorro_lista" placeholder="¿Qué mecanismos utiliza?"
+                value="{{ orden.inv_ahorro_lista }}" class="flex-grow" {% if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <!-- 2. Matriz de Inspección Detallada -->
+    <h3>Matriz de Inspección Detallada</h3>
+    <div class="overflow-x-auto mb-4">
+        <table class="w-full text-sm border-collapse">
+            <thead>
+                <tr class="bg-gray-100 text-left">
+                    <th class="p-2 border">Componente / Área</th>
+                    <th class="p-2 border w-1/4">Estado</th>
+                    <th class="p-2 border w-1/2">Hallazgos y Observaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set items = [
+                ('Cisterna', 'st_cisterna', 'obs_cisterna'),
+                ('Tinaco(s)', 'st_tinacos', 'obs_tinacos'),
+                ('Tomas conectadas', 'st_tomas', 'obs_tomas'),
+                ('Registro', 'st_registro', 'obs_registro'),
+                ('Trampas de grasa', 'st_trampas', 'obs_trampas'),
+                ('Válvulas', 'st_valvulas', 'obs_valvulas'),
+                ('Bombas', 'st_bombas', 'obs_bombas'),
+                ('Tuberías', 'st_tuberias', 'obs_tuberias'),
+                ('Grifería', 'st_griferia', 'obs_griferia'),
+                ('Medidores de agua', 'st_medidores', 'obs_medidores'),
+                ('Fregadero', 'st_fregadero', 'obs_fregadero'),
+                ('Céspol', 'st_cespol', 'obs_cespol'),
+                ('Coladeras y Rejillas', 'st_coladeras', 'obs_coladeras'),
+                ('Bajadas Pluviales', 'st_pluviales', 'obs_pluviales'),
+                ('WC', 'st_wc', 'obs_wc')
+                ] %}
+                {% for label, st_key, obs_key in items %}
+                <tr>
+                    <td class="p-2 border font-medium">{{ label }}</td>
+                    <td class="p-2 border"><input type="text" name="{{ st_key }}" value="{{ orden[st_key] }}"
+                            class="w-full border-gray-300 rounded" {% if not is_new %}disabled{% endif %}></td>
+                    <td class="p-2 border"><input type="text" name="{{ obs_key }}" value="{{ orden[obs_key] }}"
+                            class="w-full border-gray-300 rounded" {% if not is_new %}disabled{% endif %}></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 3. Evidencia Fotográfica -->
+    <h3>Evidencia Fotográfica</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label>Evidencia 01</label>
+            <input type="text" name="obs_evidencia_01" value="{{ orden.obs_evidencia_01 }}" placeholder="Descripción" {%
+                if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Evidencia 02</label>
+            <input type="text" name="obs_evidencia_02" value="{{ orden.obs_evidencia_02 }}" placeholder="Descripción" {%
+                if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Evidencia 03</label>
+            <input type="text" name="obs_evidencia_03" value="{{ orden.obs_evidencia_03 }}" placeholder="Descripción" {%
+                if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label>Evidencia 04</label>
+            <input type="text" name="obs_evidencia_04" value="{{ orden.obs_evidencia_04 }}" placeholder="Descripción" {%
+                if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="form-section mb-4">
+        <h3>Comentarios adicionales</h3>
+        <div class="form-group">
+            <label>Comentarios:</label>
+            <textarea name="hallazgos_comentarios" rows="3" {% if not is_new %}disabled{% endif
+                %}>{{ orden.hallazgos_comentarios }}</textarea>
+        </div>
     </div>
     {% endif %}
 
