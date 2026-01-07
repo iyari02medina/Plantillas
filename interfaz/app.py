@@ -3,6 +3,7 @@ import csv
 import os
 import datetime
 import math
+from jinja2 import Template
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # Needed for flash messages
@@ -418,6 +419,108 @@ def get_orden_data(tipo, folio):
     target = next((r for r in rows if r.get(id_key) == folio), None)
     return target, filepath
 
+@app.route('/nueva_orden/<tipo>', methods=['GET', 'POST'])
+def nueva_orden(tipo):
+    if request.method == 'POST':
+        # Create logic
+        folio = request.form.get(
+            'folio_cot' if tipo == 'desazolve' else 'folio_ot' if tipo == 'trampa' else 'folio_vt'
+        )
+        
+        filepath = ''
+        if tipo == 'desazolve': filepath = ORDENES_CSV
+        elif tipo == 'trampa': filepath = TRAMPAS_CSV
+        elif tipo == 'visita': filepath = VISITAS_CSV
+        
+        # Check if already exists? (Optional but good practice)
+        existing_rows = read_csv(filepath)
+        id_key = 'folio_cot' if tipo == 'desazolve' else 'folio_ot' if tipo == 'trampa' else 'folio_vt'
+        
+        if any(r.get(id_key) == folio for r in existing_rows):
+            flash(f'El Folio {folio} ya existe.', 'error')
+            return redirect(url_for('nueva_orden', tipo=tipo))
+
+        # Basic structure based on type
+        new_row = {}
+        # We need headers to know what keys to expect, or rely on form
+        # Better: get headers from existing CSV
+        headers = []
+        if existing_rows:
+            headers = list(existing_rows[0].keys())
+        else:
+            # Fallback headers if file is empty
+            if tipo == 'desazolve':
+                headers = ['folio_cot','fecha_cot','nombre_cliente','direccion_cliente','nombre_contacto','telefono_contacto','ubicacion_area','tipo_tuberia','diametro_tuberia','longitud_sondeada','flujo_nulo','flujo_lento','flujo_normal','equipo_guia','equipo_hidro','equipo_vactor','tipo_obstruccion','volumen_azolve','estado_bueno','estado_danado','estado_obstruido','observaciones','comentarios_cliente']
+            elif tipo == 'trampa':
+                 headers = ['folio_ot','fecha_ot','nombre_cliente','direccion_cliente','nombre_contacto','telefono_contacto','ubicacion_equipo','tipo_trampa','capacidad_trampa','estado_tapa','nivel_saturacion','accion_retiro_solidos','accion_succion_liquidos','accion_raspado_paredes','accion_lavado_presion','accion_aplicacion_bacterias','accion_prueba_flujo','accion_limpieza_perimetral','volumen_extraido','caracteristicas_residuo','estado_bueno','estado_reparacion','estado_faltantes','observaciones_tecnico']
+            elif tipo == 'visita':
+                 headers = ['folio_vt','fecha_vt','nombre_cliente','direccion_cliente','no_cliente','inv_cisterna_no','inv_cisterna_cap','inv_tinacos_no','inv_tinacos_cap','inv_medidor_serie','inv_medidor_lectura','inv_pipas_sn','inv_pipas_m3','inv_bombas','inv_tanque_hidro','inv_tomas_no','inv_registro_no','inv_trampas_no','inv_trampas_cap','inv_wc_no','inv_lavamanos_no','inv_fregaderos_no','inv_ahorro_sn','inv_ahorro_lista','st_cisterna','obs_cisterna','st_tinacos','obs_tinacos','st_tomas','obs_tomas','st_registro','obs_registro','st_trampas','obs_trampas','st_valvulas','obs_valvulas','st_bombas','obs_bombas','st_tuberias','obs_tuberias','st_griferia','obs_griferia','st_medidores','obs_medidores','st_fregadero','obs_fregadero','st_cespol','obs_cespol','st_coladeras','obs_coladeras','st_pluviales','obs_pluviales','st_wc','obs_wc','obs_evidencia_01','obs_evidencia_02','obs_evidencia_03','obs_evidencia_04','hallazgos_comentarios']
+
+        # Fill with form data
+        for h in headers:
+            new_row[h] = request.form.get(h, '')
+            
+        # Ensure mandatory ID and DATE if not in form (visita usually auto, but let's trust form mostly)
+        new_row[id_key] = folio
+        new_row['fecha_cot' if tipo == 'desazolve' else 'fecha_ot' if tipo == 'trampa' else 'fecha_vt'] = request.form.get(
+             'fecha_cot' if tipo == 'desazolve' else 'fecha_ot' if tipo == 'trampa' else 'fecha_vt') or datetime.date.today().strftime('%d/%m/%Y')
+        
+        try:
+             append_to_csv(filepath, headers, [new_row])
+             flash('Orden creada exitosamente.', 'success')
+             
+             if generate_order_html(tipo, new_row):
+                 flash('Documento visual (HTML) generado correctamente.', 'success')
+             else:
+                 flash('Se guardó el CSV pero falló la generación visual.', 'warning')
+                 
+             return redirect(url_for('ordenes'))
+        except PermissionError:
+             flash('PERMISO DENEGADO: Archivo abierto en otro programa.', 'error')
+             data = new_row # Keep data to retry
+             
+    # GET: Prepare empty form
+    else:
+        # Determine next folio
+        prefix = ''
+        if tipo == 'desazolve': 
+            filepath = ORDENES_CSV
+            prefix = 'OT-DES-'
+            id_key = 'folio_cot'
+        elif tipo == 'trampa': 
+            filepath = TRAMPAS_CSV
+            prefix = 'OT-TRA-'
+            id_key = 'folio_ot'
+        else: 
+            filepath = VISITAS_CSV
+            prefix = 'VT-'
+            id_key = 'folio_vt'
+            
+        rows = read_csv(filepath)
+        max_num = 0
+        for r in rows:
+            try:
+                # Extract number from format like PREFIX-001
+                # Robust extraction: find last digits
+                txt = r.get(id_key, '')
+                import re
+                nums = re.findall(r'\d+', txt)
+                if nums:
+                    val = int(nums[-1])
+                    if val > max_num: max_num = val
+            except: pass
+            
+        suggested_folio = f"{prefix}{max_num + 1:03d}"
+        
+        # Empty data structure with just today's date
+        data = {
+            id_key: suggested_folio,
+            'fecha_cot' if tipo == 'desazolve' else 'fecha_ot' if tipo == 'trampa' else 'fecha_vt': datetime.date.today().strftime('%d/%m/%Y')
+        }
+
+    clientes = read_csv(CLIENTES_CSV)
+    return render_template('crear_orden.html', orden=data, tipo=tipo, folio=data.get(id_key), clientes=clientes, is_new=True)
+
 @app.route('/orden/<tipo>/<folio>', methods=['GET', 'POST'])
 def detalle_orden(tipo, folio):
     data, filepath = get_orden_data(tipo, folio)
@@ -460,14 +563,129 @@ def detalle_orden(tipo, folio):
         # We need the header list
         headers = list(all_rows[0].keys()) if all_rows else list(new_row.keys())
         
-        overwrite_csv(filepath, headers, updated_rows)
-        flash('Orden actualizada exitosamente.', 'success')
+        try:
+            overwrite_csv(filepath, headers, updated_rows)
+            flash('Orden actualizada exitosamente.', 'success')
+            
+            # Regenerate HTML
+            if generate_order_html(tipo, new_row):
+                 flash('Documento visual (HTML) regenerado correctamente.', 'success')
+            else:
+                 flash('Advertencia: Se guardaron datos pero falló la generación del documento visual.', 'warning')
+                 
+        except PermissionError:
+            flash(f'PERMISO DENEGADO: El archivo "{os.path.basename(filepath)}" está abierto en otro programa (probablemente Excel). Ciérrelo y vuelva a intentar guardar.', 'error')
+        except Exception as e:
+            flash(f'Ocurrió un error al guardar: {e}', 'error')
         
-        # Refresh data
+        # Refresh data (keep user inputs even if save failed/succeeded to reflect state)
         data = new_row
+
         
     clientes = read_csv(CLIENTES_CSV)
-    return render_template('crear_orden.html', orden=data, tipo=tipo, folio=folio, clientes=clientes)
+    return render_template('crear_orden.html', orden=data, tipo=tipo, folio=folio, clientes=clientes, is_new=False)
+
+
+def generate_order_html(tipo, data):
+    """Generates the HTML file for a specific order based on its type and data."""
+    try:
+        # Determine paths
+        plantillas_root = os.path.abspath(os.path.join(BASE_DIR, '..'))
+        docs_gen_root = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados'))
+        
+        template_path = ''
+        output_dir = ''
+        filename = ''
+        
+        # Prepare context data (copy to avoid mutating original)
+        ctx = data.copy()
+        
+        if tipo == 'desazolve':
+            template_path = os.path.join(plantillas_root, 'Orden de trabajo', 'desazolve.html')
+            output_dir = os.path.join(docs_gen_root, 'dezasolves')
+            
+            # Mapper specific to desazolve template
+            ctx['folio_ot'] = ctx.get('folio_cot', 'N/A')
+            ctx['fecha_ot'] = ctx.get('fecha_cot', 'N/A')
+            if 'no_cliente' not in ctx: ctx['no_cliente'] = '---'
+            
+            # Checkboxes x -> bool
+            checkbox_fields = [
+                'flujo_nulo', 'flujo_lento', 'flujo_normal',
+                'equipo_guia', 'equipo_hidro', 'equipo_vactor',
+                'estado_bueno', 'estado_danado', 'estado_obstruido'
+            ]
+            for field in checkbox_fields:
+                val = ctx.get(field, '')
+                # Handle inconsistent values ('x', 'on', 'true')
+                ctx[field] = val.lower().strip() in ['x', 'on', 'true', '1']
+                
+            # Default evidences if empty
+            if not ctx.get('obs_evidencia_01'): ctx['obs_evidencia_01'] = 'Evidencia inicial del área.'
+            if not ctx.get('obs_evidencia_02'): ctx['obs_evidencia_02'] = 'Evidencia final del servicio.'
+            if not ctx.get('obs_evidencia_03'): ctx['obs_evidencia_03'] = 'Equipo utilizado durante el proceso.'
+            
+            filename = f"OT_DESAZOLVE_{ctx['folio_ot']}.html"
+
+        elif tipo == 'trampa':
+            template_path = os.path.join(plantillas_root, 'Orden de trabajo', 'limpieza_trampa_grasa.html')
+            output_dir = os.path.join(docs_gen_root, 'limpiezas_trampa_grasa')
+            
+            if 'no_cliente' not in ctx: ctx['no_cliente'] = '---'
+            
+            checkbox_fields = [
+                'accion_retiro_solidos', 'accion_succion_liquidos', 'accion_raspado_paredes',
+                'accion_lavado_presion', 'accion_aplicacion_bacterias', 'accion_prueba_flujo',
+                'accion_limpieza_perimetral', 'estado_bueno', 'estado_reparacion', 'estado_faltantes'
+            ]
+            for field in checkbox_fields:
+                val = ctx.get(field, '')
+                ctx[field] = val.lower().strip() in ['x', 'on', 'true', '1']
+                
+            if not ctx.get('obs_evidencia_01'): ctx['obs_evidencia_01'] = 'Trampa saturada antes del servicio.'
+            if not ctx.get('obs_evidencia_02'): ctx['obs_evidencia_02'] = 'Trampa limpia después del servicio.'
+            
+            filename = f"OT_TRAMPA_{ctx['folio_ot']}.html"
+
+        elif tipo == 'visita':
+            template_path = os.path.join(plantillas_root, 'Visita_tecnica', 'visita_tecnica.html')
+            output_dir = os.path.join(docs_gen_root, 'visitas_tecnicas')
+            
+            folio_vt = ctx.get('folio_vt', 'SINFOLIO').replace('/', '-')
+            filename = f"VISITA_TECNICA_{folio_vt}.html"
+            
+        else:
+            return False
+
+        # Read template
+        if not os.path.exists(template_path):
+             print(f"Template missing: {template_path}")
+             return False
+             
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+        output_html = template.render(**ctx)
+
+        # Fix paths
+        output_html = output_html.replace('href="../estilos.css"', 'href="../../Plantillas/estilos.css"')
+        output_html = output_html.replace('src="../img/logo-cophi-negro.jpg"', 'src="../../Plantillas/img/logo-cophi-negro.jpg"')
+        output_html = output_html.replace('src="../paginacion.js"', 'src="../../Plantillas/paginacion.js"')
+
+        # Ensure output dir
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            
+        filepath = os.path.join(output_dir, filename)
+        with open(filepath, "w", encoding="utf-8") as out:
+            out.write(output_html)
+            
+        return True
+        
+    except Exception as e:
+        print(f"Error generating order HTML: {e}")
+        return False
 
 @app.route('/ver_orden_pdf/<tipo>/<folio>')
 def ver_orden_pdf(tipo, folio):

@@ -10,10 +10,11 @@
             {% else %}Orden de Trabajo{% endif %}
         </h1>
         <p class="subtitle">
-            {{ 'Consulta y edita los detalles.' if orden else 'Complete el formulario.' }}
+            {% if is_new %}Complete el formulario para crear un nuevo registro.{% else %}Consulta y edita los
+            detalles.{% endif %}
         </p>
     </div>
-    {% if orden %}
+    {% if not is_new %}
     <div class="flex gap-4">
         <a href="{{ url_for('ver_orden_pdf', tipo=tipo, folio=folio) }}" target="_blank" class="btn btn-secondary">Ver
             PDF</a>
@@ -22,7 +23,8 @@
     {% endif %}
 </header>
 
-<form action="{{ url_for('detalle_orden', tipo=tipo, folio=folio) }}" method="POST" class="card">
+<form action="{{ url_for('nueva_orden', tipo=tipo) if is_new else url_for('detalle_orden', tipo=tipo, folio=folio) }}"
+    method="POST" class="card">
     <!-- Common Fields (Mapped by Logic or Raw Key Access) -->
     <div class="grid-2 mb-4">
         <div class="form-group">
@@ -35,8 +37,8 @@
             <label>Fecha</label>
             <input type="text"
                 name="{{ 'fecha_cot' if tipo == 'desazolve' else 'fecha_ot' if tipo == 'trampa' else 'fecha_vt' }}"
-                value="{{ orden.fecha_cot if tipo == 'desazolve' else orden.fecha_ot if tipo == 'trampa' else orden.fecha_vt }}"
-                disabled>
+                value="{{ orden.get('fecha_cot') if tipo == 'desazolve' else orden.get('fecha_ot') if tipo == 'trampa' else orden.get('fecha_vt') }}"
+                {% if not is_new %}disabled{% endif %}>
         </div>
     </div>
 
@@ -44,29 +46,30 @@
     <div class="grid-2 mb-4">
         <div class="form-group relative">
             <label>Cliente</label>
-            <input type="text" id="nombre_cliente" name="nombre_cliente" value="{{ orden.nombre_cliente }}" disabled
-                required autocomplete="off" oninput="fillClient(this)">
+            <input type="text" id="nombre_cliente" name="nombre_cliente" value="{{ orden.nombre_cliente }}" {% if not
+                is_new %}disabled{% endif %} required autocomplete="off" oninput="fillClient(this)">
             <div id="suggestions-box"></div>
         </div>
         <div class="form-group col-span-2">
             <label>Dirección</label>
-            <input type="text" id="direccion_cliente" name="direccion_cliente" value="{{ orden.direccion_cliente }}"
-                disabled>
+            <input type="text" id="direccion_cliente" name="direccion_cliente" value="{{ orden.direccion_cliente }}" {%
+                if not is_new %}disabled{% endif %}>
         </div>
         {% if tipo != 'visita' %}
         <div class="form-group">
             <label>Contacto</label>
-            <input type="text" id="nombre_contacto" name="nombre_contacto" value="{{ orden.nombre_contacto }}" disabled>
+            <input type="text" id="nombre_contacto" name="nombre_contacto" value="{{ orden.nombre_contacto }}" {% if not
+                is_new %}disabled{% endif %}>
         </div>
         <div class="form-group">
             <label>Teléfono</label>
-            <input type="text" id="telefono_contacto" name="telefono_contacto" value="{{ orden.telefono_contacto }}"
-                disabled>
+            <input type="text" id="telefono_contacto" name="telefono_contacto" value="{{ orden.telefono_contacto }}" {%
+                if not is_new %}disabled{% endif %}>
         </div>
         {% else %}
         <div class="form-group">
             <label>No. Cliente</label>
-            <input type="text" name="no_cliente" value="{{ orden.no_cliente }}" disabled>
+            <input type="text" name="no_cliente" value="{{ orden.no_cliente }}" {% if not is_new %}disabled{% endif %}>
         </div>
         {% endif %}
     </div>
@@ -79,19 +82,23 @@
     <div class="grid-2 mb-4">
         <div class="form-group">
             <label>Ubicación Área</label>
-            <input type="text" name="ubicacion_area" value="{{ orden.ubicacion_area }}" disabled>
+            <input type="text" name="ubicacion_area" value="{{ orden.ubicacion_area }}" {% if not is_new %}disabled{%
+                endif %}>
         </div>
         <div class="form-group">
             <label>Tipo Tubería</label>
-            <input type="text" name="tipo_tuberia" value="{{ orden.tipo_tuberia }}" disabled>
+            <input type="text" name="tipo_tuberia" value="{{ orden.tipo_tuberia }}" {% if not is_new %}disabled{% endif
+                %}>
         </div>
         <div class="form-group">
             <label>Diámetro</label>
-            <input type="text" name="diametro_tuberia" value="{{ orden.diametro_tuberia }}" disabled>
+            <input type="text" name="diametro_tuberia" value="{{ orden.diametro_tuberia }}" {% if not is_new
+                %}disabled{% endif %}>
         </div>
         <div class="form-group">
             <label>Longitud Sondeada</label>
-            <input type="text" name="longitud_sondeada" value="{{ orden.longitud_sondeada }}" disabled>
+            <input type="text" name="longitud_sondeada" value="{{ orden.longitud_sondeada }}" {% if not is_new
+                %}disabled{% endif %}>
         </div>
     </div>
 
@@ -99,16 +106,16 @@
         <label class="font-bold mb-2 block">Flujo</label>
         <div class="flex gap-4">
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="flujo_nulo" value="x" {% if orden.flujo_nulo=='x' %}checked{% endif %}
-                    disabled> Nulo
+                <input type="checkbox" name="flujo_nulo" value="x" {% if orden.flujo_nulo=='x' or orden.flujo_nulo==True
+                    %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Nulo
             </label>
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="flujo_lento" value="x" {% if orden.flujo_lento=='x' %}checked{% endif %}
-                    disabled> Lento
+                <input type="checkbox" name="flujo_lento" value="x" {% if orden.flujo_lento=='x' or
+                    orden.flujo_lento==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Lento
             </label>
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="flujo_normal" value="x" {% if orden.flujo_normal=='x' %}checked{% endif %}
-                    disabled> Normal
+                <input type="checkbox" name="flujo_normal" value="x" {% if orden.flujo_normal=='x' or
+                    orden.flujo_normal==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Normal
             </label>
         </div>
     </div>
@@ -117,33 +124,36 @@
         <label class="font-bold mb-2 block">Equipo Utilizado</label>
         <div class="flex gap-4">
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="equipo_guia" value="x" {% if orden.equipo_guia=='x' %}checked{% endif %}
-                    disabled> Guía
+                <input type="checkbox" name="equipo_guia" value="x" {% if orden.equipo_guia=='x' or
+                    orden.equipo_guia==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Guía
             </label>
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="equipo_hidro" value="x" {% if orden.equipo_hidro=='x' %}checked{% endif %}
-                    disabled> Hidro
+                <input type="checkbox" name="equipo_hidro" value="x" {% if orden.equipo_hidro=='x' or
+                    orden.equipo_hidro==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Hidro
             </label>
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="equipo_vactor" value="x" {% if orden.equipo_vactor=='x' %}checked{% endif
-                    %} disabled> Vactor
+                <input type="checkbox" name="equipo_vactor" value="x" {% if orden.equipo_vactor=='x' or
+                    orden.equipo_vactor==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Vactor
             </label>
         </div>
     </div>
 
     <div class="form-group mb-4">
         <label>Tipo Obstrucción</label>
-        <input type="text" name="tipo_obstruccion" value="{{ orden.tipo_obstruccion }}" disabled>
+        <input type="text" name="tipo_obstruccion" value="{{ orden.tipo_obstruccion }}" {% if not is_new %}disabled{%
+            endif %}>
     </div>
 
     <div class="form-group mb-4">
         <label>Volumen Azolve</label>
-        <input type="text" name="volumen_azolve" value="{{ orden.volumen_azolve }}" disabled>
+        <input type="text" name="volumen_azolve" value="{{ orden.volumen_azolve }}" {% if not is_new %}disabled{% endif
+            %}>
     </div>
 
     <div class="form-group">
         <label>Observaciones</label>
-        <textarea name="observaciones" rows="3" disabled>{{ orden.observaciones }}</textarea>
+        <textarea name="observaciones" rows="3" {% if not is_new %}disabled{% endif
+            %}>{{ orden.observaciones }}</textarea>
     </div>
     {% endif %}
 
@@ -153,19 +163,23 @@
     <div class="grid-2 mb-4">
         <div class="form-group">
             <label>Ubicación Equipo</label>
-            <input type="text" name="ubicacion_equipo" value="{{ orden.ubicacion_equipo }}" disabled>
+            <input type="text" name="ubicacion_equipo" value="{{ orden.ubicacion_equipo }}" {% if not is_new
+                %}disabled{% endif %}>
         </div>
         <div class="form-group">
             <label>Tipo Trampa</label>
-            <input type="text" name="tipo_trampa" value="{{ orden.tipo_trampa }}" disabled>
+            <input type="text" name="tipo_trampa" value="{{ orden.tipo_trampa }}" {% if not is_new %}disabled{% endif
+                %}>
         </div>
         <div class="form-group">
             <label>Capacidad</label>
-            <input type="text" name="capacidad_trampa" value="{{ orden.capacidad_trampa }}" disabled>
+            <input type="text" name="capacidad_trampa" value="{{ orden.capacidad_trampa }}" {% if not is_new
+                %}disabled{% endif %}>
         </div>
         <div class="form-group">
             <label>Nivel Saturación</label>
-            <input type="text" name="nivel_saturacion" value="{{ orden.nivel_saturacion }}" disabled>
+            <input type="text" name="nivel_saturacion" value="{{ orden.nivel_saturacion }}" {% if not is_new
+                %}disabled{% endif %}>
         </div>
     </div>
 
@@ -173,36 +187,43 @@
         <label class="font-bold mb-2 block">Acciones Realizadas</label>
         <div class="grid-2">
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="accion_retiro_solidos" value="x" {% if orden.accion_retiro_solidos=='x'
-                    %}checked{% endif %} disabled> Retiro Sólidos
+                <input type="checkbox" name="accion_retiro_solidos" value="x" {% if orden.accion_retiro_solidos=='x' or
+                    orden.accion_retiro_solidos==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
+                Retiro Sólidos
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="accion_succion_liquidos" value="x" {% if orden.accion_succion_liquidos=='x'
-                    %}checked{% endif %} disabled> Succión Líquidos
+                    or orden.accion_succion_liquidos==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
+                Succión Líquidos
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="accion_raspado_paredes" value="x" {% if orden.accion_raspado_paredes=='x'
-                    %}checked{% endif %} disabled> Raspado Paredes
+                    or orden.accion_raspado_paredes==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
+                Raspado Paredes
             </label>
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="accion_lavado_presion" value="x" {% if orden.accion_lavado_presion=='x'
-                    %}checked{% endif %} disabled> Lavado a Presión
+                <input type="checkbox" name="accion_lavado_presion" value="x" {% if orden.accion_lavado_presion=='x' or
+                    orden.accion_lavado_presion==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
+                Lavado a Presión
             </label>
             <label class="flex items-center gap-2">
                 <input type="checkbox" name="accion_aplicacion_bacterias" value="x" {% if
-                    orden.accion_aplicacion_bacterias=='x' %}checked{% endif %} disabled> Aplicación Bacterias
+                    orden.accion_aplicacion_bacterias=='x' or orden.accion_aplicacion_bacterias==True %}checked{% endif
+                    %} {% if not is_new %}disabled{% endif %}> Aplicación Bacterias
             </label>
         </div>
     </div>
 
     <div class="form-group mb-4">
         <label>Volumen Extraído</label>
-        <input type="text" name="volumen_extraido" value="{{ orden.volumen_extraido }}" disabled>
+        <input type="text" name="volumen_extraido" value="{{ orden.volumen_extraido }}" {% if not is_new %}disabled{%
+            endif %}>
     </div>
 
     <div class="form-group">
         <label>Observaciones Técnico</label>
-        <textarea name="observaciones_tecnico" rows="3" disabled>{{ orden.observaciones_tecnico }}</textarea>
+        <textarea name="observaciones_tecnico" rows="3" {% if not is_new %}disabled{% endif
+            %}>{{ orden.observaciones_tecnico }}</textarea>
     </div>
     {% endif %}
 
@@ -211,7 +232,8 @@
     <h3>Detalles Visita Técnica</h3>
     <div class="mb-4">
         <label>Hallazgos / Comentarios</label>
-        <textarea name="hallazgos_comentarios" rows="5" disabled>{{ orden.hallazgos_comentarios }}</textarea>
+        <textarea name="hallazgos_comentarios" rows="5" {% if not is_new %}disabled{% endif
+            %}>{{ orden.hallazgos_comentarios }}</textarea>
     </div>
     <div class="text-muted text-sm">
         <p>Nota: La edición completa de inventario de visita técnica es muy extensa para este formulario rápido.</p>
@@ -221,7 +243,9 @@
 
     <div class="text-right mt-8 flex justify-end gap-4">
         <a href="{{ url_for('ordenes') }}" class="btn btn-secondary">Volver</a>
-        <button type="submit" class="btn btn-primary hidden" id="btn-submit">Guardar Cambios</button>
+        <button type="submit" class="btn btn-primary {% if not is_new %}hidden{% endif %}" id="btn-submit">
+            {{ 'Guardar Nueva Orden' if is_new else 'Guardar Cambios' }}
+        </button>
     </div>
 </form>
 

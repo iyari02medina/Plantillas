@@ -1,10 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<header>
-    <h1>Órdenes de Trabajo</h1>
-    <p class="subtitle">Historial de órdenes de desazolve y servicios.</p>
-</header>
+<div class="content">
+    <div class="header-section">
+        <div>
+            <h1>Órdenes de Trabajo</h1>
+            <p class="subtitle">Gestión de servicios y visitas técnicas</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ url_for('nueva_orden', tipo='desazolve') }}" class="btn btn-primary">+ Nuevo Desazolve</a>
+            <a href="{{ url_for('nueva_orden', tipo='trampa') }}" class="btn btn-primary">+ Nueva Trampa</a>
+            <a href="{{ url_for('nueva_orden', tipo='visita') }}" class="btn btn-primary">+ Nueva Visita</a>
+        </div>
+    </div>
+</div>
 
 <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
     <button onclick="showTab('desazolve')" id="btn-desazolve" class="btn btn-primary">Desazolves</button>
