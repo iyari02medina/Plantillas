@@ -24,6 +24,7 @@
                 <th>Ubicación</th>
                 <th>Servicio</th>
                 <th>Estado</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -48,11 +49,15 @@
                     <span class="badge">--</span>
                     {% endif %}
                 </td>
+                <td>
+                    <a href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_cot) }}"
+                        class="btn btn-secondary btn-small">Ver Detalle</a>
+                </td>
             </tr>
             {% endif %}
             {% else %}
             <tr>
-                <td colspan="6" class="text-center text-muted p-8">No hay órdenes de desazolve registradas.</td>
+                <td colspan="7" class="text-center text-muted p-8">No hay órdenes de desazolve registradas.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -68,9 +73,9 @@
                 <th>Folio</th>
                 <th>Fecha</th>
                 <th>Cliente</th>
-                <th>Ubicación</th>
                 <th>Tipo</th>
                 <th>Capacidad</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -80,9 +85,12 @@
                 <td><strong>{{ orden.folio_ot }}</strong></td>
                 <td>{{ orden.fecha_ot }}</td>
                 <td>{{ orden.nombre_cliente }}</td>
-                <td>{{ orden.ubicacion_equipo }}</td>
                 <td>{{ orden.tipo_trampa }}</td>
                 <td>{{ orden.capacidad_trampa }}</td>
+                <td>
+                    <a href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_ot) }}"
+                        class="btn btn-secondary btn-small">Ver Detalle</a>
+                </td>
             </tr>
             {% endif %}
             {% else %}
@@ -105,6 +113,7 @@
                 <th>Cliente</th>
                 <th>Dirección</th>
                 <th>No. Cliente</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -116,16 +125,21 @@
                 <td>{{ orden.nombre_cliente }}</td>
                 <td>{{ orden.direccion_cliente }}</td>
                 <td>{{ orden.no_cliente }}</td>
+                <td>
+                    <a href="{{ url_for('detalle_orden', tipo='visita', folio=orden.folio_vt) }}"
+                        class="btn btn-secondary btn-small">Ver Detalle</a>
+                </td>
             </tr>
             {% endif %}
             {% else %}
             <tr>
-                <td colspan="5" class="text-center text-muted p-8">No hay visitas técnicas registradas.</td>
+                <td colspan="6" class="text-center text-muted p-8">No hay visitas técnicas registradas.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
 
 <script>
     function showTab(tabName) {

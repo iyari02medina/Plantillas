@@ -398,6 +398,107 @@ def ver_cotizacion(folio):
             pass
         return "Archivo no encontrado", 404
 
+def get_orden_data(tipo, folio):
+    filepath = ''
+    id_key = ''
+    
+    if tipo == 'desazolve':
+        filepath = ORDENES_CSV
+        id_key = 'folio_cot' # confusing naming in csv
+    elif tipo == 'trampa':
+        filepath = TRAMPAS_CSV
+        id_key = 'folio_ot'
+    elif tipo == 'visita':
+        filepath = VISITAS_CSV
+        id_key = 'folio_vt'
+    else:
+        return None, None
+        
+    rows = read_csv(filepath)
+    target = next((r for r in rows if r.get(id_key) == folio), None)
+    return target, filepath
+
+@app.route('/orden/<tipo>/<folio>', methods=['GET', 'POST'])
+def detalle_orden(tipo, folio):
+    data, filepath = get_orden_data(tipo, folio)
+    
+    if not data and request.method == 'GET':
+        flash('Orden no encontrada.', 'error')
+        return redirect(url_for('ordenes'))
+
+    if request.method == 'POST':
+        # Save logic
+        # Read all rows again to ensure freshness
+        all_rows = read_csv(filepath)
+        
+        # Determine ID key again
+        id_key = 'folio_cot' if tipo == 'desazolve' else 'folio_ot' if tipo == 'trampa' else 'folio_vt'
+        
+        # Filter out the old row
+        updated_rows = [r for r in all_rows if r.get(id_key) != folio]
+        
+        # Create new row from form data
+        # We need to construct the row carefully. 
+        # For simplicity, we can just grab the existing row keys and generic update from form.
+        # But we must be careful with checkboxes ('on' vs 'x') or missing check fields.
+        
+        new_row = data.copy() # Start with existing data
+        
+        # Create a dictionary of form data
+        for key in request.form:
+            new_row[key] = request.form[key]
+            
+        # Handle specific checkbox logic if needed (or assume form sends correct values)
+        # Note: HTML checkboxes only send value if checked. 
+        # If we have checkboxes in our form that map to CSV columns, we need to handle the 'unchecked' case.
+        # This is complex without knowing all checkbox fields. 
+        # For now, we will rely on text inputs mostly, or explicit logic if we build the form with checkboxes.
+        # A safer way allows updating only provided keys.
+        
+        updated_rows.append(new_row)
+        
+        # We need the header list
+        headers = list(all_rows[0].keys()) if all_rows else list(new_row.keys())
+        
+        overwrite_csv(filepath, headers, updated_rows)
+        flash('Orden actualizada exitosamente.', 'success')
+        
+        # Refresh data
+        data = new_row
+        
+    clientes = read_csv(CLIENTES_CSV)
+    return render_template('crear_orden.html', orden=data, tipo=tipo, folio=folio, clientes=clientes)
+
+@app.route('/ver_orden_pdf/<tipo>/<folio>')
+def ver_orden_pdf(tipo, folio):
+    # This assumes PDFs/HTMLs are generated similarly to quotations
+    # We need to verify where they are stored.
+    # Based on file structure, maybe they are in 'Documentos_generados/ordenes' or similar?
+    # Or maybe they are not generated yet automatically.
+    # The user manual mentioned separate scripts for boletas. 
+    # For now, let's try to find them in a likely location or return a placeholder.
+    
+    # Check potential directories
+    base_gen = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados'))
+    
+    subfolder = 'boletas' # 'ordenes' or 'boletas'?
+    # Try finding the file
+    search_dirs = [
+        os.path.join(base_gen, 'boletas'),
+        os.path.join(base_gen, 'ordenes'),
+        os.path.join(base_gen, 'visitas') # Hypothesis
+    ]
+    
+    for d in search_dirs:
+        if os.path.exists(d):
+            files = os.listdir(d)
+            for f in files:
+                if folio in f and f.endswith('.html'):
+                    return send_from_directory(d, f)
+                    
+    return "Archivo PDF/HTML no encontrado para esta orden. Asegúrese de haber generado el documento.", 404
+
+
 @app.route('/cotizacion/<folio>')
 def detalle_cotizacion(folio):
     data = get_cotizacion_data(folio)

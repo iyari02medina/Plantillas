@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="flex justify-between items-center">
+    <div>
+        <h1>
+            {% if tipo == 'desazolve' %}Orden de Desazolve
+            {% elif tipo == 'trampa' %}Orden de Trampa de Grasa
+            {% elif tipo == 'visita' %}Visita Técnica
+            {% else %}Orden de Trabajo{% endif %}
+        </h1>
+        <p class="subtitle">
+            {{ 'Consulta y edita los detalles.' if orden else 'Complete el formulario.' }}
+        </p>
+    </div>
+    {% if orden %}
+    <div class="flex gap-4">
+        <a href="{{ url_for('ver_orden_pdf', tipo=tipo, folio=folio) }}" target="_blank" class="btn btn-secondary">Ver
+            PDF</a>
+        <button type="button" class="btn btn-primary" onclick="enableEdit()" id="btn-editar">Editar</button>
+    </div>
+    {% endif %}
+</header>
+
+<form action="{{ url_for('detalle_orden', tipo=tipo, folio=folio) }}" method="POST" class="card">
+    <!-- Common Fields (Mapped by Logic or Raw Key Access) -->
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label>Folio</label>
+            <input type="text"
+                name="{{ 'folio_cot' if tipo == 'desazolve' else 'folio_ot' if tipo == 'trampa' else 'folio_vt' }}"
+                value="{{ folio }}" readonly class="readonly-bg">
+        </div>
+        <div class="form-group">
+            <label>Fecha</label>
+            <input type="text"
+                name="{{ 'fecha_cot' if tipo == 'desazolve' else 'fecha_ot' if tipo == 'trampa' else 'fecha_vt' }}"
+                value="{{ orden.fecha_cot if tipo == 'desazolve' else orden.fecha_ot if tipo == 'trampa' else orden.fecha_vt }}"
+                disabled>
+        </div>
+    </div>
+
+    <!-- Client Section -->
+    <div class="grid-2 mb-4">
+        <div class="form-group relative">
+            <label>Cliente</label>
+            <input type="text" id="nombre_cliente" name="nombre_cliente" value="{{ orden.nombre_cliente }}" disabled
+                required autocomplete="off" oninput="fillClient(this)">
+            <div id="suggestions-box"></div>
+        </div>
+        <div class="form-group col-span-2">
+            <label>Dirección</label>
+            <input type="text" id="direccion_cliente" name="direccion_cliente" value="{{ orden.direccion_cliente }}"
+                disabled>
+        </div>
+        {% if tipo != 'visita' %}
+        <div class="form-group">
+            <label>Contacto</label>
+            <input type="text" id="nombre_contacto" name="nombre_contacto" value="{{ orden.nombre_contacto }}" disabled>
+        </div>
+        <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" id="telefono_contacto" name="telefono_contacto" value="{{ orden.telefono_contacto }}"
+                disabled>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label>No. Cliente</label>
+            <input type="text" name="no_cliente" value="{{ orden.no_cliente }}" disabled>
+        </div>
+        {% endif %}
+    </div>
+
+    <hr class="mb-4">
+
+    <!-- DESAZOLVE SPECIFIC -->
+    {% if tipo == 'desazolve' %}
+    <h3>Detalles del Servicio (Desazolve)</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label>Ubicación Área</label>
+            <input type="text" name="ubicacion_area" value="{{ orden.ubicacion_area }}" disabled>
+        </div>
+        <div class="form-group">
+            <label>Tipo Tubería</label>
+            <input type="text" name="tipo_tuberia" value="{{ orden.tipo_tuberia }}" disabled>
+        </div>
+        <div class="form-group">
+            <label>Diámetro</label>
+            <input type="text" name="diametro_tuberia" value="{{ orden.diametro_tuberia }}" disabled>
+        </div>
+        <div class="form-group">
+            <label>Longitud Sondeada</label>
+            <input type="text" name="longitud_sondeada" value="{{ orden.longitud_sondeada }}" disabled>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <label class="font-bold mb-2 block">Flujo</label>
+        <div class="flex gap-4">
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="flujo_nulo" value="x" {% if orden.flujo_nulo=='x' %}checked{% endif %}
+                    disabled> Nulo
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="flujo_lento" value="x" {% if orden.flujo_lento=='x' %}checked{% endif %}
+                    disabled> Lento
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="flujo_normal" value="x" {% if orden.flujo_normal=='x' %}checked{% endif %}
+                    disabled> Normal
+            </label>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <label class="font-bold mb-2 block">Equipo Utilizado</label>
+        <div class="flex gap-4">
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="equipo_guia" value="x" {% if orden.equipo_guia=='x' %}checked{% endif %}
+                    disabled> Guía
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="equipo_hidro" value="x" {% if orden.equipo_hidro=='x' %}checked{% endif %}
+                    disabled> Hidro
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="equipo_vactor" value="x" {% if orden.equipo_vactor=='x' %}checked{% endif
+                    %} disabled> Vactor
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group mb-4">
+        <label>Tipo Obstrucción</label>
+        <input type="text" name="tipo_obstruccion" value="{{ orden.tipo_obstruccion }}" disabled>
+    </div>
+
+    <div class="form-group mb-4">
+        <label>Volumen Azolve</label>
+        <input type="text" name="volumen_azolve" value="{{ orden.volumen_azolve }}" disabled>
+    </div>
+
+    <div class="form-group">
+        <label>Observaciones</label>
+        <textarea name="observaciones" rows="3" disabled>{{ orden.observaciones }}</textarea>
+    </div>
+    {% endif %}
+
+    <!-- TRAMPA SPECIFIC -->
+    {% if tipo == 'trampa' %}
+    <h3>Detalles de Trampa</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label>Ubicación Equipo</label>
+            <input type="text" name="ubicacion_equipo" value="{{ orden.ubicacion_equipo }}" disabled>
+        </div>
+        <div class="form-group">
+            <label>Tipo Trampa</label>
+            <input type="text" name="tipo_trampa" value="{{ orden.tipo_trampa }}" disabled>
+        </div>
+        <div class="form-group">
+            <label>Capacidad</label>
+            <input type="text" name="capacidad_trampa" value="{{ orden.capacidad_trampa }}" disabled>
+        </div>
+        <div class="form-group">
+            <label>Nivel Saturación</label>
+            <input type="text" name="nivel_saturacion" value="{{ orden.nivel_saturacion }}" disabled>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <label class="font-bold mb-2 block">Acciones Realizadas</label>
+        <div class="grid-2">
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="accion_retiro_solidos" value="x" {% if orden.accion_retiro_solidos=='x'
+                    %}checked{% endif %} disabled> Retiro Sólidos
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="accion_succion_liquidos" value="x" {% if orden.accion_succion_liquidos=='x'
+                    %}checked{% endif %} disabled> Succión Líquidos
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="accion_raspado_paredes" value="x" {% if orden.accion_raspado_paredes=='x'
+                    %}checked{% endif %} disabled> Raspado Paredes
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="accion_lavado_presion" value="x" {% if orden.accion_lavado_presion=='x'
+                    %}checked{% endif %} disabled> Lavado a Presión
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="accion_aplicacion_bacterias" value="x" {% if
+                    orden.accion_aplicacion_bacterias=='x' %}checked{% endif %} disabled> Aplicación Bacterias
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group mb-4">
+        <label>Volumen Extraído</label>
+        <input type="text" name="volumen_extraido" value="{{ orden.volumen_extraido }}" disabled>
+    </div>
+
+    <div class="form-group">
+        <label>Observaciones Técnico</label>
+        <textarea name="observaciones_tecnico" rows="3" disabled>{{ orden.observaciones_tecnico }}</textarea>
+    </div>
+    {% endif %}
+
+    <!-- VISITA SPECIFIC -->
+    {% if tipo == 'visita' %}
+    <h3>Detalles Visita Técnica</h3>
+    <div class="mb-4">
+        <label>Hallazgos / Comentarios</label>
+        <textarea name="hallazgos_comentarios" rows="5" disabled>{{ orden.hallazgos_comentarios }}</textarea>
+    </div>
+    <div class="text-muted text-sm">
+        <p>Nota: La edición completa de inventario de visita técnica es muy extensa para este formulario rápido.</p>
+        <p>Se recomienda editar directamente en el archivo CSV si se requieren cambios masivos de inventario.</p>
+    </div>
+    {% endif %}
+
+    <div class="text-right mt-8 flex justify-end gap-4">
+        <a href="{{ url_for('ordenes') }}" class="btn btn-secondary">Volver</a>
+        <button type="submit" class="btn btn-primary hidden" id="btn-submit">Guardar Cambios</button>
+    </div>
+</form>
+
+<script id="clients-data" type="application/json">{{ clientes|tojson|safe }}</script>
+
+<script>
+    const clientsData = JSON.parse(document.getElementById('clients-data').textContent);
+
+    function normalizeStr(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function fillClient(input) {
+        // Same logic as crear_cotizacion.js, duplicated here for simplicity or could be imported
+        const val = normalizeStr(input.value);
+        const suggestionsBox = document.getElementById('suggestions-box');
+        suggestionsBox.innerHTML = '';
+        suggestionsBox.style.display = 'none';
+
+        if (!val) return;
+
+        const matches = clientsData.filter(c => {
+            const nombre = c.nombre_empresa || '';
+            return normalizeStr(nombre).includes(val);
+        });
+
+        if (matches.length > 0) {
+            suggestionsBox.style.display = 'block';
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = match.nombre_empresa;
+                div.onclick = () => {
+                    document.getElementById('nombre_cliente').value = match.nombre_empresa;
+                    document.getElementById('direccion_cliente').value = match.direccion_empresa || '';
+                    if (document.getElementById('telefono_contacto')) {
+                        document.getElementById('telefono_contacto').value = match.telefono_empresa || '';
+                    }
+                    suggestionsBox.style.display = 'none';
+                };
+                suggestionsBox.appendChild(div);
+            });
+        }
+    }
+
+    function enableEdit() {
+        document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
+        document.querySelectorAll('input[readonly]').forEach(el => {
+            // Keep folio readonly usually, but user might want to edit it? Assuming no for ID.
+            if (!el.name.includes('folio')) {
+                el.readOnly = false;
+                el.classList.remove('readonly-bg');
+            }
+        });
+
+        const btnSubmit = document.getElementById('btn-submit');
+        if (btnSubmit) btnSubmit.classList.remove('hidden');
+
+        const btnEdit = document.getElementById('btn-editar');
+        if (btnEdit) btnEdit.classList.add('hidden');
+    }
+
+    // Checkbox hack: HTML forms don't send anything for unchecked checkboxes.
+    // We need to ensure that if we uncheck something, it sends a distinct value or handle it in backend.
+    // A common trick is a hidden input with the same name before the checkbox, but Flask/dict usage might conflict.
+    // For now, simple text editing is safer. For checkboxes, if the user unchecks, the key is missing.
+    // My backend logic loops over form keys. Implicitly this means missing keys (unchecked) won't update the COPY of the data if I iterate form keys.
+    // TO FIX THIS: Backend should iterate over EXPECTED keys or I should ensure checkboxes send '0' or empty.
+    // JavaScript can intercept submit and add hidden fields for unchecked boxes.
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+        // Find all unchecked checkboxes and append a hidden input or handle logic
+        // Easier: In backend, I need to know which fields ARE checkboxes to unset them if missing.
+        // Or, simpler: Just set value to '' if not checked before submit? No, unchecked inputs aren't sent.
+
+        // Let's add hidden inputs for all unchecked checkboxes
+        const checkboxes = this.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            if (!cb.checked) {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = cb.name;
+                hidden.value = ''; // Empty string for unchecked
+                this.appendChild(hidden);
+            }
+        });
+    });
+</script>
+{% endblock %}
