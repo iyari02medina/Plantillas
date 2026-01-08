@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="flex justify-between items-center">
+    <div>
+        <h1>Tarificador</h1>
+        <p class="subtitle">Historial de informes de tarificación.</p>
+    </div>
+    <a href="{{ url_for('nuevo_tarificador') }}" class="btn btn-primary">Nuevo Tarificador</a>
+</header>
+
+<div class="card table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Folio</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total a Pagar</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in tarificadores %}
+            <tr>
+                <td><strong>{{ data.folio_tar }}</strong></td>
+                <td>{{ data.nombre_cliente }}</td>
+                <td>{{ data.fecha_tar }}</td>
+                <td>${{ data.total_pagar }}</td>
+                <td>
+                    <a href="{{ url_for('detalle_tarificador', folio=data.folio_tar) }}"
+                        class="btn btn-secondary btn-small">Ver Detalle</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center text-muted p-8">No hay registros encontrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if total_pages > 1 %}
+    <div class="pagination">
+        <!-- Previous Button -->
+        {% if page > 1 %}
+        <a href="{{ url_for('tarificador', page=page-1) }}" class="btn btn-secondary btn-small">&laquo; Anterior</a>
+        {% else %}
+        <span class="btn btn-secondary btn-small disabled-link">&laquo; Anterior</span>
+        {% endif %}
+
+        <!-- Page Numbers -->
+        {% for p in range(1, total_pages + 1) %}
+        <a href="{{ url_for('tarificador', page=p) }}"
+            class="btn {% if p == page %}btn-primary{% else %}btn-secondary{% endif %} page-link">{{ p }}</a>
+        {% endfor %}
+
+        <!-- Next Button -->
+        {% if page < total_pages %} <a href="{{ url_for('tarificador', page=page+1) }}"
+            class="btn btn-secondary btn-small">Siguiente &raquo;</a>
+            {% else %}
+            <span class="btn btn-secondary btn-small disabled-link">Siguiente &raquo;</span>
+            {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

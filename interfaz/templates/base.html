@@ -23,6 +23,8 @@
                     class="nav-link {% if request.endpoint == 'cotizaciones' %}active{% endif %}">Cotizaciones</a></li>
             <li><a href="{{ url_for('ordenes') }}"
                     class="nav-link {% if request.endpoint == 'ordenes' %}active{% endif %}">Órdenes de Trabajo</a></li>
+            <li><a href="{{ url_for('tarificador') }}"
+                    class="nav-link {% if request.endpoint == 'tarificador' %}active{% endif %}">Tarificador</a></li>
         </ul>
     </div>
 

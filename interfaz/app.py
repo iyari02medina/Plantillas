@@ -16,6 +16,7 @@ TRAMPAS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Orden de trabajo', '
 VISITAS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Visita_tecnica', 'datos_visita_tecnica.csv'))
 INVENTARIO_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'productos_servicios.csv'))
 CLIENTES_CSV = r"C:\Users\DELL\Desktop\Cophi\Recursos\Programa_cophi\Plantillas\inventario\empresas.csv"
+TARIFICADOR_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'tarificador', 'datos_tarificador.csv'))
 COTIZACIONES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'cotizaciones'))
 TEMPLATE_COT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cotizacion'))
 
@@ -381,6 +382,239 @@ def ordenes():
     trampas = read_csv(TRAMPAS_CSV)
     visitas = read_csv(VISITAS_CSV)
     return render_template('ordenes.html', desazolves=desazolves, trampas=trampas, visitas=visitas)
+
+@app.route('/tarificador')
+def tarificador():
+    raw_data = read_csv(TARIFICADOR_CSV)
+    
+    # Reverse to show newest first
+    all_tars = raw_data[::-1]
+    
+    # Pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    total_items = len(all_tars) if all_tars else 0
+    total_pages = math.ceil(total_items / per_page)
+    
+    # Correct page bounds
+    if page < 1: page = 1
+    if page > total_pages and total_pages > 0: page = total_pages
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_tars = all_tars[start:end]
+    
+    return render_template('tarificador.html', 
+                         tarificadores=paginated_tars,
+                         page=page,
+                         total_pages=total_pages)
+
+# --- Tarificador Logic Helpers ---
+# Use functions similar to generar_tarificador.py to ensure consistency
+RANGOS_FILE = os.path.abspath(os.path.join(BASE_DIR, '..', 'tarificador', 'rango_incumplimiento.csv'))
+
+def clean_float(value):
+    try:
+        import re
+        match = re.search(r'[\d\.,]+', str(value))
+        if match:
+            clean_value = match.group().replace(',', '')
+            return float(clean_value)
+        return 0.0
+    except:
+        return 0.0
+
+def load_rangos():
+    rangos = []
+    if not os.path.exists(RANGOS_FILE):
+        return rangos
+    try:
+        with open(RANGOS_FILE, "r", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                min_val = clean_float(row.get('Minimo', 0))
+                max_str = row.get('Maximo', '').strip()
+                max_val = clean_float(max_str) if max_str else float('inf')
+                price = clean_float(row.get('Contaminantes Básicos', 0))
+                rangos.append({'min': min_val, 'max': max_val, 'price': price})
+    except Exception as e:
+        print(f"Error loading rangos: {e}")
+    return rangos
+
+def calculate_tarificador_row(row):
+    rangos = load_rangos()
+    contaminantes = ['sst', 'dbo', 'gya', 'ss', 'mf', 'temp', 'saam', 'dqo', 'nt', 'fen', 'color']
+    
+    precio_total_m3 = 0.0
+    
+    for c in contaminantes:
+        res = clean_float(row.get(f'{c}_resultado', 0))
+        lmp = clean_float(row.get(f'{c}_lmp', 0))
+        price = 0.0
+        
+        if lmp > 0:
+            ratio = (res - lmp) / lmp
+            if ratio > 0:
+                for r in rangos:
+                    if r['min'] < ratio <= r['max']:
+                        price = r['price']
+                        break
+        
+        row[f'{c}_precio'] = f"${price:.2f}"
+        precio_total_m3 += price
+        
+    volumen = clean_float(row.get('volumen_promedio_descargado', 0))
+    total_pagar = precio_total_m3 * volumen
+    
+    row['precio_m3_total'] = f"{precio_total_m3:.2f}"
+    row['total_pagar'] = f"{total_pagar:.2f}"
+    return row
+
+def generate_single_tarificador_html(data):
+    # This logic matches generar_tarificador.py but for a single item
+    try:
+        template_path = os.path.join(BASE_DIR, '..', 'tarificador', 'tarificador.html')
+        output_dir = os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'tarificadores')
+        
+        if not os.path.exists(template_path): return False
+        if not os.path.exists(output_dir): os.makedirs(output_dir)
+        
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+        
+        t = Template(template_content)
+        
+        # Prepare context (format currency for display)
+        ctx = data.copy()
+        
+        # Simple formatter helper
+        fmt = lambda x: f"{clean_float(x):,.2f}"
+        
+        ctx['precio_m3_total'] = fmt(ctx.get('precio_m3_total', 0))
+        ctx['total_pagar'] = fmt(ctx.get('total_pagar', 0))
+        
+        contaminantes = ['sst', 'dbo', 'gya', 'ss', 'mf', 'temp', 'saam', 'dqo', 'nt', 'fen', 'color']
+        for c in contaminantes:
+             ctx[f'{c}_precio'] = fmt(ctx.get(f'{c}_precio', 0))
+             
+        # Paths Fix
+        output_html = t.render(**ctx)
+        output_html = output_html.replace('href="../estilos.css"', 'href="../../Plantillas/estilos.css"')
+        output_html = output_html.replace('src="../img/logo-cophi-negro.jpg"', 'src="../../Plantillas/img/logo-cophi-negro.jpg"')
+        output_html = output_html.replace('src="../paginacion.js"', 'src="../../Plantillas/paginacion.js"')
+        
+        folio = ctx.get('folio_tar', 'SINFOLIO').replace('/', '-')
+        filepath = os.path.join(output_dir, f"TARIFICADOR_{folio}.html")
+        
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(output_html)
+            
+        return True
+    except Exception as e:
+        print(f"Error generating tarificador HTML: {e}")
+        return False
+
+@app.route('/nuevo_tarificador', methods=['GET', 'POST'])
+def nuevo_tarificador():
+    if request.method == 'POST':
+        folio = request.form.get('folio_tar')
+        
+        existing = read_csv(TARIFICADOR_CSV)
+        headers = []
+        if existing: headers = list(existing[0].keys())
+        
+        # Ensure we have all needed headers if file is empty or new cols needed
+        needed_headers = ['folio_tar','fecha_tar','nombre_cliente','no_cliente','direccion_cliente','no_permiso_descargas','vigencia_permiso_descargas','laboratorio','fecha_muestreo','tipo_muestreo','no_informe','volumen_promedio_descargado']
+        contaminantes = ['sst', 'dbo', 'gya', 'ss', 'mf', 'temp', 'saam', 'dqo', 'nt', 'fen', 'color']
+        for c in contaminantes:
+            needed_headers.extend([f'{c}_resultado', f'{c}_lmp', f'{c}_precio'])
+        needed_headers.extend(['precio_m3_total', 'total_pagar'])
+        
+        for h in needed_headers:
+             if h not in headers: headers.append(h)
+             
+        # Create row data
+        row = {}
+        # Fill from form
+        for h in headers:
+            row[h] = request.form.get(h, '')
+            
+        # Ensure ID
+        row['folio_tar'] = folio
+        if not row.get('fecha_tar'):
+             row['fecha_tar'] = datetime.date.today().strftime('%d/%m/%Y')
+             
+        # Perform Calculations
+        row = calculate_tarificador_row(row)
+        
+        # Decide Append or Update
+        updated_rows = [r for r in existing if r.get('folio_tar') != folio]
+        updated_rows.append(row)
+        
+        try:
+            overwrite_csv(TARIFICADOR_CSV, headers, updated_rows)
+            flash('Tarificador guardado y calculado exitosamente.', 'success')
+            
+            if generate_single_tarificador_html(row):
+                 flash('Documento visual generado.', 'success')
+            else:
+                 flash('Error generando documento visual.', 'warning')
+                 
+            return redirect(url_for('tarificador'))
+        except Exception as e:
+            flash(f'Error guardando: {e}', 'error')
+            return redirect(url_for('tarificador'))
+
+    # GET
+    clientes = read_csv(CLIENTES_CSV)
+    
+    # Suggest Folio
+    existing = read_csv(TARIFICADOR_CSV)
+    max_num = 0
+    if existing:
+        for r in existing:
+            try:
+                # Expecting TAR-XXX
+                txt = r.get('folio_tar', '')
+                import re
+                nums = re.findall(r'\d+', txt)
+                if nums:
+                    val = int(nums[-1])
+                    if val > max_num: max_num = val
+            except: pass
+    suggested_folio = f"TAR-{max_num + 1:03d}"
+    
+    return render_template('crear_tarificador.html', clientes=clientes, suggested_folio=suggested_folio, todays_date=datetime.date.today().strftime('%d/%m/%Y'))
+
+@app.route('/tarificador/<folio>')
+def detalle_tarificador(folio):
+    print(f"Buscando detalle para folio: {folio}")
+    rows = read_csv(TARIFICADOR_CSV)
+    target = next((r for r in rows if r.get('folio_tar') == folio), None)
+    
+    if not target:
+        flash('Registro no encontrado.', 'error')
+        return redirect(url_for('tarificador'))
+        
+    clientes = read_csv(CLIENTES_CSV)
+    # We pass 'tarificador' object to template to trigger Edit Mode
+    return render_template('crear_tarificador.html', tarificador=target, clientes=clientes)
+
+TARIFICADORES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'tarificadores'))
+
+@app.route('/ver_tarificador/<folio>')
+def ver_tarificador(folio):
+    safe_folio = folio.replace('/', '-')
+    filename = f"TARIFICADOR_{safe_folio}.html"
+    try:
+        if not os.path.exists(TARIFICADORES_GEN_DIR):
+             return "Directorio de documentos no encontrado", 404
+             
+        return send_from_directory(TARIFICADORES_GEN_DIR, filename)
+    except FileNotFoundError:
+        return "Archivo no encontrado", 404
+    except Exception as e:
+        return f"Error leyendo el archivo: {e}", 500
 
 @app.route('/ver_cotizacion/<folio>')
 def ver_cotizacion(folio):

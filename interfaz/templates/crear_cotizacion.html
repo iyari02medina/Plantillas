@@ -161,8 +161,8 @@
         // Enable all inputs
         document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
 
-        // Unlock Readonly inputs (Folio)
-        document.querySelectorAll('input[readonly]').forEach(el => {
+        // Unlock Readonly inputs (except Folio)
+        document.querySelectorAll('input[readonly]:not(#folio_cot)').forEach(el => {
             el.readOnly = false;
             el.classList.remove('readonly-bg');
         });
