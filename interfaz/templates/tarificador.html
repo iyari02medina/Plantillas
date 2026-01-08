@@ -16,7 +16,7 @@
                 <th>Folio</th>
                 <th>Cliente</th>
                 <th>Fecha</th>
-                <th>Total a Pagar</th>
+                <th>Precio m3</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -26,7 +26,7 @@
                 <td><strong>{{ data.folio_tar }}</strong></td>
                 <td>{{ data.nombre_cliente }}</td>
                 <td>{{ data.fecha_tar }}</td>
-                <td>${{ data.total_pagar }}</td>
+                <td>${{ data.precio_m3_total }}</td>
                 <td>
                     <a href="{{ url_for('detalle_tarificador', folio=data.folio_tar) }}"
                         class="btn btn-secondary btn-small">Ver Detalle</a>
