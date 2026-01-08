@@ -434,7 +434,7 @@ def load_rangos():
             for row in reader:
                 min_val = clean_float(row.get('Minimo', 0))
                 max_str = row.get('Maximo', '').strip()
-                max_val = clean_float(max_str) if max_str else float('inf')
+                max_val = clean_float(max_str) if max_str else None
                 price = clean_float(row.get('Contaminantes Básicos', 0))
                 rangos.append({'min': min_val, 'max': max_val, 'price': price})
     except Exception as e:
@@ -456,7 +456,8 @@ def calculate_tarificador_row(row):
             ratio = (res - lmp) / lmp
             if ratio > 0:
                 for r in rangos:
-                    if r['min'] < ratio <= r['max']:
+                    max_bound = r['max'] if r['max'] is not None else float('inf')
+                    if r['min'] < ratio <= max_bound:
                         price = r['price']
                         break
         
@@ -584,7 +585,7 @@ def nuevo_tarificador():
             except: pass
     suggested_folio = f"TAR-{max_num + 1:03d}"
     
-    return render_template('crear_tarificador.html', clientes=clientes, suggested_folio=suggested_folio, todays_date=datetime.date.today().strftime('%d/%m/%Y'))
+    return render_template('crear_tarificador.html', clientes=clientes, suggested_folio=suggested_folio, todays_date=datetime.date.today().strftime('%d/%m/%Y'), rangos=load_rangos())
 
 @app.route('/tarificador/<folio>')
 def detalle_tarificador(folio):
@@ -598,7 +599,7 @@ def detalle_tarificador(folio):
         
     clientes = read_csv(CLIENTES_CSV)
     # We pass 'tarificador' object to template to trigger Edit Mode
-    return render_template('crear_tarificador.html', tarificador=target, clientes=clientes)
+    return render_template('crear_tarificador.html', tarificador=target, clientes=clientes, rangos=load_rangos())
 
 TARIFICADORES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'tarificadores'))
 

@@ -96,7 +96,7 @@
             <label for="volumen_promedio_descargado">Volumen Promedio Descargado (m³)</label>
             <input type="number" step="0.01" id="volumen_promedio_descargado" name="volumen_promedio_descargado"
                 value="{{ tarificador.volumen_promedio_descargado if tarificador else '' }}" {% if tarificador
-                %}disabled{% endif %}>
+                %}disabled{% endif %} oninput="calculatePrices()">
         </div>
     </div>
 
@@ -105,9 +105,10 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 40%">Parámetro</th>
-                    <th style="width: 30%">Resultado</th>
-                    <th style="width: 30%">LMP</th>
+                    <th style="width: 35%">Parámetro</th>
+                    <th style="width: 20%">Resultado</th>
+                    <th style="width: 20%">LMP</th>
+                    <th style="width: 25%">Precio ($/m³)</th>
                 </tr>
             </thead>
             <tbody>
@@ -132,12 +133,17 @@
                     <td>
                         <input type="text" name="{{ key }}_resultado"
                             value="{{ tarificador[key + '_resultado'] if tarificador else '' }}" class="w-full" {% if
-                            tarificador %}disabled{% endif %}>
+                            tarificador %}disabled{% endif %} oninput="calculatePrices()">
                     </td>
                     <td>
                         <input type="text" name="{{ key }}_lmp"
                             value="{{ tarificador[key + '_lmp'] if tarificador else '' }}" class="w-full" {% if
-                            tarificador %}disabled{% endif %}>
+                            tarificador %}disabled{% endif %} oninput="calculatePrices()">
+                    </td>
+                    <td>
+                        <input type="text" name="{{ key }}_precio"
+                            value="{{ tarificador[key + '_precio'] if tarificador else '' }}" class="w-full" {% if
+                            tarificador %}disabled{% endif %} readonly>
                     </td>
                 </tr>
                 {% endfor %}
@@ -169,8 +175,10 @@
 </form>
 
 <script id="clients-data" type="application/json">{{ clientes|tojson|safe }}</script>
+<script id="rangos-data" type="application/json">{{ rangos|tojson|safe }}</script>
 <script>
     const clientsData = JSON.parse(document.getElementById('clients-data').textContent);
+    const rangosData = JSON.parse(document.getElementById('rangos-data').textContent);
 
     function enableEdit() {
         // Enable all inputs
@@ -224,8 +232,11 @@
     function selectClient(client) {
         document.getElementById('nombre_cliente').value = client.nombre_empresa;
         if (document.getElementById('direccion_cliente')) document.getElementById('direccion_cliente').value = client.direccion_empresa || '';
-        // No client allows mapping other fields easily if consistent naming used
         document.getElementById('suggestions-box').style.display = 'none';
+
+        // Auto-fill other fields if available in client data (optional)
+        if (document.getElementById('no_cliente') && client.no_cliente)
+            document.getElementById('no_cliente').value = client.no_cliente;
     }
 
     document.addEventListener('click', function (e) {
@@ -234,5 +245,79 @@
             if (box) box.style.display = 'none';
         }
     });
+
+    // --- Real-time Calculation Logic ---
+    const CONTAMINANTES = ['sst', 'dbo', 'gya', 'ss', 'mf', 'temp', 'saam', 'dqo', 'nt', 'fen', 'color'];
+
+    function cleanFloat(val) {
+        if (!val) return 0;
+        // Remove currency symbols and commas
+        val = val.toString().replace(/[$,]/g, '');
+        return parseFloat(val) || 0;
+    }
+
+    function formatMoney(amount) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        }).format(amount);
+    }
+
+    // Helper to format strictly like the python backend might prefer $0.00
+    function formatMoneySimple(amount) {
+        return new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN'
+        }).format(amount);
+    }
+
+    function calculatePrices() {
+        let precioM3Total = 0;
+
+        CONTAMINANTES.forEach(key => {
+            const resInput = document.getElementsByName(`${key}_resultado`)[0];
+            const lmpInput = document.getElementsByName(`${key}_lmp`)[0];
+            const precioInput = document.getElementsByName(`${key}_precio`)[0];
+
+            if (!resInput || !lmpInput || !precioInput) return;
+
+            const res = cleanFloat(resInput.value);
+            const lmp = cleanFloat(lmpInput.value);
+
+            let price = 0;
+
+            if (lmp > 0) {
+                const ratio = (res - lmp) / lmp;
+                if (ratio > 0) {
+                    for (const r of rangosData) {
+                        const max = r.max === null ? Infinity : r.max;
+                        if (ratio > r.min && ratio <= max) {
+                            price = r.price;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            precioInput.value = formatMoneySimple(price);
+            precioM3Total += price;
+        });
+
+        const subtotalDisplay = document.getElementById('subtotal-display');
+        if (subtotalDisplay) subtotalDisplay.textContent = formatMoneySimple(precioM3Total);
+
+        const volInput = document.getElementById('volumen_promedio_descargado');
+        const volumen = volInput ? cleanFloat(volInput.value) : 0;
+        const totalPagar = precioM3Total * volumen;
+
+        const totalDisplay = document.getElementById('total-display');
+        if (totalDisplay) totalDisplay.textContent = formatMoneySimple(totalPagar);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        calculatePrices();
+    });
+
 </script>
 {% endblock %}
