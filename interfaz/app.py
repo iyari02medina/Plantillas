@@ -441,6 +441,13 @@ def load_rangos():
         print(f"Error loading rangos: {e}")
     return rangos
 
+def get_default_lmps():
+    """Obtiene los valores LMP por defecto de la primera fila del CSV (fila 2 en Excel/Editor)."""
+    rows = read_csv(TARIFICADOR_CSV)
+    if rows:
+        return rows[0]
+    return {}
+
 def calculate_tarificador_row(row):
     rangos = load_rangos()
     contaminantes = ['sst', 'dbo', 'gya', 'ss', 'mf', 'temp', 'saam', 'dqo', 'nt', 'fen', 'color']
@@ -585,7 +592,7 @@ def nuevo_tarificador():
             except: pass
     suggested_folio = f"TAR-{max_num + 1:03d}"
     
-    return render_template('crear_tarificador.html', clientes=clientes, suggested_folio=suggested_folio, todays_date=datetime.date.today().strftime('%d/%m/%Y'), rangos=load_rangos())
+    return render_template('crear_tarificador.html', clientes=clientes, suggested_folio=suggested_folio, todays_date=datetime.date.today().strftime('%d/%m/%Y'), rangos=load_rangos(), default_lmps=get_default_lmps())
 
 @app.route('/tarificador/<folio>')
 def detalle_tarificador(folio):
@@ -599,7 +606,7 @@ def detalle_tarificador(folio):
         
     clientes = read_csv(CLIENTES_CSV)
     # We pass 'tarificador' object to template to trigger Edit Mode
-    return render_template('crear_tarificador.html', tarificador=target, clientes=clientes, rangos=load_rangos())
+    return render_template('crear_tarificador.html', tarificador=target, clientes=clientes, rangos=load_rangos(), default_lmps=get_default_lmps())
 
 TARIFICADORES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'tarificadores'))
 

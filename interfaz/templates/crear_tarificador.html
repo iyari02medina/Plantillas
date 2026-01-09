@@ -137,8 +137,8 @@
                     </td>
                     <td>
                         <input type="text" name="{{ key }}_lmp"
-                            value="{{ tarificador[key + '_lmp'] if tarificador else '' }}" class="w-full" {% if
-                            tarificador %}disabled{% endif %} oninput="calculatePrices()">
+                            value="{{ tarificador[key + '_lmp'] if tarificador else default_lmps.get(key + '_lmp', '') }}"
+                            class="w-full always-locked readonly-bg" readonly>
                     </td>
                     <td>
                         <input type="text" name="{{ key }}_precio"
@@ -185,7 +185,7 @@
         document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
 
         // Unlock Readonly inputs (except Folio)
-        document.querySelectorAll('input[readonly]:not(#folio_tar)').forEach(el => {
+        document.querySelectorAll('input[readonly]:not(#folio_tar):not(.always-locked)').forEach(el => {
             el.readOnly = false;
             el.classList.remove('readonly-bg');
         });
