@@ -17,8 +17,11 @@ VISITAS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Visita_tecnica', 'da
 INVENTARIO_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'productos_servicios.csv'))
 CLIENTES_CSV = r"C:\Users\DELL\Desktop\Cophi\Recursos\Programa_cophi\Plantillas\inventario\empresas.csv"
 TARIFICADOR_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'tarificador', 'datos_tarificador.csv'))
+PERMISOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cuestionario_permiso_descargas', 'cuestionario_variables.csv'))
 COTIZACIONES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'cotizaciones'))
+PERMISOS_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'Cuestionarios_permiso_descarga'))
 TEMPLATE_COT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cotizacion'))
+TEMPLATE_PERMISOS_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cuestionario_permiso_descargas'))
 
 def generate_quotation_html(folio):
     """Genera el archivo HTML de la cotización usando el script logic."""
@@ -868,6 +871,58 @@ def detalle_orden(tipo, folio):
     return render_template('crear_orden.html', orden=data, tipo=tipo, folio=folio, clientes=clientes, is_new=False)
 
 
+def generate_permiso_html(data):
+    """Genera los archivos HTML para permiso de descarga (Cuestionario, Acuse, Carta Poder)."""
+    try:
+        from jinja2 import Environment, FileSystemLoader
+        import re
+        
+        env = Environment(loader=FileSystemLoader(TEMPLATE_PERMISOS_DIR))
+        
+        # Plantillas configuradas
+        templates_to_gen = [
+            {'file': 'v2_cuestionario.html', 'prefix': 'Cuestionario'},
+            {'file': 'acuse.html',           'prefix': 'Acuse'},
+            {'file': 'carta-poder.html',     'prefix': 'Carta_Poder'}
+        ]
+        
+        # Sanitizar nombre para carpeta
+        nombre_entidad = data.get('arr_nombre', '').strip() or data.get('prop_nombre', '').strip() or "SinNombre"
+        safe_name = re.sub(r'[<>:"/\\|?*]', '', nombre_entidad).strip()
+        current_year = datetime.datetime.now().year
+        
+        client_folder = f"{safe_name}_Permiso_descargas_{current_year}"
+        output_client_path = os.path.join(PERMISOS_GEN_DIR, client_folder)
+        
+        if not os.path.exists(output_client_path):
+            os.makedirs(output_client_path)
+            
+        # Asegurar imagen header
+        header_src = os.path.join(TEMPLATE_PERMISOS_DIR, 'header.JPG')
+        header_dst = os.path.join(output_client_path, 'header.JPG')
+        if os.path.exists(header_src) and not os.path.exists(header_dst):
+            import shutil
+            shutil.copy2(header_src, header_dst)
+            
+        for t_cfg in templates_to_gen:
+            template = env.get_template(t_cfg['file'])
+            html_content = template.render(**data)
+            
+            # Ajustar rutas de estilos/scripts si es necesario (asumiendo que v2_cuestionario lo necesita)
+            # El script original no lo hacía porque usaba file:// con Playwright.
+            # Aquí lo dejamos igual o añadimos ajustes si el usuario lo pide.
+            
+            filename = f"{t_cfg['prefix']}_{safe_name}_{current_year}.html"
+            with open(os.path.join(output_client_path, filename), 'w', encoding='utf-8') as f:
+                f.write(html_content)
+                
+        return True
+    except Exception as e:
+        print(f"Error generando HTML para permiso: {e}")
+        return False
+
+
+
 def generate_order_html(tipo, data):
     """Generates the HTML file for a specific order based on its type and data."""
     try:
@@ -1006,6 +1061,136 @@ def ver_orden_pdf(tipo, folio):
             
     return f"Archivo no encontrado para el folio {folio} en {folder}. Asegúrese de haber generado el documento.", 404
 
+
+
+@app.route('/permiso_descarga/<nis>')
+def detalle_permiso_descarga(nis):
+    raw_data = read_csv(PERMISOS_CSV)
+    target = next((r for r in raw_data if r.get('nis') == nis), None)
+    
+    if not target:
+        flash('Permiso de descarga no encontrado.', 'error')
+        return redirect(url_for('permisos_descarga'))
+        
+    clientes = read_csv(CLIENTES_CSV)
+    return render_template('crear_permiso_descarga.html', permiso=target, clientes=clientes)
+
+
+@app.route('/permisos_descarga')
+def permisos_descarga():
+    raw_data = read_csv(PERMISOS_CSV)
+    
+    # Invertir para mostrar los nuevos primero
+    all_permisos = raw_data[::-1]
+    
+    # Paginación
+    page = request.args.get('page', 1, type=int)
+    per_page = 15
+    total_items = len(all_permisos)
+    total_pages = math.ceil(total_items / per_page)
+    
+    if page < 1: page = 1
+    if page > total_pages and total_pages > 0: page = total_pages
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_permisos = all_permisos[start:end]
+    
+    return render_template('permiso_descarga.html', 
+                         permisos=paginated_permisos,
+                         page=page,
+                         total_pages=total_pages)
+
+
+@app.route('/nuevo_permiso_descarga', methods=['GET', 'POST'])
+def nuevo_permiso_descarga():
+    if request.method == 'POST':
+        nis = request.form.get('nis')
+        
+        existing = read_csv(PERMISOS_CSV)
+        headers = []
+        if existing:
+            headers = list(existing[0].keys())
+        else:
+            headers = ['nis','nombre_negocio','prop_nombre','prop_direccion','prop_colonia','prop_municipio','prop_telefono','prop_localidad','prop_cp','prop_rfc','arr_nombre','arr_ine','arr_direccion','arr_colonia','arr_municipio','arr_telefono','arr_localidad','arr_cp','arr_rfc','giro_licencia','giro_descripcion','num_empleados','turnos','horario_atencion','pozo','num_concesion','pipas','datos_pipas','red','num_tomas','fuente_otro','total_wc','total_mingitorios','total_lavamanos','total_regaderas','total_cisternas','cap_cisternas','total_tinacos','cap_tinacos','tiene_comedor','mecanismos_ahorro','descarga_muni','promedio_descarga','tiene_registro','localización_registro','profundidad_registro','diametro_registro','material_registro','tiene_medidor_descargas','tiene_pretrat','operación_pretratamiento','disposicion_residuos','desc_pretratamiento','tiene_analisis','fecha_acuse','testigo1_nombre','testigo2_nombre']
+            
+        new_row = {}
+        for h in headers:
+            new_row[h] = request.form.get(h, '')
+            
+        # Normalización básica de Si/No como en el script original
+        for k, v in new_row.items():
+            if v:
+                v_lower = v.strip().lower()
+                if v_lower in ['si', 'sí', 'on', 'true']:
+                    new_row[k] = 'Si'
+                elif v_lower in ['no', 'off', 'false']:
+                    new_row[k] = 'No'
+
+        # Actualizar o Añadir
+        updated_rows = [r for r in existing if r.get('nis') != nis]
+        updated_rows.append(new_row)
+        
+        try:
+            overwrite_csv(PERMISOS_CSV, headers, updated_rows)
+            flash('Permiso de descarga guardado exitosamente.', 'success')
+            
+            if generate_permiso_html(new_row):
+                flash('Documentos HTML generados correctamente.', 'success')
+            else:
+                flash('Se guardó el CSV pero hubo un error al generar los documentos.', 'warning')
+                
+            return redirect(url_for('permisos_descarga'))
+        except Exception as e:
+            flash(f'Error al guardar: {e}', 'error')
+            return redirect(url_for('permisos_descarga'))
+
+    # GET
+    clientes = read_csv(CLIENTES_CSV)
+    
+    # Sugerir NIS (numericamente si es posible)
+    existing = read_csv(PERMISOS_CSV)
+    max_num = 0
+    if existing:
+        for r in existing:
+            try:
+                import re
+                nums = re.findall(r'\d+', str(r.get('nis', '')))
+                if nums:
+                    val = int(nums[-1])
+                    if val > max_num: max_num = val
+            except: pass
+    suggested_nis = max_num + 1
+
+    return render_template('crear_permiso_descarga.html', clientes=clientes, suggested_nis=suggested_nis)
+
+
+@app.route('/ver_permiso_pdf/<nis>/<tipo>')
+def ver_permiso_pdf(nis, tipo):
+    """
+    Muestra el HTML generado para un permiso. 
+    tipo puede ser: 'Cuestionario', 'Acuse', 'Carta_Poder'
+    """
+    raw_data = read_csv(PERMISOS_CSV)
+    target = next((r for r in raw_data if r.get('nis') == nis), None)
+    
+    if not target:
+        return "Permiso no encontrado", 404
+        
+    import re
+    nombre_entidad = target.get('arr_nombre', '').strip() or target.get('prop_nombre', '').strip() or "SinNombre"
+    safe_name = re.sub(r'[<>:"/\\|?*]', '', nombre_entidad).strip()
+    current_year = datetime.datetime.now().year
+    
+    client_folder = f"{safe_name}_Permiso_descargas_{current_year}"
+    target_dir = os.path.join(PERMISOS_GEN_DIR, client_folder)
+    
+    filename = f"{tipo}_{safe_name}_{current_year}.html"
+    
+    if os.path.exists(os.path.join(target_dir, filename)):
+        return send_from_directory(target_dir, filename)
+    else:
+        return f"Documento {filename} no encontrado en {client_folder}. Intente guardarlo de nuevo para regenerarlo.", 404
 
 
 @app.route('/cotizacion/<folio>')

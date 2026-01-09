@@ -25,6 +25,9 @@
                     class="nav-link {% if request.endpoint == 'ordenes' %}active{% endif %}">Órdenes de Trabajo</a></li>
             <li><a href="{{ url_for('tarificador') }}"
                     class="nav-link {% if request.endpoint == 'tarificador' %}active{% endif %}">Tarificador</a></li>
+            <li><a href="{{ url_for('permisos_descarga') }}"
+                    class="nav-link {% if request.endpoint == 'permisos_descarga' %}active{% endif %}">Permisos de
+                    Descarga</a></li>
         </ul>
     </div>
 
