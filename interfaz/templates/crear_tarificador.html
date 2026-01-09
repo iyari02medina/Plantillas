@@ -151,21 +151,20 @@
         </table>
     </div>
 
-    {% if tarificador %}
     <div class="card bg-gray-50 mt-4 p-4">
         <div class="flex flex-col items-end gap-2">
             <div class="flex justify-between w-64">
                 <span class="font-bold">Precio m³:</span>
-                <span id="subtotal-display">{{ tarificador.precio_m3_total }}</span>
+                <span id="subtotal-display">{{ tarificador.precio_m3_total if tarificador else '0.00' }}</span>
             </div>
             <div class="flex justify-between w-64 text-xl font-bold border-t pt-2 mt-2">
                 <span>Total a Pagar:</span>
-                <span id="total-display" class="text-primary">{{ tarificador.total_pagar }}</span>
+                <span id="total-display" class="text-primary">{{ tarificador.total_pagar if tarificador else '0.00'
+                    }}</span>
             </div>
-            <p class="text-xs text-gray-500 mt-2">* Estos valores se recalculan al guardar.</p>
+            <p class="text-xs text-gray-500 mt-2">* Estos valores se calculan automáticamente.</p>
         </div>
     </div>
-    {% endif %}
 
     <div class="text-right mt-8 flex justify-end gap-4">
         <a href="{{ url_for('tarificador') }}" class="btn btn-secondary">Cancelar</a>
