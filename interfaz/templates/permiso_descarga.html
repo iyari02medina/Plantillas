@@ -31,8 +31,31 @@
                 </td>
                 <td>{{ p.fecha_acuse }}</td>
                 <td>
-                    <a href="{{ url_for('detalle_permiso_descarga', nis=p.nis) }}"
-                        class="btn btn-secondary btn-small">Ver Detalle</a>
+                    <div class="flex gap-2">
+                        <a href="{{ url_for('detalle_permiso_descarga', nis=p.nis) }}"
+                            class="btn btn-secondary btn-small">Ver Detalle</a>
+
+                        <div class="dropdown" style="position: relative;">
+                            <button class="btn btn-secondary btn-small dropdown-toggle" type="button"
+                                onclick="toggleDropdown(this)">
+                                Documentos ▾
+                            </button>
+                            <div class="dropdown-menu"
+                                style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; padding: 0.5rem; z-index: 100; min-width: 150px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                <a href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Cuestionario') }}"
+                                    target="_blank"
+                                    style="display: block; padding: 0.25rem 0.5rem; color: var(--text-color); text-decoration: none;">Ver
+                                    Cuestionario</a>
+                                <a href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Acuse') }}" target="_blank"
+                                    style="display: block; padding: 0.25rem 0.5rem; color: var(--text-color); text-decoration: none;">Ver
+                                    Acuse</a>
+                                <a href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Carta_Poder') }}"
+                                    target="_blank"
+                                    style="display: block; padding: 0.25rem 0.5rem; color: var(--text-color); text-decoration: none;">Ver
+                                    Carta Poder</a>
+                            </div>
+                        </div>
+                    </div>
                 </td>
             </tr>
             {% else %}
@@ -71,4 +94,27 @@
     </div>
     {% endif %}
 </div>
+<script>
+    function toggleDropdown(btn) {
+        // Cerrar otros dropdowns abiertos
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            if (menu !== btn.nextElementSibling) {
+                menu.style.display = 'none';
+            }
+        });
+
+        const menu = btn.nextElementSibling;
+        const isVisible = menu.style.display === 'block';
+        menu.style.display = isVisible ? 'none' : 'block';
+    }
+
+    // Cerrar al hacer clic fuera
+    document.addEventListener('click', function (e) {
+        if (!e.target.classList.contains('dropdown-toggle')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.style.display = 'none';
+            });
+        }
+    });
+</script>
 {% endblock %}

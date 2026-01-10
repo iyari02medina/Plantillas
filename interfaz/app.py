@@ -908,11 +908,15 @@ def generate_permiso_html(data):
             template = env.get_template(t_cfg['file'])
             html_content = template.render(**data)
             
-            # Ajustar rutas de estilos/scripts si es necesario (asumiendo que v2_cuestionario lo necesita)
-            # El script original no lo hacía porque usaba file:// con Playwright.
-            # Aquí lo dejamos igual o añadimos ajustes si el usuario lo pide.
-            
             filename = f"{t_cfg['prefix']}_{safe_name}_{current_year}.html"
+            
+            # Ajustar rutas de estilos/scripts para que funcionen desde la carpeta del cliente
+            # (3 niveles arriba para llegar a la raíz de Plantillas si fuera necesario, 
+            # pero aquí ajustamos para que apunten a la ruta que el servidor Flask entiende)
+            html_content = html_content.replace('href="../estilos.css"', 'href="../../../Plantillas/estilos.css"')
+            html_content = html_content.replace('src="../paginacion.js"', 'src="../../../Plantillas/paginacion.js"')
+            # La imagen header.JPG se copia localmente, por lo que src="header.JPG" está bien.
+
             with open(os.path.join(output_client_path, filename), 'w', encoding='utf-8') as f:
                 f.write(html_content)
                 
@@ -1178,19 +1182,34 @@ def ver_permiso_pdf(nis, tipo):
         return "Permiso no encontrado", 404
         
     import re
+    import glob
     nombre_entidad = target.get('arr_nombre', '').strip() or target.get('prop_nombre', '').strip() or "SinNombre"
     safe_name = re.sub(r'[<>:"/\\|?*]', '', nombre_entidad).strip()
-    current_year = datetime.datetime.now().year
     
-    client_folder = f"{safe_name}_Permiso_descargas_{current_year}"
-    target_dir = os.path.join(PERMISOS_GEN_DIR, client_folder)
+    # Búsqueda robusta: Buscar cualquier carpeta que empiece con el nombre sanitizado
+    # Esto evita el error si el año cambió o si hay pequeñas variaciones
+    search_pattern = os.path.join(PERMISOS_GEN_DIR, f"{safe_name}_Permiso_descargas_*")
+    folders = glob.glob(search_pattern)
     
-    filename = f"{tipo}_{safe_name}_{current_year}.html"
+    if not folders:
+        # Intento 2: Buscar por NIS en el nombre de la carpeta (si decidiéramos renombrarlas en el futuro)
+        # O simplemente fallar si no hay nada que coincida con el nombre
+        return f"No se encontró la carpeta para '{safe_name}'. Asegúrese de haber generado los documentos.", 404
+        
+    # Usar la carpeta más reciente encontrada
+    target_dir = sorted(folders, reverse=True)[0]
     
-    if os.path.exists(os.path.join(target_dir, filename)):
-        return send_from_directory(target_dir, filename)
-    else:
-        return f"Documento {filename} no encontrado en {client_folder}. Intente guardarlo de nuevo para regenerarlo.", 404
+    # Buscar el archivo que empiece con el tipo (Cuestionario, Acuse, etc)
+    try:
+        files = os.listdir(target_dir)
+        filename = next((f for f in files if f.startswith(tipo) and f.endswith('.html')), None)
+        
+        if filename:
+            return send_from_directory(target_dir, filename)
+        else:
+            return f"Documento de tipo {tipo} no encontrado en la carpeta del cliente.", 404
+    except Exception as e:
+        return f"Error al acceder a los documentos: {e}", 500
 
 
 @app.route('/cotizacion/<folio>')
