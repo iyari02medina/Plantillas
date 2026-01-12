@@ -17,7 +17,7 @@ TEMPLATES_CONFIG = [
 ]
 CSV_FILE = 'cuestionario_variables.csv'
 OUTPUT_DIR = os.path.join('..', '..', 'Documentos_generados', 'Cuestionarios_permiso_descarga')
-HEADER_IMAGE = 'header.JPG'
+HEADER_IMAGE = '../img/header.JPG'
 
 def sanitize_filename(name):
     """

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,31 +15,50 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+
         /* Print-specific styles */
         @media print {
             body {
-                font-size: 9pt; /* Smaller font size to fit more content */
+                font-size: 9pt;
+                /* Smaller font size to fit more content */
                 background: #fff;
             }
+
             main {
                 padding: 0;
                 margin: 0;
             }
+
             .printable-content {
                 box-shadow: none !important;
-                padding: 1cm 1.5cm !important; /* Adjusted margins for printing */
+                padding: 1cm 1.5cm !important;
+                /* Adjusted margins for printing */
                 max-width: 100% !important;
                 border: none;
             }
-            h1 { font-size: 16pt !important; }
-            h2 { font-size: 13pt !important; margin-bottom: 0.8rem !important; }
-            p { font-size: 9pt !important; margin-bottom: 0.8rem !important;}
+
+            h1 {
+                font-size: 16pt !important;
+            }
+
+            h2 {
+                font-size: 13pt !important;
+                margin-bottom: 0.8rem !important;
+            }
+
+            p {
+                font-size: 9pt !important;
+                margin-bottom: 0.8rem !important;
+            }
+
             ol {
                 /* Reset Tailwind's space-y utility for print */
                 --tw-space-y-reverse: 0 !important;
                 margin: 0 !important;
-                line-height: 1.25; /* Tighter line spacing */
+                line-height: 1.25;
+                /* Tighter line spacing */
             }
+
             li {
                 /* Add a smaller, consistent space between list items */
                 padding-top: 0.1rem;
@@ -47,6 +67,7 @@
         }
     </style>
 </head>
+
 <body class="bg-slate-50 text-slate-800">
 
     <!-- Header Section (Hidden on Print) -->
@@ -55,34 +76,38 @@
             <!-- Logo 1 -->
             <img src="https://www.cophi.mx/logo-cophi2.jpg" alt="Logo Cophi" class="h-16 md:h-20">
             <!-- Logo 2 -->
-            <img src="https://scontent.fpbc2-4.fna.fbcdn.net/v/t39.30808-6/300831593_494354372695762_5350467236397008670_n.png?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=GmXUkHXV2XEQ7kNvwGG2GL3&_nc_oc=AdnGGLOwSLcKG3bno0G7dCj3OXA-u19m-xIF9P0wmPdTbBO86FW4jfSA8s1YHtjgaB-tsOVkefpf2Pt9A9SS4Ar&_nc_zt=23&_nc_ht=scontent.fpbc2-4.fna&_nc_gid=YEAZ2PtaGO19BF5-wKqn9w&oh=00_AfewSwssqAEdxGSvaiJ3Rkv68VY1-G0DotR7lry7Ps3lAQ&oe=68EA22CB" alt="Logo Adicional" class="h-16 md:h-20">
+            <img src="https://scontent.fpbc2-4.fna.fbcdn.net/v/t39.30808-6/300831593_494354372695762_5350467236397008670_n.png?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=GmXUkHXV2XEQ7kNvwGG2GL3&_nc_oc=AdnGGLOwSLcKG3bno0G7dCj3OXA-u19m-xIF9P0wmPdTbBO86FW4jfSA8s1YHtjgaB-tsOVkefpf2Pt9A9SS4Ar&_nc_zt=23&_nc_ht=scontent.fpbc2-4.fna&_nc_gid=YEAZ2PtaGO19BF5-wKqn9w&oh=00_AfewSwssqAEdxGSvaiJ3Rkv68VY1-G0DotR7lry7Ps3lAQ&oe=68EA22CB"
+                alt="Logo Adicional" class="h-16 md:h-20">
         </div>
     </header>
 
     <!-- Main Content Section -->
     <main class="container mx-auto px-6 py-8 md:py-12">
         <div class="bg-white p-8 md:p-12 rounded-xl shadow-lg max-w-4xl mx-auto printable-content">
-            
+
             <!-- Logos for Print Only -->
             <div class="hidden print:flex justify-between items-center mb-6">
                 <img src="https://www.cophi.mx/logo-cophi2.jpg" alt="Logo Cophi" style="height: 2cm;">
-                <img src="https://scontent.fpbc2-4.fna.fbcdn.net/v/t39.30808-6/300831593_494354372695762_5350467236397008670_n.png?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=GmXUkHXV2XEQ7kNvwGG2GL3&_nc_oc=AdnGGLOwSLcKG3bno0G7dCj3OXA-u19m-xIF9P0wmPdTbBO86FW4jfSA8s1YHtjgaB9-tsOVkefpf2Pt9A9SS4Ar&_nc_zt=23&_nc_ht=scontent.fpbc2-4.fna&_nc_gid=YEAZ2PtaGO19BF5-wKqn9w&oh=00_AfewSwssqAEdxGSvaiJ3Rkv68VY1-G0DotR7lry7Ps3lAQ&oe=68EA22CB" alt="Logo Adicional" style="height: 2.8cm;">
+                <img src="https://scontent.fpbc2-4.fna.fbcdn.net/v/t39.30808-6/300831593_494354372695762_5350467236397008670_n.png?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=GmXUkHXV2XEQ7kNvwGG2GL3&_nc_oc=AdnGGLOwSLcKG3bno0G7dCj3OXA-u19m-xIF9P0wmPdTbBO86FW4jfSA8s1YHtjgaB9-tsOVkefpf2Pt9A9SS4Ar&_nc_zt=23&_nc_ht=scontent.fpbc2-4.fna&_nc_gid=YEAZ2PtaGO19BF5-wKqn9w&oh=00_AfewSwssqAEdxGSvaiJ3Rkv68VY1-G0DotR7lry7Ps3lAQ&oe=68EA22CB"
+                    alt="Logo Adicional" style="height: 2.8cm;">
             </div>
-        
+
             <!-- Subtitle -->
             <h2 class="text-xl md:text-2xl font-semibold text-sky-700 mb-8 border-b pb-4">
                 Requisitos para el Permiso de Descarga de Aguas Residuales
             </h2>
 
             <!-- Requirements List -->
-            <p class="mb-6 text-slate-600">Listado de Documentos para integrar solicitud y expediente para el Permiso de Descarga de Aguas residuales ante el SOAPAP:</p>
-            
+            <p class="mb-6 text-slate-600">Listado de Documentos para integrar solicitud y expediente para el Permiso de
+                Descarga de Aguas residuales ante el SOAPAP:</p>
+
             <ol class="list-[lower-alpha] space-y-4 pl-5 text-slate-700">
                 <li>Acta constitutiva de la sociedad (Persona Moral).</li>
                 <li>Poder notarial (Persona Moral) o Identificación Oficial (Persona Física).</li>
                 <li>Registro Federal de Contribuyentes.</li>
                 <li>Carta poder y copia de la identificación de la persona que realiza el trámite.</li>
-                <li>Factibilidad de los servicios de agua potable y drenaje prestados por el SOAPAP a través de Concesiones Integrales S.A. de C.V. y/o Agua de Puebla para Todos.</li>
+                <li>Factibilidad de los servicios de agua potable y drenaje prestados por el SOAPAP a través de
+                    Concesiones Integrales S.A. de C.V. y/o Agua de Puebla para Todos.</li>
                 <li>Licencia de Funcionamiento.</li>
                 <li>Constancia de Alineamiento y Número Oficial.</li>
                 <li>Licencia de sustancias susceptibles de inhalación y efectos tóxicos.</li>
@@ -90,26 +115,41 @@
                 <li>Constancia de medidas preventivas expedida por Bomberos.</li>
                 <li>Constancia de medidas básicas de seguridad expedida por Protección Civil.</li>
                 <li>Boleta de Predial.</li>
-                <li>Planos (tamaño mínimo aceptado doble carta) de los sistemas de drenaje de proceso, sanitario y pluvial que cuenten con conexión a la red de drenaje municipal distinguiendo con colores diferentes cada una de las líneas (proceso, sanitario y pluvial).</li>
-                <li>Lista de materias primas que utiliza en sus procesos productivos y de limpieza describiendo el uso de cada uno, y anexando las fichas técnicas de cada uno de productos.</li>
-                <li>Diagrama de Flujo del proceso de producción, así como su descripción, indicando de manera precisa dónde se utiliza agua y las cantidades que se utilizan en éstos.</li>
+                <li>Planos (tamaño mínimo aceptado doble carta) de los sistemas de drenaje de proceso, sanitario y
+                    pluvial que cuenten con conexión a la red de drenaje municipal distinguiendo con colores diferentes
+                    cada una de las líneas (proceso, sanitario y pluvial).</li>
+                <li>Lista de materias primas que utiliza en sus procesos productivos y de limpieza describiendo el uso
+                    de cada uno, y anexando las fichas técnicas de cada uno de productos.</li>
+                <li>Diagrama de Flujo del proceso de producción, así como su descripción, indicando de manera precisa
+                    dónde se utiliza agua y las cantidades que se utilizan en éstos.</li>
                 <li>Balance hídrico.</li>
                 <li>Georreferencia del Predio con ubicación de la descarga final (en grados, minutos y segundos).</li>
                 <li>Número de empleados.</li>
                 <li>Número de turnos, Días y Horarios.</li>
-                <li>Fuente de abastecimiento, en caso de ser por pozo copia del título de Concesión de éste, en caso de ser pipas especifica la cantidad y la capacidad de éstas.</li>
+                <li>Fuente de abastecimiento, en caso de ser por pozo copia del título de Concesión de éste, en caso de
+                    ser pipas especifica la cantidad y la capacidad de éstas.</li>
                 <li>Promedio mensual de aguas residuales generadas.</li>
                 <li>Fotografía del o de los registros a pie de banqueta los cuales deben concordar con los planos.</li>
                 <li>Datos del Medidor de descarga.</li>
                 <li>Descripción de las Descargas. Estas deberán concordar con los planos que presente el usuario.</li>
-                <li>Descripción de la operación de su sistema de pretratamiento de aguas residuales, capacidad o volumen, marca, fecha de instalación, tipo de residuos que genera; así como las bitácoras de limpieza y mantenimiento.</li>
-                <li>Manifiestos de transporte, recolección, acopio y disposición final de los residuos generados en el sistema de Pretratamiento.</li>
-                <li>Autorizaciones por parte de la SCT, SDRSOT y SEMARNAT, o el contrato con una Planta Tratadora de Aguas Residuales Autorizada.</li>
+                <li>Descripción de la operación de su sistema de pretratamiento de aguas residuales, capacidad o
+                    volumen, marca, fecha de instalación, tipo de residuos que genera; así como las bitácoras de
+                    limpieza y mantenimiento.</li>
+                <li>Manifiestos de transporte, recolección, acopio y disposición final de los residuos generados en el
+                    sistema de Pretratamiento.</li>
+                <li>Autorizaciones por parte de la SCT, SDRSOT y SEMARNAT, o el contrato con una Planta Tratadora de
+                    Aguas Residuales Autorizada.</li>
                 <li>Copia de los tres últimos resultados de análisis de laboratorio.</li>
-                <li>Planos, proyecto ejecutivo e información relacionada del área y/o almacén específico para contenedores, arcones o tanques para el almacenamiento de químicos.</li>
-                <li>Fotografías e información del área y/o almacén de que cuenta con algún proceso de identificación, clasificación y listado de residuos peligrosos según lo establecido con la NOM-052-SEMARNAT-2005.</li>
-                <li>Plan preventivo de derrame accidental y/o contingencias para prevenir el derrame e incorporación de químicos hacia la red de drenaje municipal.</li>
-                <li>Manifiestos de transporte, recolección, acopio y disposición final de los residuos generados en éste, con sus respectivas autorizaciones por parte de la SCT, SDRSOT y SEMARNAT, residuos generados en sus procesos productivos son enviados a una planta tratadora de desechos o confinamientos.</li>
+                <li>Planos, proyecto ejecutivo e información relacionada del área y/o almacén específico para
+                    contenedores, arcones o tanques para el almacenamiento de químicos.</li>
+                <li>Fotografías e información del área y/o almacén de que cuenta con algún proceso de identificación,
+                    clasificación y listado de residuos peligrosos según lo establecido con la NOM-052-SEMARNAT-2005.
+                </li>
+                <li>Plan preventivo de derrame accidental y/o contingencias para prevenir el derrame e incorporación de
+                    químicos hacia la red de drenaje municipal.</li>
+                <li>Manifiestos de transporte, recolección, acopio y disposición final de los residuos generados en
+                    éste, con sus respectivas autorizaciones por parte de la SCT, SDRSOT y SEMARNAT, residuos generados
+                    en sus procesos productivos son enviados a una planta tratadora de desechos o confinamientos.</li>
             </ol>
         </div>
     </main>
@@ -120,5 +160,5 @@
     </footer>
 
 </body>
-</html>
 
+</html>

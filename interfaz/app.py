@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, make_response
 import csv
 import os
 import datetime
@@ -621,7 +621,11 @@ def ver_tarificador(folio):
         if not os.path.exists(TARIFICADORES_GEN_DIR):
              return "Directorio de documentos no encontrado", 404
              
-        return send_from_directory(TARIFICADORES_GEN_DIR, filename)
+        response = make_response(send_from_directory(TARIFICADORES_GEN_DIR, filename))
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     except FileNotFoundError:
         return "Archivo no encontrado", 404
     except Exception as e:
@@ -631,15 +635,20 @@ def ver_tarificador(folio):
 def ver_cotizacion(folio):
     filename = f"cotizacion_{folio}.html"
     try:
-        return send_from_directory(COTIZACIONES_GEN_DIR, filename)
+        response = make_response(send_from_directory(COTIZACIONES_GEN_DIR, filename))
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     except FileNotFoundError:
         # Fallback: try finding a file that contains the folio if exact match fails
-        # This is strictly for robustness if naming varies
         try:
             files = os.listdir(COTIZACIONES_GEN_DIR)
             for f in files:
                 if folio in f and f.endswith('.html'):
-                    return send_from_directory(COTIZACIONES_GEN_DIR, f)
+                    response = make_response(send_from_directory(COTIZACIONES_GEN_DIR, f))
+                    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                    return response
         except:
             pass
         return "Archivo no encontrado", 404
@@ -889,40 +898,77 @@ def generate_permiso_html(data):
         # Sanitizar nombre para carpeta
         nombre_entidad = data.get('arr_nombre', '').strip() or data.get('prop_nombre', '').strip() or "SinNombre"
         safe_name = re.sub(r'[<>:"/\\|?*]', '', nombre_entidad).strip()
-        current_year = datetime.datetime.now().year
         
+        # Determinar año de la fecha de acuse si existe, si no, año actual
+        # Corregido: sincronizado con ver_permiso_pdf
+        current_year = datetime.datetime.now().year
+        fecha_acuse = str(data.get('fecha_acuse', '')).strip()
+        if fecha_acuse and '/' in fecha_acuse:
+            try:
+                parts = fecha_acuse.split('/')
+                if len(parts) == 3:
+                     # Tomar el año de la fecha (puede ser dd/mm/aaaa o aaaa/mm/dd dependiendo del input)
+                     # Intentamos detectar si el año está al final o al principio
+                     if len(parts[2]) == 4: current_year = int(parts[2])
+                     elif len(parts[0]) == 4: current_year = int(parts[0])
+            except:
+                pass
+
         client_folder = f"{safe_name}_Permiso_descargas_{current_year}"
         output_client_path = os.path.join(PERMISOS_GEN_DIR, client_folder)
         
         if not os.path.exists(output_client_path):
             os.makedirs(output_client_path)
             
-        # Asegurar imagen header
-        header_src = os.path.join(TEMPLATE_PERMISOS_DIR, 'header.JPG')
+        # Asegurar imagen header (el usuario movió la imagen a ../img/header.JPG en la plantilla)
+        header_src = os.path.abspath(os.path.join(TEMPLATE_PERMISOS_DIR, '..', 'img', 'header.JPG'))
         header_dst = os.path.join(output_client_path, 'header.JPG')
-        if os.path.exists(header_src) and not os.path.exists(header_dst):
+        
+        if os.path.exists(header_src):
             import shutil
             shutil.copy2(header_src, header_dst)
             
+        # Mapeo de claves con acentos para compatibilidad con plantillas
+        # Algunas plantillas usan keys con acento, pero el CSV no.
+        render_data = data.copy()
+        mappings = {
+            'disposicion_residuos': 'disposición_residuos',
+            'localización_registro': 'localizacion_registro', # Por si acaso
+            'operación_pretratamiento': 'operacion_pretratamiento'
+        }
+        for k_csv, k_tpl in mappings.items():
+            if k_csv in render_data:
+                render_data[k_tpl] = render_data[k_csv]
+            if k_tpl in render_data:
+                render_data[k_csv] = render_data[k_tpl]
+
         for t_cfg in templates_to_gen:
             template = env.get_template(t_cfg['file'])
-            html_content = template.render(**data)
+            html_content = template.render(**render_data)
             
             filename = f"{t_cfg['prefix']}_{safe_name}_{current_year}.html"
             
-            # Ajustar rutas de estilos/scripts para que funcionen desde la carpeta del cliente
-            # (3 niveles arriba para llegar a la raíz de Plantillas si fuera necesario, 
-            # pero aquí ajustamos para que apunten a la ruta que el servidor Flask entiende)
+            # Ajustar rutas de estilos/scripts/imágenes para que funcionen tanto en servidor como localmente
+            # El patrón ../../../Plantillas/ funciona en el servidor (va a raíz /Plantillas) 
+            # y localmente (sube 3 niveles desde Cliente/Permiso/ para llegar a Plantillas)
             html_content = html_content.replace('href="../estilos.css"', 'href="../../../Plantillas/estilos.css"')
             html_content = html_content.replace('src="../paginacion.js"', 'src="../../../Plantillas/paginacion.js"')
-            # La imagen header.JPG se copia localmente, por lo que src="header.JPG" está bien.
-
+            
+            # Ajustar la ruta del header para que sea universal
+            # Buscamos todas las formas posibles en que pueda estar en la plantilla
+            header_url = "../../../Plantillas/img/header.JPG"
+            html_content = html_content.replace('src="../img/header.JPG"', f'src="{header_url}"')
+            html_content = html_content.replace('src="../img/header.jpg"', f'src="{header_url}"')
+            html_content = html_content.replace('src="header.JPG"', f'src="{header_url}"')
+            html_content = html_content.replace('src="header.jpg"', f'src="{header_url}"')
+            
             with open(os.path.join(output_client_path, filename), 'w', encoding='utf-8') as f:
                 f.write(html_content)
                 
+        print(f"DEBUG: Archivos generados correctamente en {output_client_path}")
         return True
     except Exception as e:
-        print(f"Error generando HTML para permiso: {e}")
+        print(f"ERROR: Fallo en generate_permiso_html: {e}")
         return False
 
 
@@ -1059,7 +1105,11 @@ def ver_orden_pdf(tipo, folio):
             # Find file containing folio
             for f in files:
                 if folio in f and f.endswith('.html'):
-                    return send_from_directory(target_dir, f)
+                    response = make_response(send_from_directory(target_dir, f))
+                    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                    response.headers['Pragma'] = 'no-cache'
+                    response.headers['Expires'] = '0'
+                    return response
         except Exception as e:
             print(f"Error searching directory {target_dir}: {e}")
             
@@ -1070,7 +1120,7 @@ def ver_orden_pdf(tipo, folio):
 @app.route('/permiso_descarga/<nis>')
 def detalle_permiso_descarga(nis):
     raw_data = read_csv(PERMISOS_CSV)
-    target = next((r for r in raw_data if r.get('nis') == nis), None)
+    target = next((r for r in raw_data if str(r.get('nis', '')).strip() == str(nis).strip()), None)
     
     if not target:
         flash('Permiso de descarga no encontrado.', 'error')
@@ -1118,21 +1168,36 @@ def nuevo_permiso_descarga():
         else:
             headers = ['nis','nombre_negocio','prop_nombre','prop_direccion','prop_colonia','prop_municipio','prop_telefono','prop_localidad','prop_cp','prop_rfc','arr_nombre','arr_ine','arr_direccion','arr_colonia','arr_municipio','arr_telefono','arr_localidad','arr_cp','arr_rfc','giro_licencia','giro_descripcion','num_empleados','turnos','horario_atencion','pozo','num_concesion','pipas','datos_pipas','red','num_tomas','fuente_otro','total_wc','total_mingitorios','total_lavamanos','total_regaderas','total_cisternas','cap_cisternas','total_tinacos','cap_tinacos','tiene_comedor','mecanismos_ahorro','descarga_muni','promedio_descarga','tiene_registro','localización_registro','profundidad_registro','diametro_registro','material_registro','tiene_medidor_descargas','tiene_pretrat','operación_pretratamiento','disposicion_residuos','desc_pretratamiento','tiene_analisis','fecha_acuse','testigo1_nombre','testigo2_nombre']
             
-        new_row = {}
+        # Buscar si ya existe para preservar campos no presentes en el form
+        target_existing = next((r for r in existing if str(r.get('nis', '')).strip() == str(nis).strip()), None)
+        new_row = target_existing.copy() if target_existing else {}
+        
+        # Definir campos que son checkboxes (si no están en el form, son 'No')
+        checkbox_fields = ['pozo','pipas','red','tiene_comedor','descarga_muni','tiene_registro','tiene_medidor_descargas','tiene_pretrat','tiene_analisis']
+        
+        # Actualizar con datos del formulario
         for h in headers:
-            new_row[h] = request.form.get(h, '')
+            val = request.form.get(h)
+            if val is not None:
+                new_row[h] = val
+            elif h in checkbox_fields:
+                # Si es checkbox y no está en el form, marcar como No
+                new_row[h] = 'No'
+            elif not target_existing:
+                new_row[h] = ''
             
-        # Normalización básica de Si/No como en el script original
+        # Normalización de Si/No y NIS
+        new_row['nis'] = str(nis).strip()
         for k, v in new_row.items():
-            if v:
-                v_lower = v.strip().lower()
-                if v_lower in ['si', 'sí', 'on', 'true']:
+            if v and isinstance(v, str):
+                v_str = v.strip().lower()
+                if v_str in ['si', 'sí', 'on', 'true']:
                     new_row[k] = 'Si'
-                elif v_lower in ['no', 'off', 'false']:
+                elif v_str in ['no', 'off', 'false']:
                     new_row[k] = 'No'
 
         # Actualizar o Añadir
-        updated_rows = [r for r in existing if r.get('nis') != nis]
+        updated_rows = [r for r in existing if str(r.get('nis', '')).strip() != str(nis).strip()]
         updated_rows.append(new_row)
         
         try:
@@ -1176,28 +1241,40 @@ def ver_permiso_pdf(nis, tipo):
     tipo puede ser: 'Cuestionario', 'Acuse', 'Carta_Poder'
     """
     raw_data = read_csv(PERMISOS_CSV)
-    target = next((r for r in raw_data if r.get('nis') == nis), None)
+    target = next((r for r in raw_data if str(r.get('nis', '')).strip() == str(nis).strip()), None)
     
     if not target:
         return "Permiso no encontrado", 404
         
     import re
-    import glob
     nombre_entidad = target.get('arr_nombre', '').strip() or target.get('prop_nombre', '').strip() or "SinNombre"
     safe_name = re.sub(r'[<>:"/\\|?*]', '', nombre_entidad).strip()
     
-    # Búsqueda robusta: Buscar cualquier carpeta que empiece con el nombre sanitizado
-    # Esto evita el error si el año cambió o si hay pequeñas variaciones
-    search_pattern = os.path.join(PERMISOS_GEN_DIR, f"{safe_name}_Permiso_descargas_*")
-    folders = glob.glob(search_pattern)
+    # Determinar año de la fecha de acuse (misma lógica que en generate)
+    current_year = datetime.datetime.now().year
+    fecha_acuse = str(target.get('fecha_acuse', '')).strip()
+    if fecha_acuse and '/' in fecha_acuse:
+        try:
+            parts = fecha_acuse.split('/')
+            if len(parts) == 3:
+                 if len(parts[2]) == 4: current_year = int(parts[2])
+                 elif len(parts[0]) == 4: current_year = int(parts[0])
+        except:
+            pass
+            
+    target_folder = f"{safe_name}_Permiso_descargas_{current_year}"
+    target_dir = os.path.join(PERMISOS_GEN_DIR, target_folder)
     
-    if not folders:
-        # Intento 2: Buscar por NIS en el nombre de la carpeta (si decidiéramos renombrarlas en el futuro)
-        # O simplemente fallar si no hay nada que coincida con el nombre
-        return f"No se encontró la carpeta para '{safe_name}'. Asegúrese de haber generado los documentos.", 404
-        
-    # Usar la carpeta más reciente encontrada
-    target_dir = sorted(folders, reverse=True)[0]
+    # Si la carpeta exacta no existe, intentar búsqueda robusta como fallback
+    if not os.path.exists(target_dir):
+        import glob
+        search_pattern = os.path.join(PERMISOS_GEN_DIR, f"{safe_name}_Permiso_descargas_*")
+        folders = glob.glob(search_pattern)
+        if folders:
+            folders.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+            target_dir = folders[0]
+        else:
+            return f"No se encontró la carpeta para '{safe_name}'. Asegúrese de haber generado los documentos.", 404
     
     # Buscar el archivo que empiece con el tipo (Cuestionario, Acuse, etc)
     try:
@@ -1205,9 +1282,13 @@ def ver_permiso_pdf(nis, tipo):
         filename = next((f for f in files if f.startswith(tipo) and f.endswith('.html')), None)
         
         if filename:
-            return send_from_directory(target_dir, filename)
+            response = make_response(send_from_directory(target_dir, filename))
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            return response
         else:
-            return f"Documento de tipo {tipo} no encontrado en la carpeta del cliente.", 404
+            return f"No se encontró el archivo de tipo '{tipo}' en la carpeta.", 404
     except Exception as e:
         return f"Error al acceder a los documentos: {e}", 500
 
