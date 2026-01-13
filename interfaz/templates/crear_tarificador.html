@@ -234,8 +234,14 @@
         document.getElementById('suggestions-box').style.display = 'none';
 
         // Auto-fill other fields if available in client data (optional)
-        if (document.getElementById('no_cliente') && client.no_cliente)
-            document.getElementById('no_cliente').value = client.no_cliente;
+        if (document.getElementById('no_cliente') && client.ID)
+            document.getElementById('no_cliente').value = client.ID;
+
+        if (document.getElementById('no_permiso_descargas') && client.no_permiso_descargas)
+            document.getElementById('no_permiso_descargas').value = client.no_permiso_descargas;
+
+        if (document.getElementById('vigencia_permiso_descargas') && client.vegencia_permiso_descargas)
+            document.getElementById('vigencia_permiso_descargas').value = client.vegencia_permiso_descargas;
     }
 
     document.addEventListener('click', function (e) {
