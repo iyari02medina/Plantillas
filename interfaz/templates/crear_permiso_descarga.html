@@ -78,9 +78,9 @@
                 {{ 'readonly class="readonly-bg"' if permiso else '' }}>
         </div>
         <div class="form-group col-span-2 relative">
-            <label for="nombre_negocio">Nombre del Negocio / Establecimiento</label>
-            <input type="text" id="nombre_negocio" name="nombre_negocio"
-                value="{{ permiso.nombre_negocio if permiso else '' }}" placeholder="Buscar cliente..."
+            <label for="nombre_empresa">Nombre de la Empresa / Establecimiento</label>
+            <input type="text" id="nombre_empresa" name="nombre_empresa"
+                value="{{ permiso.nombre_empresa if permiso else '' }}" placeholder="Buscar cliente..."
                 oninput="fillClient(this)" {{ 'disabled' if permiso else '' }}>
             <div id="suggestions-box"></div>
         </div>
@@ -225,32 +225,37 @@
     <h3 class="form-section-title">5. Abastecimiento de Agua</h3>
     <div class="form-grid">
         <div class="checkbox-group">
-            <input type="checkbox" id="pozo" name="pozo" value="Si" {{ 'checked' if (permiso.pozo|lower=='si' ) else ''
-                }} {{ 'disabled' if permiso else '' }}>
+            <input type="checkbox" id="pozo" name="pozo" value="Si" {{ 'checked' if (permiso and
+                permiso.pozo|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
             <label for="pozo">¿Cuenta con Pozo?</label>
         </div>
         <div class="form-group">
-            <label for="num_concesion">No. Concesión</label>
-            <input type="text" id="num_concesion" name="num_concesion"
-                value="{{ permiso.num_concesion if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+            <label for="num_concesion_pozo">No. Concesión</label>
+            <input type="text" id="num_concesion_pozo" name="num_concesion_pozo"
+                value="{{ permiso.num_concesion_pozo if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
         </div>
     </div>
     <div class="form-grid">
         <div class="checkbox-group">
-            <input type="checkbox" id="pipas" name="pipas" value="Si" {{ 'checked' if (permiso.pipas|lower=='si' )
-                else '' }} {{ 'disabled' if permiso else '' }}>
+            <input type="checkbox" id="pipas" name="pipas" value="Si" {{ 'checked' if (permiso and
+                permiso.pipas|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
             <label for="pipas">¿Usa Pipas?</label>
         </div>
         <div class="form-group">
-            <label for="datos_pipas">Datos de Pipas (Frecuencia/Cap)</label>
-            <input type="text" id="datos_pipas" name="datos_pipas" value="{{ permiso.datos_pipas if permiso else '' }}"
-                {{ 'disabled' if permiso else '' }}>
+            <label for="prom_pipas_mes">Promedio Pipas/Mes</label>
+            <input type="text" id="prom_pipas_mes" name="prom_pipas_mes"
+                value="{{ permiso.prom_pipas_mes if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+        </div>
+        <div class="form-group">
+            <label for="capacidad_pipas">Capacidad de Pipas</label>
+            <input type="text" id="capacidad_pipas" name="capacidad_pipas"
+                value="{{ permiso.capacidad_pipas if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
         </div>
     </div>
     <div class="form-grid">
         <div class="checkbox-group">
-            <input type="checkbox" id="red" name="red" value="Si" {{ 'checked' if (permiso.red|lower=='si' ) else '' }}
-                {{ 'disabled' if permiso else '' }}>
+            <input type="checkbox" id="red" name="red" value="Si" {{ 'checked' if (permiso and permiso.red|lower=='si' )
+                else '' }} {{ 'disabled' if permiso else '' }}>
             <label for="red">Suministro por Red</label>
         </div>
         <div class="form-group">
@@ -316,8 +321,8 @@
     <h3 class="form-section-title">7. Servicios y Ahorro</h3>
     <div class="form-grid">
         <div class="checkbox-group">
-            <input type="checkbox" id="tiene_comedor" name="tiene_comedor" value="Si" {{ 'checked' if
-                (permiso.tiene_comedor|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
+            <input type="checkbox" id="tiene_comedor" name="tiene_comedor" value="Si" {{ 'checked' if (permiso and
+                permiso.tiene_comedor|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
             <label for="tiene_comedor">¿Tiene Comedor?</label>
         </div>
         <div class="form-group col-span-2">
@@ -332,14 +337,14 @@
     <h3 class="form-section-title">8. Volumen de Descargas</h3>
     <div class="form-grid">
         <div class="checkbox-group">
-            <input type="checkbox" id="descarga_muni" name="descarga_muni" value="Si" {{ 'checked' if
-                (permiso.descarga_muni|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
+            <input type="checkbox" id="descarga_muni" name="descarga_muni" value="Si" {{ 'checked' if (permiso and
+                permiso.descarga_muni|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
             <label for="descarga_muni">Descarga al Municipio</label>
         </div>
         <div class="form-group">
-            <label for="promedio_descarga">Promedio Descarga (m3/mes)</label>
-            <input type="text" id="promedio_descarga" name="promedio_descarga"
-                value="{{ permiso.promedio_descarga if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+            <label for="prom_descarga_muni">Promedio Descarga (m3/mes)</label>
+            <input type="text" id="prom_descarga_muni" name="prom_descarga_muni"
+                value="{{ permiso.prom_descarga_muni if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
         </div>
     </div>
 
@@ -347,8 +352,8 @@
     <h3 class="form-section-title">9. Registro de Descarga</h3>
     <div class="form-grid">
         <div class="checkbox-group">
-            <input type="checkbox" id="tiene_registro" name="tiene_registro" value="Si" {{ 'checked' if
-                (permiso.tiene_registro|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
+            <input type="checkbox" id="tiene_registro" name="tiene_registro" value="Si" {{ 'checked' if (permiso and
+                permiso.tiene_registro|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
             <label for="tiene_registro">¿Cuenta con Registro?</label>
         </div>
         <div class="form-group">
@@ -376,7 +381,7 @@
     </div>
     <div class="checkbox-group">
         <input type="checkbox" id="tiene_medidor_descargas" name="tiene_medidor_descargas" value="Si" {{ 'checked' if
-            (permiso.tiene_medidor_descargas|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
+            (permiso and permiso.tiene_medidor_descargas|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
         <label for="tiene_medidor_descargas">¿Cuenta con Medidor de Descarga?</label>
     </div>
 
@@ -384,8 +389,8 @@
     <h3 class="form-section-title">10. Pretratamiento</h3>
     <div class="form-grid">
         <div class="checkbox-group">
-            <input type="checkbox" id="tiene_pretrat" name="tiene_pretrat" value="Si" {{ 'checked' if
-                (permiso.tiene_pretrat|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
+            <input type="checkbox" id="tiene_pretrat" name="tiene_pretrat" value="Si" {{ 'checked' if (permiso and
+                permiso.tiene_pretrat|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
             <label for="tiene_pretrat">¿Tiene Pretratamiento?</label>
         </div>
         <div class="form-group col-span-2">
@@ -402,8 +407,8 @@
                 value="{{ permiso.disposicion_residuos if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
         </div>
         <div class="checkbox-group">
-            <input type="checkbox" id="tiene_analisis" name="tiene_analisis" value="Si" {{ 'checked' if
-                (permiso.tiene_analisis|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
+            <input type="checkbox" id="tiene_analisis" name="tiene_analisis" value="Si" {{ 'checked' if (permiso and
+                permiso.tiene_analisis|lower=='si' ) else '' }} {{ 'disabled' if permiso else '' }}>
             <label for="tiene_analisis">¿Cuenta con Análisis Recientes?</label>
         </div>
     </div>
@@ -490,7 +495,7 @@
 
     function selectClient(client) {
         // Llenado inteligente basado en el cliente seleccionado
-        document.getElementById('nombre_negocio').value = client.nombre_empresa;
+        document.getElementById('nombre_empresa').value = client.nombre_empresa;
 
         // Determinar si es persona moral o física por la longitud del nombre o RFC si lo tuviéramos
         // Para simplificar, llenamos ambos y el usuario decide

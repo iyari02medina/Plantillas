@@ -1166,11 +1166,17 @@ def nuevo_permiso_descarga():
         if existing:
             headers = list(existing[0].keys())
         else:
-            headers = ['nis','nombre_negocio','prop_nombre','prop_direccion','prop_colonia','prop_municipio','prop_telefono','prop_localidad','prop_cp','prop_rfc','arr_nombre','arr_ine','arr_direccion','arr_colonia','arr_municipio','arr_telefono','arr_localidad','arr_cp','arr_rfc','giro_licencia','giro_descripcion','num_empleados','turnos','horario_atencion','pozo','num_concesion','pipas','datos_pipas','red','num_tomas','fuente_otro','total_wc','total_mingitorios','total_lavamanos','total_regaderas','total_cisternas','cap_cisternas','total_tinacos','cap_tinacos','tiene_comedor','mecanismos_ahorro','descarga_muni','promedio_descarga','tiene_registro','localización_registro','profundidad_registro','diametro_registro','material_registro','tiene_medidor_descargas','tiene_pretrat','operación_pretratamiento','disposicion_residuos','desc_pretratamiento','tiene_analisis','fecha_acuse','testigo1_nombre','testigo2_nombre']
+            headers = ['nis','nombre_empresa','prop_nombre','prop_direccion','prop_colonia','prop_municipio','prop_telefono','prop_localidad','prop_cp','prop_rfc','arr_nombre','arr_ine','arr_direccion','arr_colonia','arr_municipio','arr_telefono','arr_localidad','arr_cp','arr_rfc','giro_licencia','giro_descripcion','num_empleados','turnos','horario_atencion','pozo','num_concesion_pozo','pipas','prom_pipas_mes','capacidad_pipas','red','num_tomas','fuente_otro','total_wc','total_mingitorios','total_lavamanos','total_regaderas','total_cisternas','cap_cisternas','total_tinacos','cap_tinacos','tiene_comedor','mecanismos_ahorro','prom_descarga_muni','tiene_registro','localización_registro','profundidad_registro','diametro_registro','material_registro','tiene_medidor_descargas','tiene_pretrat','operación_pretratamiento','disposicion_residuos','desc_pretratamiento','tiene_analisis','fecha_acuse','testigo1_nombre','testigo2_nombre']
             
         # Buscar si ya existe para preservar campos no presentes en el form
         target_existing = next((r for r in existing if str(r.get('nis', '')).strip() == str(nis).strip()), None)
         new_row = target_existing.copy() if target_existing else {}
+
+        # Asegurar que los nuevos campos estén en los encabezados
+        expected_fields = ['nombre_empresa', 'num_concesion_pozo', 'prom_pipas_mes', 'capacidad_pipas', 'prom_descarga_muni']
+        for f in expected_fields:
+            if f not in headers:
+                headers.append(f)
         
         # Definir campos que son checkboxes (si no están en el form, son 'No')
         checkbox_fields = ['pozo','pipas','red','tiene_comedor','descarga_muni','tiene_registro','tiene_medidor_descargas','tiene_pretrat','tiene_analisis']
@@ -1182,9 +1188,11 @@ def nuevo_permiso_descarga():
                 new_row[h] = val
             elif h in checkbox_fields:
                 # Si es checkbox y no está en el form, marcar como No
+                # Solo si ya tenemos el row o si es nuevo, pero evitar sobreescribir si el campo no existe en form
+                # Checkboxes siempre envian valor si checkeados, nada si no.
                 new_row[h] = 'No'
-            elif not target_existing:
-                new_row[h] = ''
+            elif h not in new_row:
+                 new_row[h] = ''
             
         # Normalización de Si/No y NIS
         new_row['nis'] = str(nis).strip()
@@ -1199,6 +1207,12 @@ def nuevo_permiso_descarga():
         # Actualizar o Añadir
         updated_rows = [r for r in existing if str(r.get('nis', '')).strip() != str(nis).strip()]
         updated_rows.append(new_row)
+        
+        # Asegurar consistencia de columnas en todas las filas para DictWriter
+        for r in updated_rows:
+            for h in headers:
+                if h not in r:
+                    r[h] = ''
         
         try:
             overwrite_csv(PERMISOS_CSV, headers, updated_rows)
@@ -1231,7 +1245,7 @@ def nuevo_permiso_descarga():
             except: pass
     suggested_nis = max_num + 1
 
-    return render_template('crear_permiso_descarga.html', clientes=clientes, suggested_nis=suggested_nis)
+    return render_template('crear_permiso_descarga.html', clientes=clientes, suggested_nis=suggested_nis, permiso=None)
 
 
 @app.route('/ver_permiso_pdf/<nis>/<tipo>')

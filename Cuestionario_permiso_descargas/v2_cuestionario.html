@@ -635,7 +635,7 @@
                 <td>
                     <div class="field w-100">
                         <span class="label">No. Concesión:</span>
-                        <span class="input-line jinja">{{ num_concesion }}</span>
+                        <span class="input-line jinja">{{ num_concesion_pozo }}</span>
                     </div>
                 </td>
             </tr>
@@ -648,7 +648,7 @@
                 <td>
                     <div class="field w-100">
                         <span class="label">No. Pipas/mes y cap:</span>
-                        <span class="input-line jinja">{{ datos_pipas }}</span>
+                        <span class="input-line jinja">{{ prom_pipas_mes }} / {{ capacidad_pipas }}</span>
                     </div>
                 </td>
             </tr>
@@ -745,15 +745,16 @@
         <div class="subsection-header">5.1.- ¿Se encuentra actualmente realizando descargas de aguas residuales al
             sistema de drenaje Municipal?</div>
         <div style="margin-bottom: 10px;">
-            Sí <span class="box">{% if descarga_muni=='Si' %}X{%endif%}</span> No <span class="box">{% if
-                descarga_muni=='No' %}X{%endif%}</span>
+            Sí <span class="box">{% if prom_descarga_muni and prom_descarga_muni != '' and prom_descarga_muni != '0'
+                %}X{%endif%}</span> No <span class="box">{% if
+                not prom_descarga_muni or prom_descarga_muni == '' or prom_descarga_muni == '0' %}X{%endif%}</span>
         </div>
 
         <div class="subsection-header">5.2.- Variación de flujo de agua residual.</div>
         <div class="form-row">
             <div class="field w-100">
                 <span class="label">Promedio mensual de aguas residuales generadas (m³/mes):</span>
-                <span class="input-line jinja">{{ promedio_descarga }}</span>
+                <span class="input-line jinja">{{ prom_descarga_muni }}</span>
             </div>
         </div>
 
