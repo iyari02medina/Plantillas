@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="flex justify-between items-center">
+    <div>
+        <h1>{{ 'Nuevo Cliente' if is_new and tipo == 'clientes' else 'Nuevo Prospecto' if is_new else 'Detalle de
+            Cliente' if tipo == 'clientes' else 'Detalle de Prospecto' }}</h1>
+        <p class="subtitle">
+            {% if is_new %}Ingrese los datos para registrar.{% else %}Consulta y edita los detalles.{% endif %}
+        </p>
+    </div>
+    {% if not is_new %}
+    <div class="flex gap-4">
+        <button type="button" class="btn btn-primary" onclick="enableEdit()" id="btn-editar">Editar</button>
+    </div>
+    {% endif %}
+</header>
+
+<form action="{{ url_for('guardar_directorio', tipo=tipo) }}" method="POST" class="card">
+
+    <!-- Hidden ID field for updates -->
+    {% if not is_new %}
+    {% if tipo == 'clientes' %}
+    <input type="hidden" name="ID" value="{{ item.get('ID', '') }}">
+    {% else %}
+    <input type="hidden" name="folio" value="{{ item.get('folio', '') }}">
+    {% endif %}
+    {% endif %}
+
+    <!-- 1. INFORMACIÓN GENERAL (Común) -->
+    <h3 class="form-section-title">Información General</h3>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Nombre Empresa / Negocio</label>
+            <input type="text" name="nombre_empresa" value="{{ item.get('nombre_empresa', '') }}" required
+                class="form-input" {% if not is_new %}disabled{% endif %} placeholder="Ej. Abarrotes Don Pepe">
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Tipo Empresa / Giro</label>
+            <input type="text" name="tipo_empresa" value="{{ item.get('tipo_empresa', '') }}" class="form-input" {% if
+                not is_new %}disabled{% endif %} placeholder="Ej. Restaurante, Taller...">
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Teléfono</label>
+            <input type="text" name="telefono_empresa" value="{{ item.get('telefono_empresa', '') }}" class="form-input"
+                {% if not is_new %}disabled{% endif %} placeholder="Ej. 55 1234 5678">
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Dirección Completa</label>
+            <input type="text" name="direccion_empresa" value="{{ item.get('direccion_empresa', '') }}"
+                class="form-input" {% if not is_new %}disabled{% endif %}
+                placeholder="Calle, Número, Colonia, Municipio...">
+        </div>
+    </div>
+
+    <!-- CAMPOS EXCLUSIVOS PARA CLIENTES -->
+    {% if tipo == 'clientes' %}
+
+    <!-- 2. DATOS FISCALES Y ADMINISTRATIVOS -->
+    <h3 class="form-section-title mt-6">Datos Fiscales y Administrativos</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Razón Social</label>
+            <input type="text" name="razon_social" value="{{ item.get('razon_social', '') }}" class="form-input" {% if
+                not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Giro / Licencia</label>
+            <input type="text" name="giro_licencia" value="{{ item.get('giro_licencia', '') }}" class="form-input" {% if
+                not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">NIS (Contrato Agua)</label>
+            <input type="text" name="nis" value="{{ item.get('nis', '') }}" class="form-input" {% if not is_new
+                %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">No. Permiso Descargas</label>
+            <input type="text" name="no_permiso_descargas" value="{{ item.get('no_permiso_descargas', '') }}"
+                class="form-input" {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Vigencia Permiso</label>
+            <input type="text" name="vegencia_permiso_descargas"
+                value="{{ item.get('vegencia_permiso_descargas', '') }}" class="form-input" placeholder="dd/mm/aaaa" {%
+                if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Hora Apertura</label>
+            <input type="text" name="hora_apertura" value="{{ item.get('hora_apertura', '') }}" class="form-input" {% if
+                not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Hora Cierre</label>
+            <input type="text" name="hora_cierre" value="{{ item.get('hora_cierre', '') }}" class="form-input" {% if not
+                is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <!-- 3. INFRAESTRUCTURA DE ALMACENAMIENTO -->
+    <h3 class="form-section-title mt-6">Infraestructura Hidráulica</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Total Cisternas</label>
+            <input type="text" name="total_cisternas" value="{{ item.get('total_cisternas', '') }}" class="form-input"
+                {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Capacidad Cisternas</label>
+            <input type="text" name="cap_cisternas" value="{{ item.get('cap_cisternas', '') }}" class="form-input" {% if
+                not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Total Tinacos</label>
+            <input type="text" name="total_tinacos" value="{{ item.get('total_tinacos', '') }}" class="form-input" {% if
+                not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Capacidad Tinacos</label>
+            <input type="text" name="cap_tinacos" value="{{ item.get('cap_tinacos', '') }}" class="form-input" {% if not
+                is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <!-- 4. ABASTECIMIENTO -->
+    <h3 class="form-section-title mt-6">Abastecimiento de Agua</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Pozo</label>
+            <input type="text" name="pozo" value="{{ item.get('pozo', '') }}" class="form-input" placeholder="Si/No" {%
+                if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Num. Concesión Pozo</label>
+            <input type="text" name="num_concesion_pozo" value="{{ item.get('num_concesion_pozo', '') }}"
+                class="form-input" {% if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="grid-3 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Pipas</label>
+            <input type="text" name="pipas" value="{{ item.get('pipas', '') }}" class="form-input" placeholder="Si/No"
+                {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Prom. Pipas/Mes</label>
+            <input type="text" name="prom_pipas_mes" value="{{ item.get('prom_pipas_mes', '') }}" class="form-input" {%
+                if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Capacidad Pipas</label>
+            <input type="text" name="capacidad_pipas" value="{{ item.get('capacidad_pipas', '') }}" class="form-input"
+                {% if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Red Municipal</label>
+            <input type="text" name="red" value="{{ item.get('red', '') }}" class="form-input" placeholder="Si/No" {% if
+                not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Num. Tomas</label>
+            <input type="text" name="num_tomas" value="{{ item.get('num_tomas', '') }}" class="form-input" {% if not
+                is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Medidor de Agua (Si/No)</label>
+            <!-- Note: Key has trailing space in CSV 'medidor_agua ' -->
+            <input type="text" name="medidor_agua " value="{{ item.get('medidor_agua ', '') }}" class="form-input" {% if
+                not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">No. Serie Medidor</label>
+            <input type="text" name="no_serie_medidor" value="{{ item.get('no_serie_medidor', '') }}" class="form-input"
+                {% if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <!-- 5. DESCARGAS, REGISTROS Y AGUAS RESIDUALES -->
+    <h3 class="form-section-title mt-6">Descargas y Aguas Residuales</h3>
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Prom. Descarga Municipal</label>
+            <input type="text" name="prom_descarga_muni" value="{{ item.get('prom_descarga_muni', '') }}"
+                class="form-input" {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Tiene Medidor Descargas</label>
+            <input type="text" name="tiene_medidor_descargas" value="{{ item.get('tiene_medidor_descargas', '') }}"
+                class="form-input" {% if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">¿Tiene Registro?</label>
+            <input type="text" name="tiene_registro" value="{{ item.get('tiene_registro', '') }}" class="form-input" {%
+                if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Localización Registro</label>
+            <input type="text" name="localización_registro" value="{{ item.get('localización_registro', '') }}"
+                class="form-input" {% if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="grid-3 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">Profundidad Reg.</label>
+            <input type="text" name="profundidad_registro" value="{{ item.get('profundidad_registro', '') }}"
+                class="form-input" {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Diámetro Reg.</label>
+            <input type="text" name="diametro_registro" value="{{ item.get('diametro_registro', '') }}"
+                class="form-input" {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Material Reg.</label>
+            <input type="text" name="material_registro" value="{{ item.get('material_registro', '') }}"
+                class="form-input" {% if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">No. Trampas Grasa</label>
+            <input type="text" name="no_trampas_grasa" value="{{ item.get('no_trampas_grasa', '') }}" class="form-input"
+                {% if not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Cap. Trampas</label>
+            <input type="text" name="cap_trampas" value="{{ item.get('cap_trampas', '') }}" class="form-input" {% if not
+                is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label class="form-label mb-1">¿Tiene Comedor?</label>
+            <input type="text" name="tiene_comedor" value="{{ item.get('tiene_comedor', '') }}" class="form-input" {% if
+                not is_new %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+            <label class="form-label mb-1">Mecanismos Ahorro</label>
+            <input type="text" name="mecanismos_ahorro" value="{{ item.get('mecanismos_ahorro', '') }}"
+                class="form-input" {% if not is_new %}disabled{% endif %}>
+        </div>
+    </div>
+
+    {% endif %} <!-- Fin de campos exclusivos de Clientes -->
+
+    <div class="text-right mt-8 flex justify-end gap-4">
+        <a href="{{ url_for('ver_directorio', tipo=tipo) }}" class="btn btn-secondary">Volver</a>
+        <button type="submit" class="btn btn-primary {% if not is_new %}hidden{% endif %}" id="btn-submit">
+            {{ 'Guardar' if is_new else 'Guardar Cambios' }}
+        </button>
+    </div>
+
+</form>
+
+<script>
+    function enableEdit() {
+        // Enable inputs
+        document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+
+        // Toggle buttons
+        const btnSubmit = document.getElementById('btn-submit');
+        if (btnSubmit) btnSubmit.classList.remove('hidden');
+
+        const btnEdit = document.getElementById('btn-editar');
+        if (btnEdit) btnEdit.classList.add('hidden');
+    }
+</script>
+{% endblock %}

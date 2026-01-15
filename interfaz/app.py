@@ -1332,5 +1332,175 @@ def serve_plantillas(filename):
 def server_css():
     return send_from_directory('static', 'estilos.css')
 
+@app.route('/directorio')
+def directorio():
+    return render_template('directorio.html')
+
+PROSPECTOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'prospectos.csv'))
+
+@app.route('/directorio/<tipo>')
+def ver_directorio(tipo):
+    if tipo not in ['clientes', 'prospectos']:
+        return redirect(url_for('directorio'))
+    
+    csv_file = CLIENTES_CSV if tipo == 'clientes' else PROSPECTOS_CSV
+    data = read_csv(csv_file)
+    
+    # Pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    total_pages = math.ceil(len(data) / per_page)
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_data = data[start:end]
+    
+    # Headers to show
+    headers = []
+    if data:
+        # Prioritize important headers
+        all_keys = list(data[0].keys())
+        priority = ['nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa', 'contacto'] 
+        headers = [k for k in priority if k in all_keys]
+        # Add others up to 5 cols
+        for k in all_keys:
+            if k not in headers and len(headers) < 5:
+                headers.append(k)
+    else:
+         headers = ['nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa']
+
+    return render_template('tabla_directorio.html', tipo=tipo, data=paginated_data, headers=headers, page=page, total_pages=total_pages)
+
+@app.route('/directorio/nuevo/<tipo>')
+def nuevo_directorio_item(tipo):
+    return render_template('crear_directorio.html', tipo=tipo, is_new=True, item={})
+
+@app.route('/directorio/detalle/<tipo>/<id_val>')
+def detalle_directorio(tipo, id_val):
+    if tipo not in ['clientes', 'prospectos']:
+        return redirect(url_for('directorio'))
+        
+    csv_file = CLIENTES_CSV if tipo == 'clientes' else PROSPECTOS_CSV
+    data = read_csv(csv_file)
+    
+    # Find item
+    key = 'ID' if tipo == 'clientes' else 'folio'
+    item = next((r for r in data if str(r.get(key, '')).strip() == str(id_val).strip()), None)
+    
+    # Fallback to name if not found by ID (for records with missing IDs like KHEIRO)
+    if not item:
+        normalized_id_val = str(id_val).strip().lower()
+        item = next((r for r in data if str(r.get('nombre_empresa', '')).strip().lower() == normalized_id_val), None)
+    
+    if not item:
+        flash('Registro no encontrado.', 'error')
+        return redirect(url_for('ver_directorio', tipo=tipo))
+        
+    return render_template('crear_directorio.html', tipo=tipo, is_new=False, item=item)
+
+@app.route('/directorio/guardar/<tipo>', methods=['POST'])
+def guardar_directorio(tipo):
+    csv_file = CLIENTES_CSV if tipo == 'clientes' else PROSPECTOS_CSV
+    
+    existing = read_csv(csv_file)
+    headers = []
+    if existing:
+        headers = list(existing[0].keys())
+    else:
+        if tipo == 'clientes':
+            headers = ['ID', 'nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa', 'razon_social']
+        else:
+            headers = ['folio', 'nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa']
+            
+    # Check if update or new
+    key = 'ID' if tipo == 'clientes' else 'folio'
+    id_val = request.form.get(key)
+    
+    # Handle new fields from form not in headers
+    # Always ensure basic fields + others from form serve as headers if missing
+    for k in request.form.keys():
+        if k not in headers and k != key: # Don't add ID/key if not there, handled separately
+             headers.append(k)
+    
+    if id_val:
+        # Update
+        target = next((r for r in existing if str(r.get(key, '')).strip() == str(id_val).strip()), None)
+        # Fallback to name if ID search fails (for KHEIRO-like cases)
+        if not target:
+            target = next((r for r in existing if str(r.get('nombre_empresa', '')).strip().lower() == str(id_val).strip().lower()), None)
+            
+        if target:
+            # Update target in place
+            for k in request.form:
+                 target[k] = request.form[k]
+             # Ensure headers covers everything
+            updated_rows = existing
+            flash('Registro actualizado correctamente.', 'success')
+        else:
+            # Should not happen typically if coming from edit form intended for existing
+            # Treat as new if not found? Or error. Let's treat as new to be safe/robust or error.
+            # Actually, if we passed an ID but it wasn't found, it might be a concurrency issue or bad ID.
+            # Let's create new.
+             flash('ID no encontrado, se creó uno nuevo.', 'warning')
+             return guardar_nuevo_directorio_logic(tipo, existing, headers, csv_file)
+    else:
+        # New
+        return guardar_nuevo_directorio_logic(tipo, existing, headers, csv_file)
+
+    # Normalize rows
+    for r in existing:
+        for h in headers:
+            if h not in r:
+                r[h] = ''
+                
+    try:
+        overwrite_csv(csv_file, headers, existing)
+    except Exception as e:
+        flash(f'Error al guardar: {e}', 'error')
+        
+    return redirect(url_for('ver_directorio', tipo=tipo))
+
+def guardar_nuevo_directorio_logic(tipo, existing, headers, csv_file):
+    new_row = {}
+    
+    # Generate ID
+    if tipo == 'clientes':
+        try:
+            max_id = max([int(r.get('ID', 0)) for r in existing if str(r.get('ID','')).isdigit()], default=0)
+            new_row['ID'] = max_id + 1
+        except:
+            new_row['ID'] = 1
+    else:
+        try:
+            max_folio = max([int(r.get('folio', 0)) for r in existing if str(r.get('folio','')).isdigit()], default=0)
+            new_row['folio'] = max_folio + 1
+        except:
+             new_row['folio'] = 1
+             
+    # Fill Data
+    for k in request.form:
+        new_row[k] = request.form[k]
+        
+    # Append
+    existing.append(new_row)
+    
+    # Fix headers
+    for k in new_row.keys():
+        if k not in headers:
+            headers.append(k)
+            
+    # Normalize
+    for r in existing:
+        for h in headers:
+            if h not in r:
+                r[h] = ''
+    
+    try:
+        overwrite_csv(csv_file, headers, existing)
+        flash(f'{tipo.capitalize()[:-1]} creado exitosamente.', 'success')
+    except Exception as e:
+        flash(f'Error al guardar: {e}', 'error')
+        
+    return redirect(url_for('ver_directorio', tipo=tipo))
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
