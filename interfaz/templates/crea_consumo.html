@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+<header class="flex justify-between items-center">
+    <div>
+        <h1>{{ 'Detalle Consumo' if consumo else 'Registro de Consumo' }}</h1>
+        <p class="subtitle">{{ 'Consulta y edita los detalles.' if consumo else 'Complete el formulario para registrar
+            un nuevo consumo.' }}</p>
+    </div>
+    {% if consumo %}
+    <div class="flex gap-4">
+        <!-- Placeholder for PDF generation if needed later -->
+        <!-- <a href="#" class="btn btn-secondary">Ver PDF</a> -->
+        <button type="button" class="btn btn-primary" onclick="enableEdit()" id="btn-editar">Editar</button>
+    </div>
+    {% endif %}
+</header>
+
+<form action="{{ url_for('guardar_consumo') }}" method="POST" class="card">
+    <!-- Hidden input for original ID/Folio if editing -->
+    <input type="hidden" name="original_folio" value="{{ consumo.folio if consumo else '' }}">
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label for="folio">Folio</label>
+            <input type="text" id="folio" name="folio" placeholder="Ej. CON-001"
+                value="{{ suggested_folio if not consumo else consumo.folio }}" required readonly class="readonly-bg">
+        </div>
+        <div class="form-group">
+            <label for="fecha_registro">Fecha Registro</label>
+            <input type="date" id="fecha_registro" name="fecha_registro"
+                value="{{ consumo.fecha_registro if consumo else '' }}" {% if consumo %}disabled{% endif %} required>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label for="fecha_lectura">Fecha Lectura</label>
+            <input type="date" id="fecha_lectura" name="fecha_lectura"
+                value="{{ consumo.fecha_lectura if consumo else '' }}" {% if consumo %}disabled{% endif %} required>
+        </div>
+        <div class="form-group">
+            <label for="consumo">Consumo (m³)</label>
+            <input type="number" step="0.01" id="consumo" name="consumo" placeholder="0.00"
+                value="{{ consumo.consumo if consumo else '' }}" {% if consumo %}disabled{% endif %} required>
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group relative">
+            <label for="nombre_cliente">Nombre Cliente</label>
+            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar cliente..."
+                autocomplete="off" oninput="fillClient(this)" required
+                value="{{ consumo.nombre_cliente if consumo else '' }}" {% if consumo %}disabled{% endif %}>
+            <div id="suggestions-box"></div>
+        </div>
+        <div class="form-group">
+            <label for="ID_cliente">ID Cliente</label>
+            <input type="text" id="ID_cliente" name="ID_cliente" placeholder="ID Cliente"
+                value="{{ consumo.ID_cliente if consumo else '' }}" readonly class="readonly-bg">
+        </div>
+    </div>
+
+    <div class="grid-2 mb-4">
+        <div class="form-group">
+            <label for="lectura">Lectura Actual</label>
+            <input type="number" step="0.01" id="lectura" name="lectura" placeholder="0.00"
+                value="{{ consumo.lectura if consumo else '' }}" {% if consumo %}disabled{% endif %} required>
+        </div>
+        <!-- Placeholder for future fields or empty space -->
+        <div></div>
+    </div>
+
+    <div class="text-right mt-8 flex justify-end gap-4">
+        <a href="{{ url_for('consumos') }}" class="btn btn-secondary">Cancelar</a>
+        <!-- Assuming 'consumos' is the list view -->
+        <button type="submit" class="btn btn-primary {% if consumo %}hidden{% endif %}" id="btn-submit">Guardar
+            Consumo</button>
+    </div>
+</form>
+
+<!-- Pass clients data to JS -->
+<script id="clients-data" type="application/json">{{ clientes|tojson|safe }}</script>
+
+<script>
+    // Embedded script to handle client search and edit toggling
+
+    // Normalize string for searching
+    function normalizeStr(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    // Load clients data
+    let clientsData = [];
+    try {
+        const dataEl = document.getElementById('clients-data');
+        if (dataEl && dataEl.textContent) {
+            clientsData = JSON.parse(dataEl.textContent);
+        }
+    } catch (e) {
+        console.error("Error parsing clients data", e);
+    }
+
+    function fillClient(input) {
+        const val = normalizeStr(input.value);
+        const suggestionsBox = document.getElementById('suggestions-box');
+
+        // Clear suggestions
+        suggestionsBox.innerHTML = '';
+        suggestionsBox.style.display = 'none';
+
+        if (!val) return;
+
+        // Filter clients
+        const matches = clientsData.filter(c => {
+            const nombre = c.nombre_empresa || '';
+            const id = c.ID || '';
+            // Search by Name or ID
+            return normalizeStr(nombre).includes(val) || normalizeStr(id).includes(val);
+        });
+
+        if (matches.length > 0) {
+            suggestionsBox.style.display = 'block';
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = `${match.nombre_empresa} (${match.ID})`;
+                div.onclick = () => selectClient(match);
+                suggestionsBox.appendChild(div);
+            });
+        }
+    }
+
+    function selectClient(client) {
+        document.getElementById('nombre_cliente').value = client.nombre_empresa;
+        document.getElementById('ID_cliente').value = client.ID;
+
+        // Close suggestions
+        document.getElementById('suggestions-box').style.display = 'none';
+
+        // Visual feedback
+        const input = document.getElementById('nombre_cliente');
+        input.style.borderColor = 'var(--success-color)';
+        setTimeout(() => input.style.borderColor = '', 1000);
+    }
+
+    // Close suggestions on click outside
+    document.addEventListener('click', function (e) {
+        if (e.target.id !== 'nombre_cliente') {
+            const box = document.getElementById('suggestions-box');
+            if (box) box.style.display = 'none';
+        }
+    });
+
+    function enableEdit() {
+        // Enable all inputs
+        document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
+
+        // Unlock Readonly inputs (except Folio and IDs if they should remain static)
+        // Here we keep Folio readonly usually. ID might be editable if they picked wrong client, but usually client search handles it.
+        // Let's allow ID search again, so ID input itself remains readonly (populated by search)
+        document.querySelectorAll('input[readonly]:not(#folio):not(#ID_cliente)').forEach(el => {
+            el.readOnly = false;
+            el.classList.remove('readonly-bg');
+        });
+
+        // However, user might want to change client, so search input should be enabled (it is by first line).
+        // ID input is readonly by default in HTML. It shouldn't be manually edited, only via search.
+
+        const btnSubmit = document.getElementById('btn-submit');
+        if (btnSubmit) btnSubmit.classList.remove('hidden');
+
+        const btnEdit = document.getElementById('btn-editar');
+        if (btnEdit) btnEdit.classList.add('hidden');
+    }
+
+    // Set default date if new
+    document.addEventListener('DOMContentLoaded', () => {
+        const dateInput = document.getElementById('fecha_registro');
+        if (dateInput && !dateInput.value) {
+            const now = new Date();
+            // Format: YYYY-MM-DD
+            const localDate = now.toISOString().split('T')[0];
+            dateInput.value = localDate;
+        }
+    });
+</script>
+
+{% endblock %}

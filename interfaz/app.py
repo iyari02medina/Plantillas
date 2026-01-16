@@ -22,6 +22,7 @@ COTIZACIONES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Docum
 PERMISOS_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'Cuestionarios_permiso_descarga'))
 TEMPLATE_COT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cotizacion'))
 TEMPLATE_PERMISOS_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cuestionario_permiso_descargas'))
+CONSUMOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Consumos_agua', 'consumos.csv'))
 
 def generate_quotation_html(folio):
     """Genera el archivo HTML de la cotización usando el script logic."""
@@ -1501,6 +1502,107 @@ def guardar_nuevo_directorio_logic(tipo, existing, headers, csv_file):
         flash(f'Error al guardar: {e}', 'error')
         
     return redirect(url_for('ver_directorio', tipo=tipo))
+
+
+@app.route('/consumos')
+def consumos():
+    raw_data = read_csv(CONSUMOS_CSV)
+    # Reverse to show newest first
+    all_consumos = raw_data[::-1]
+    
+    # Pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    total_items = len(all_consumos)
+    total_pages = math.ceil(total_items / per_page)
+    
+    if page < 1: page = 1
+    if page > total_pages and total_pages > 0: page = total_pages
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_consumos = all_consumos[start:end]
+    
+    return render_template('consumos_agua.html', 
+                         consumos=paginated_consumos,
+                         page=page,
+                         total_pages=total_pages)
+
+@app.route('/crear_consumo', methods=['GET'])
+def crear_consumo():
+    # Load clients for the search
+    clientes = read_csv(CLIENTES_CSV)
+    
+    # Suggest Folio
+    existing = read_csv(CONSUMOS_CSV)
+    max_num = 0
+    if existing:
+        for r in existing:
+            try:
+                # Expecting CON-XXX
+                txt = r.get('folio', '')
+                import re
+                nums = re.findall(r'\d+', txt)
+                if nums:
+                    val = int(nums[-1])
+                    if val > max_num: max_num = val
+            except: pass
+    suggested_folio = f"CON-{max_num + 1:03d}"
+    
+    return render_template('crea_consumo.html', clientes=clientes, suggested_folio=suggested_folio)
+
+@app.route('/guardar_consumo', methods=['POST'])
+def guardar_consumo():
+    folio = request.form.get('folio')
+    original_folio = request.form.get('original_folio')
+    
+    existing = read_csv(CONSUMOS_CSV)
+    
+    # Headers
+    headers = []
+    if existing:
+        headers = list(existing[0].keys())
+    if not headers:
+        headers = ['folio', 'fecha_registro', 'fecha_lectura', 'ID_cliente', 'nombre_cliente', 'lectura', 'consumo']
+        
+    # Check duplicates if new
+    if not original_folio and any(r.get('folio') == folio for r in existing):
+        flash(f'El Folio {folio} ya existe.', 'error')
+        return redirect(url_for('crear_consumo'))
+
+    # Prepare row
+    row = {}
+    for h in headers:
+        row[h] = request.form.get(h, '')
+        
+    # Ensure ID if missing in form for some reason
+    row['folio'] = folio
+
+    if original_folio:
+        # Edit
+        updated_rows = [r for r in existing if r.get('folio') != original_folio]
+        updated_rows.append(row)
+        overwrite_csv(CONSUMOS_CSV, headers, updated_rows)
+        flash('Consumo actualizado exitosamente.', 'success')
+    else:
+        # New
+        append_to_csv(CONSUMOS_CSV, headers, [row])
+        flash('Consumo registrado exitosamente.', 'success')
+        
+    return redirect(url_for('consumos'))
+
+@app.route('/consumo/<folio>')
+def detalle_consumo(folio):
+    print(f"Buscando detalle para consumo folio: {folio}")
+    rows = read_csv(CONSUMOS_CSV)
+    target = next((r for r in rows if r.get('folio') == folio), None)
+    
+    if not target:
+        flash('Consumo no encontrado.', 'error')
+        return redirect(url_for('consumos'))
+        
+    clientes = read_csv(CLIENTES_CSV)
+    return render_template('crea_consumo.html', consumo=target, clientes=clientes)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
