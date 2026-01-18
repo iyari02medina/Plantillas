@@ -504,38 +504,108 @@
 
 <!-- PESTAÑA 6: CONSUMOS DE AGUA -->
 <div id="tab-consumos" class="tab-content hidden">
-    <div class="card table-container">
-        <h3>Consumos de Agua</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Folio</th>
-                    <th>Fecha Lectura</th>
-                    <th>Consumo (m³)</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if consumos %}
-                {% for data in consumos %}
-                <tr>
-                    <td><strong>{{ data.folio }}</strong></td>
-                    <td>{{ data.fecha_lectura }}</td>
-                    <td>{{ data.consumo }}</td>
-                    <td>
-                        <a href="{{ url_for('detalle_consumo', folio=data.folio) }}"
-                            class="btn btn-secondary btn-small">Ver Consumo</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="4" class="text-center text-muted p-8">No hay consumos.</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
+
+    <!-- Widget de Tarifas y Visualizador -->
+    <div class="mb-6 grid-2" style="gap: 2rem;">
+
+        <!-- Tarjeta de Tarifas -->
+        <div class="card p-4">
+            <h4 class="mb-2 font-bold" style="color: var(--primary-color);">Tarifa Actual (Mensual)</h4>
+            {% if current_tariff %}
+            <div class="flex justify-between mb-1">
+                <span>Agua:</span>
+                <strong>${{ current_tariff.tarifa_agua }}</strong>
+            </div>
+            <div class="flex justify-between mb-1">
+                <span>Drenaje:</span>
+                <strong>${{ current_tariff.tarifa_drenaje }}</strong>
+            </div>
+            <div class="flex justify-between mb-1">
+                <span>Saneamiento:</span>
+                <strong>${{ current_tariff.tarifa_saneamiento }}</strong>
+            </div>
+            <hr class="my-2">
+            <div class="flex justify-between text-lg">
+                <span>Total:</span>
+                <strong>${{ current_tariff.total_tarifa }}</strong>
+            </div>
+            {% else %}
+            <p class="text-sm text-muted">No hay información de tarifas disponible.</p>
+            {% endif %}
+            <div class="mt-2 text-sm text-muted">Base: Último consumo registrado ({{ latest_consumo }} m³)</div>
+        </div>
+
+        <!-- Visualizador de Consumo -->
+        <div class="card p-4 flex flex-col justify-center">
+            <h4 class="mb-4 font-bold">Nivel de Consumo</h4>
+
+            <div
+                style="position: relative; height: 30px; background: #eee; border-radius: 15px; overflow: hidden; display: flex;">
+                <!-- Green Zone 0-40 -->
+                <div
+                    style="width: 40%; background: #4caf50; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem;">
+                    0-40</div>
+                <!-- Orange Zone 40-80 -->
+                <div
+                    style="width: 40%; background: #ff9800; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem;">
+                    41-80</div>
+                <!-- Red Zone 80+ -->
+                <div
+                    style="width: 20%; background: #f44336; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem;">
+                    80+</div>
+
+                <!-- Indicator Marker -->
+                {% set marker_pos = latest_consumo if latest_consumo < 100 else 100 %} <div
+                    style="position: absolute; left: {{ marker_pos }}%; top: -5px; bottom: -5px; width: 4px; background: black; border: 2px solid white; z-index: 10;">
+            </div>
+            <div
+                style="position: absolute; left: {{ marker_pos }}%; top: 35px; transform: translateX(-50%); font-weight: bold; font-size: 0.9rem;">
+                {{ latest_consumo }} m³
+            </div>
+        </div>
+        <div class="mt-8 text-center text-sm">
+            {% if latest_consumo <= 40 %} <span style="color: #4caf50; font-weight: bold;">Consumo Bajo (Óptimo)</span>
+                {% elif latest_consumo <= 80 %} <span style="color: #ff9800; font-weight: bold;">Consumo Medio
+                    (Precaución)</span>
+                    {% else %}
+                    <span style="color: #f44336; font-weight: bold;">Consumo Alto (Crítico)</span>
+                    {% endif %}
+        </div>
     </div>
+</div>
+
+<div class="card table-container">
+    <h3>Consumos de Agua</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Folio</th>
+                <th>Fecha Lectura</th>
+                <th>Consumo (m³)</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if consumos %}
+            {% for data in consumos %}
+            <tr>
+                <td><strong>{{ data.folio }}</strong></td>
+                <td>{{ data.fecha_lectura }}</td>
+                <td>{{ data.consumo }}</td>
+                <td>
+                    <a href="{{ url_for('detalle_consumo', folio=data.folio) }}" class="btn btn-secondary btn-small">Ver
+                        Consumo</a>
+                </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center text-muted p-8">No hay consumos.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
 </div>
 
 <script>

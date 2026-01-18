@@ -23,6 +23,7 @@ PERMISOS_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documento
 TEMPLATE_COT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cotizacion'))
 TEMPLATE_PERMISOS_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cuestionario_permiso_descargas'))
 CONSUMOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Consumos_agua', 'consumos.csv'))
+RANGOS_AGUA_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Consumos_agua', 'rangos.csv'))
 
 def generate_quotation_html(folio):
     """Genera el archivo HTML de la cotización usando el script logic."""
@@ -1447,7 +1448,52 @@ def detalle_directorio(tipo, id_val):
         related_data['permisos'] = filter_rows(read_csv(PERMISOS_CSV), ['nis'], 'nombre_empresa')
 
         # Consumos
-        related_data['consumos'] = filter_rows(read_csv(CONSUMOS_CSV), ['ID_cliente'], 'nombre_cliente')
+        consumos_data = filter_rows(read_csv(CONSUMOS_CSV), ['ID_cliente'], 'nombre_cliente')
+        # Sort consumos by date (assuming folio/date correlation or just take last in list)
+        # Better to sort by folio descending or date if possible. For now, list order (usually chron).
+        related_data['consumos'] = consumos_data
+        
+        # Calculate Current Tariff based on latest consumption
+        latest_consumo = 0.0
+        if consumos_data:
+            # Assuming last item is latest. If not, needs sorting logic.
+            # Let's try to parse 'consumo'
+            try:
+                latest_consumo = float(consumos_data[-1].get('consumo', 0))
+            except: pass
+            
+        related_data['latest_consumo'] = latest_consumo
+        
+        # Ranges Logic
+        raw_rangos = read_csv(RANGOS_AGUA_CSV)
+        rangos = []
+        for r in raw_rangos:
+             # Sanitize keys (remove spaces)
+             rangos.append({k.strip(): v for k, v in r.items()})
+             
+        current_tariff = None
+        
+        for r in rangos:
+            try:
+                min_val = float(r.get('minimo', 0))
+                max_val = float(r.get('maximo', 999999))
+                if min_val <= latest_consumo <= max_val:
+                    current_tariff = r
+                    break
+            except: pass
+            
+        if not current_tariff and rangos:
+             # Fallback logic
+             try:
+                 first_min = float(rangos[0].get('minimo', 0))
+                 if latest_consumo < first_min:
+                     current_tariff = rangos[0]
+                 else:
+                     current_tariff = rangos[-1]
+             except:
+                 current_tariff = rangos[-1]
+             
+        related_data['current_tariff'] = current_tariff
         
     return render_template('crear_directorio.html', tipo=tipo, is_new=False, item=item, **related_data)
 
@@ -1631,10 +1677,56 @@ def guardar_consumo():
     # Ensure ID if missing in form for some reason
     row['folio'] = folio
 
+    # Calculate Consumo (Current Reading - Previous Reading)
+    try:
+        lectura_actual = float(request.form.get('lectura', 0))
+        id_cliente = request.form.get('ID_cliente')
+        
+        # Determine Previous Reading
+        # 1. Get all consumes for this client
+        client_rows = [r for r in existing if r.get('ID_cliente') == id_cliente]
+        
+        # 2. Exclude current folio if editing to avoid self-reference (though we want the previous relative to this one)
+        # If editing, we need to find the record immediately preceding this one in DATE.
+        # If new, we find the record with max date.
+        
+        # Let's sort client_rows by date
+        current_date_str = request.form.get('fecha_lectura', '9999-12-31')
+        
+        # Filter for records strictly before this date (or same date but created earlier? Date granularity might be insufficient for same-day)
+        # Assuming one reading per month/date.
+        previous_records = [r for r in client_rows if r.get('folio') != folio and r.get('fecha_lectura', '') < current_date_str]
+        
+        if previous_records:
+             # Sort by date descending
+             previous_records.sort(key=lambda x: x.get('fecha_lectura', ''), reverse=True)
+             last_record = previous_records[0]
+             lectura_anterior = float(last_record.get('lectura', 0))
+        else:
+             lectura_anterior = 0.0
+             
+        consumo_val = lectura_actual - lectura_anterior
+        # If negative, implies reset or error. Ensure non-negative? User said "calcula desde 0" monthly.
+        # If meter reset, maybe just take current reading?
+        # For safety/simplicity per request: "diferencia entre la actual y la pasada"
+        if consumo_val < 0:
+             consumo_val = lectura_actual # Assume baseline reset if previous > current
+        
+        row['consumo'] = f"{consumo_val:.2f}"
+        
+    except Exception as e:
+        print(f"Error calculating consumption: {e}")
+        # Fallback to form value if calculation fails
+        row['consumo'] = request.form.get('consumo', '0')
+
     if original_folio:
         # Edit
         updated_rows = [r for r in existing if r.get('folio') != original_folio]
         updated_rows.append(row)
+        # Re-sort entire CSV by folio or date? Keeping original order mostly, but appended.
+        # Maybe better to sort list by folio to keep it clean.
+        updated_rows.sort(key=lambda x: x.get('folio', '')) # Simple sort
+        
         overwrite_csv(CONSUMOS_CSV, headers, updated_rows)
         flash('Consumo actualizado exitosamente.', 'success')
     else:

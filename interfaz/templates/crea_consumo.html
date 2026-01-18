@@ -44,8 +44,8 @@
         </div>
         <div class="form-group">
             <label for="consumo">Consumo (m³)</label>
-            <input type="number" step="0.01" id="consumo" name="consumo" placeholder="0.00"
-                value="{{ consumo.consumo if consumo else '' }}" {% if consumo %}disabled{% endif %} required>
+            <input type="number" step="0.01" id="consumo" name="consumo" placeholder="Calculado auto."
+                value="{{ consumo.consumo if consumo else '' }}" readonly class="readonly-bg">
         </div>
     </div>
 
