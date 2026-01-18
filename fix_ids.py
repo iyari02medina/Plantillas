@@ -25,7 +25,7 @@ if not rows:
 
 max_id_num = 0
 for r in rows:
-    id_val = r.get('ID', '')
+    id_val = r.get('id_cliente', '')
     if id_val and id_val.startswith('CLI-'):
         try:
             # Extract number from CLI-XXX
@@ -36,9 +36,9 @@ for r in rows:
 
 updated = False
 for r in rows:
-    if not r.get('ID'):
+    if not r.get('id_cliente'):
         max_id_num += 1
-        r['ID'] = f'CLI-{max_id_num:03d}'
+        r['id_cliente'] = f'CLI-{max_id_num:03d}'
         updated = True
 
 if updated:

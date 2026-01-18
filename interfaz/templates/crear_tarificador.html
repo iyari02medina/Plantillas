@@ -234,8 +234,8 @@
         document.getElementById('suggestions-box').style.display = 'none';
 
         // Auto-fill other fields if available in client data (optional)
-        if (document.getElementById('no_cliente') && client.ID)
-            document.getElementById('no_cliente').value = client.ID;
+        if (document.getElementById('no_cliente') && client.id_cliente)
+            document.getElementById('no_cliente').value = client.id_cliente;
 
         if (document.getElementById('no_permiso_descargas') && client.no_permiso_descargas)
             document.getElementById('no_permiso_descargas').value = client.no_permiso_descargas;

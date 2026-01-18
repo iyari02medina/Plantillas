@@ -177,7 +177,7 @@ def index():
     
     # Simple metrics
     total_cotizaciones = len(set(c['folio_cot'] for c in cotizaciones if c.get('folio_cot')))
-    total_ordenes = len(set(o['folio_cot'] for o in ordenes if o.get('folio_cot')))
+    total_ordenes = len(set(o['folio_des'] for o in ordenes if o.get('folio_des')))
     
     return render_template('index.html', total_cotizaciones=total_cotizaciones, total_ordenes=total_ordenes)
 
@@ -660,10 +660,10 @@ def get_orden_data(tipo, folio):
     
     if tipo == 'desazolve':
         filepath = ORDENES_CSV
-        id_key = 'folio_cot' # confusing naming in csv
+        id_key = 'folio_des' # confusing naming in csv
     elif tipo == 'trampa':
         filepath = TRAMPAS_CSV
-        id_key = 'folio_ot'
+        id_key = 'folio_lt'
     elif tipo == 'visita':
         filepath = VISITAS_CSV
         id_key = 'folio_vt'
@@ -679,7 +679,7 @@ def nueva_orden(tipo):
     if request.method == 'POST':
         # Create logic
         folio = request.form.get(
-            'folio_cot' if tipo == 'desazolve' else 'folio_ot' if tipo == 'trampa' else 'folio_vt'
+            'folio_des' if tipo == 'desazolve' else 'folio_lt' if tipo == 'trampa' else 'folio_vt'
         )
         
         filepath = ''
@@ -689,7 +689,7 @@ def nueva_orden(tipo):
         
         # Check if already exists? (Optional but good practice)
         existing_rows = read_csv(filepath)
-        id_key = 'folio_cot' if tipo == 'desazolve' else 'folio_ot' if tipo == 'trampa' else 'folio_vt'
+        id_key = 'folio_des' if tipo == 'desazolve' else 'folio_lt' if tipo == 'trampa' else 'folio_vt'
         
         if any(r.get(id_key) == folio for r in existing_rows):
             flash(f'El Folio {folio} ya existe.', 'error')
@@ -705,13 +705,13 @@ def nueva_orden(tipo):
         
         # Ensure we have the full expected schema for desazolve regardless of existing CSV
         if tipo == 'desazolve':
-            expected_fields = ['folio_cot','fecha_cot','nombre_cliente','direccion_cliente','no_cliente','nombre_contacto','telefono_contacto','ubicacion_area','tipo_tuberia','diametro_tuberia','longitud_sondeada','flujo_nulo','flujo_lento','flujo_normal','equipo_guia','equipo_hidro','equipo_vactor','tipo_obstruccion','volumen_azolve','estado_bueno','estado_danado','estado_obstruido','observaciones','obs_evidencia_01','obs_evidencia_02','obs_evidencia_03','comentarios_cliente']
+            expected_fields = ['folio_des','fecha_des','nombre_cliente','direccion_cliente','no_cliente','nombre_contacto','telefono_contacto','ubicacion_area','tipo_tuberia','diametro_tuberia','longitud_sondeada','flujo_nulo','flujo_lento','flujo_normal','equipo_guia','equipo_hidro','equipo_vactor','tipo_obstruccion','volumen_azolve','estado_bueno','estado_danado','estado_obstruido','observaciones','obs_evidencia_01','obs_evidencia_02','obs_evidencia_03','comentarios_cliente']
             for f in expected_fields:
                 if f not in headers:
                     headers.append(f)
         
         elif tipo == 'trampa':
-            expected_fields = ['folio_ot','fecha_ot','nombre_cliente','direccion_cliente','no_cliente','ubicacion_equipo','tipo_trampa','capacidad_trampa','estado_tapa','nivel_saturacion','accion_retiro_solidos','accion_succion_liquidos','accion_raspado_paredes','accion_lavado_presion','accion_aplicacion_bacterias','accion_prueba_flujo','accion_limpieza_perimetral','volumen_extraido','caracteristicas_residuo','estado_bueno','estado_reparacion','estado_faltantes','observaciones_tecnico','obs_evidencia_01','obs_evidencia_02']
+            expected_fields = ['folio_lt','fecha_lt','nombre_cliente','direccion_cliente','no_cliente','ubicacion_equipo','tipo_trampa','capacidad_trampa','estado_tapa','nivel_saturacion','accion_retiro_solidos','accion_succion_liquidos','accion_raspado_paredes','accion_lavado_presion','accion_aplicacion_bacterias','accion_prueba_flujo','accion_limpieza_perimetral','volumen_extraido','caracteristicas_residuo','estado_bueno','estado_reparacion','estado_faltantes','observaciones_tecnico','obs_evidencia_01','obs_evidencia_02']
             for f in expected_fields:
                 if f not in headers:
                     headers.append(f)
@@ -744,8 +744,8 @@ def nueva_orden(tipo):
             
         # Ensure mandatory ID and DATE if not in form (visita usually auto, but let's trust form mostly)
         new_row[id_key] = folio
-        new_row['fecha_cot' if tipo == 'desazolve' else 'fecha_ot' if tipo == 'trampa' else 'fecha_vt'] = request.form.get(
-             'fecha_cot' if tipo == 'desazolve' else 'fecha_ot' if tipo == 'trampa' else 'fecha_vt') or datetime.date.today().strftime('%d/%m/%Y')
+        new_row['fecha_des' if tipo == 'desazolve' else 'fecha_lt' if tipo == 'trampa' else 'fecha_vt'] = request.form.get(
+             'fecha_des' if tipo == 'desazolve' else 'fecha_lt' if tipo == 'trampa' else 'fecha_vt') or datetime.date.today().strftime('%d/%m/%Y')
         
         try:
              # Check if we need to update the file structure (if we added headers)
@@ -782,11 +782,11 @@ def nueva_orden(tipo):
         if tipo == 'desazolve': 
             filepath = ORDENES_CSV
             prefix = 'OT-DES-'
-            id_key = 'folio_cot'
+            id_key = 'folio_des'
         elif tipo == 'trampa': 
             filepath = TRAMPAS_CSV
             prefix = 'OT-TRA-'
-            id_key = 'folio_ot'
+            id_key = 'folio_lt'
         else: 
             filepath = VISITAS_CSV
             prefix = 'VT-'
@@ -811,7 +811,7 @@ def nueva_orden(tipo):
         # Empty data structure with just today's date
         data = {
             id_key: suggested_folio,
-            'fecha_cot' if tipo == 'desazolve' else 'fecha_ot' if tipo == 'trampa' else 'fecha_vt': datetime.date.today().strftime('%d/%m/%Y')
+            'fecha_des' if tipo == 'desazolve' else 'fecha_lt' if tipo == 'trampa' else 'fecha_vt': datetime.date.today().strftime('%d/%m/%Y')
         }
 
     clientes = read_csv(CLIENTES_CSV)
@@ -831,7 +831,7 @@ def detalle_orden(tipo, folio):
         all_rows = read_csv(filepath)
         
         # Determine ID key again
-        id_key = 'folio_cot' if tipo == 'desazolve' else 'folio_ot' if tipo == 'trampa' else 'folio_vt'
+        id_key = 'folio_des' if tipo == 'desazolve' else 'folio_lt' if tipo == 'trampa' else 'folio_vt'
         
         # Filter out the old row
         updated_rows = [r for r in all_rows if r.get(id_key) != folio]
@@ -843,7 +843,7 @@ def detalle_orden(tipo, folio):
             
         # Ensure we have the full expected schema for desazolve checks
         if tipo == 'desazolve':
-            expected_fields = ['folio_cot','fecha_cot','nombre_cliente','direccion_cliente','no_cliente','nombre_contacto','telefono_contacto','ubicacion_area','tipo_tuberia','diametro_tuberia','longitud_sondeada','flujo_nulo','flujo_lento','flujo_normal','equipo_guia','equipo_hidro','equipo_vactor','tipo_obstruccion','volumen_azolve','estado_bueno','estado_danado','estado_obstruido','observaciones','obs_evidencia_01','obs_evidencia_02','obs_evidencia_03','comentarios_cliente']
+            expected_fields = ['folio_des','fecha_des','nombre_cliente','direccion_cliente','no_cliente','nombre_contacto','telefono_contacto','ubicacion_area','tipo_tuberia','diametro_tuberia','longitud_sondeada','flujo_nulo','flujo_lento','flujo_normal','equipo_guia','equipo_hidro','equipo_vactor','tipo_obstruccion','volumen_azolve','estado_bueno','estado_danado','estado_obstruido','observaciones','obs_evidencia_01','obs_evidencia_02','obs_evidencia_03','comentarios_cliente']
             for f in expected_fields:
                 if f not in headers:
                     headers.append(f)
@@ -993,8 +993,8 @@ def generate_order_html(tipo, data):
             output_dir = os.path.join(docs_gen_root, 'dezasolves')
             
             # Mapper specific to desazolve template
-            ctx['folio_ot'] = ctx.get('folio_cot', 'N/A')
-            ctx['fecha_ot'] = ctx.get('fecha_cot', 'N/A')
+            ctx['folio_ot'] = ctx.get('folio_des', 'N/A')
+            ctx['fecha_ot'] = ctx.get('fecha_des', 'N/A')
             if 'no_cliente' not in ctx: ctx['no_cliente'] = '---'
             
             # Checkboxes x -> bool
@@ -1019,6 +1019,7 @@ def generate_order_html(tipo, data):
             template_path = os.path.join(plantillas_root, 'Orden de trabajo', 'limpieza_trampa_grasa.html')
             output_dir = os.path.join(docs_gen_root, 'limpiezas_trampa_grasa')
             
+            ctx['folio_ot'] = ctx.get('folio_lt', 'N/A')
             if 'no_cliente' not in ctx: ctx['no_cliente'] = '---'
             
             checkbox_fields = [

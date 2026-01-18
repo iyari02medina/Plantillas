@@ -37,10 +37,10 @@
         </thead>
         <tbody>
             {% for orden in desazolves|reverse %}
-            {% if orden.folio_cot %}
+            {% if orden.folio_des %}
             <tr>
-                <td><strong>{{ orden.folio_cot }}</strong></td>
-                <td>{{ orden.fecha_cot }}</td>
+                <td><strong>{{ orden.folio_des }}</strong></td>
+                <td>{{ orden.fecha_des }}</td>
                 <td>{{ orden.nombre_cliente }}</td>
                 <td>{{ orden.ubicacion_area }}</td>
                 <td>
@@ -49,7 +49,7 @@
                     {% if orden.equipo_guia == 'x' %}Guía{% endif %}
                 </td>
                 <td>
-                    <a href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_cot) }}"
+                    <a href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_des) }}"
                         class="btn btn-secondary btn-small">Ver Detalle</a>
                 </td>
             </tr>
@@ -79,15 +79,15 @@
         </thead>
         <tbody>
             {% for orden in trampas|reverse %}
-            {% if orden.folio_ot %}
+            {% if orden.folio_lt %}
             <tr>
-                <td><strong>{{ orden.folio_ot }}</strong></td>
-                <td>{{ orden.fecha_ot }}</td>
+                <td><strong>{{ orden.folio_lt }}</strong></td>
+                <td>{{ orden.fecha_lt }}</td>
                 <td>{{ orden.nombre_cliente }}</td>
                 <td>{{ orden.tipo_trampa }}</td>
                 <td>{{ orden.capacidad_trampa }}</td>
                 <td>
-                    <a href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_ot) }}"
+                    <a href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_lt) }}"
                         class="btn btn-secondary btn-small">Ver Detalle</a>
                 </td>
             </tr>

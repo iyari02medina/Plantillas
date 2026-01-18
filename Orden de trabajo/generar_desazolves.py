@@ -27,8 +27,8 @@ def generar_html():
             # Mapeo de campos si los nombres en el CSV difieren de la plantilla
             # En el CSV es folio_cot, en plantilla es folio_ot
             data = row.copy()
-            data['folio_ot'] = row.get('folio_cot', 'N/A')
-            data['fecha_ot'] = row.get('fecha_cot', 'N/A')
+            data['folio_ot'] = row.get('folio_des', 'N/A')
+            data['fecha_ot'] = row.get('fecha_des', 'N/A')
             data['no_cliente'] = row.get('no_cliente', '---')
             
             # Asegurar que los campos de checkbox sean booleanos para Jinja2

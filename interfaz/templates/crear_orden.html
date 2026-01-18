@@ -30,14 +30,14 @@
         <div class="form-group">
             <label>Folio</label>
             <input type="text"
-                name="{{ 'folio_cot' if tipo == 'desazolve' else 'folio_ot' if tipo == 'trampa' else 'folio_vt' }}"
+                name="{{ 'folio_des' if tipo == 'desazolve' else 'folio_lt' if tipo == 'trampa' else 'folio_vt' }}"
                 value="{{ folio }}" readonly class="readonly-bg">
         </div>
         <div class="form-group">
             <label>Fecha</label>
             <input type="text"
-                name="{{ 'fecha_cot' if tipo == 'desazolve' else 'fecha_ot' if tipo == 'trampa' else 'fecha_vt' }}"
-                value="{{ orden.get('fecha_cot') if tipo == 'desazolve' else orden.get('fecha_ot') if tipo == 'trampa' else orden.get('fecha_vt') }}"
+                name="{{ 'fecha_des' if tipo == 'desazolve' else 'fecha_lt' if tipo == 'trampa' else 'fecha_vt' }}"
+                value="{{ orden.get('fecha_des') if tipo == 'desazolve' else orden.get('fecha_lt') if tipo == 'trampa' else orden.get('fecha_vt') }}"
                 {% if not is_new %}disabled{% endif %}>
         </div>
     </div>

@@ -25,6 +25,8 @@ def generar_html():
         reader = csv.DictReader(f)
         for row in reader:
             data = row.copy()
+            data['folio_ot'] = row.get('folio_lt', 'N/A')
+            data['fecha_ot'] = row.get('fecha_lt', 'N/A')
             data['no_cliente'] = row.get('no_cliente', '---')
             
             # Asegurar que los campos de checkbox sean booleanos para Jinja2
