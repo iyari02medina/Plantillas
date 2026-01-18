@@ -537,7 +537,11 @@
 
         <!-- Visualizador de Consumo -->
         <div class="card p-4 flex flex-col justify-center">
-            <h4 class="mb-4 font-bold">Nivel de Consumo</h4>
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="font-bold">Nivel de Consumo</h4>
+                <div class="text-2xl font-bold" style="color: var(--primary-color);">{{ latest_consumo }} <span
+                        class="text-sm font-normal text-muted">m³ / mes</span></div>
+            </div>
 
             <div
                 style="position: relative; height: 30px; background: #eee; border-radius: 15px; overflow: hidden; display: flex;">
