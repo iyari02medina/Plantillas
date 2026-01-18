@@ -16,264 +16,527 @@
     {% endif %}
 </header>
 
-<form action="{{ url_for('guardar_directorio', tipo=tipo) }}" method="POST" class="card">
+<!-- Menú de Navegación (Tabs) -->
+{% if not is_new %}
+<div style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <button onclick="showTab('general')" id="btn-general" class="btn btn-primary">Información General</button>
+    <button onclick="showTab('cotizaciones')" id="btn-cotizaciones" class="btn btn-secondary">Cotizaciones</button>
+    <button onclick="showTab('ordenes')" id="btn-ordenes" class="btn btn-secondary">Órdenes de Trabajo</button>
+    <button onclick="showTab('tarificador')" id="btn-tarificador" class="btn btn-secondary">Tarificador</button>
+    <button onclick="showTab('permisos')" id="btn-permisos" class="btn btn-secondary">Permisos de Descarga</button>
+    <button onclick="showTab('consumos')" id="btn-consumos" class="btn btn-secondary">Consumos de Agua</button>
+</div>
+{% endif %}
 
-    <!-- Hidden ID field for updates -->
-    {% if not is_new %}
-    {% if tipo == 'clientes' %}
-    <input type="hidden" name="ID" value="{{ item.get('ID', '') }}">
-    {% else %}
-    <input type="hidden" name="folio" value="{{ item.get('folio', '') }}">
-    {% endif %}
-    {% endif %}
+<!-- PESTAÑA 1: INFORMACIÓN GENERAL -->
+<div id="tab-general" class="tab-content">
+    <form action="{{ url_for('guardar_directorio', tipo=tipo) }}" method="POST" class="card">
 
-    <!-- 1. INFORMACIÓN GENERAL (Común) -->
-    <h3 class="form-section-title">Información General</h3>
+        <!-- Hidden ID field for updates -->
+        {% if not is_new %}
+        {% if tipo == 'clientes' %}
+        <input type="hidden" name="ID" value="{{ item.get('ID', '') }}">
+        {% else %}
+        <input type="hidden" name="folio" value="{{ item.get('folio', '') }}">
+        {% endif %}
+        {% endif %}
 
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Nombre Empresa / Negocio</label>
-            <input type="text" name="nombre_empresa" value="{{ item.get('nombre_empresa', '') }}" required
-                class="form-input" {% if not is_new %}disabled{% endif %} placeholder="Ej. Abarrotes Don Pepe">
+        <!-- 1. INFORMACIÓN GENERAL (Común) -->
+        <h3 class="form-section-title">Información General</h3>
+
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Nombre Empresa / Negocio</label>
+                <input type="text" name="nombre_empresa" value="{{ item.get('nombre_empresa', '') }}" required
+                    class="form-input" {% if not is_new %}disabled{% endif %} placeholder="Ej. Abarrotes Don Pepe">
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Tipo Empresa / Giro</label>
+                <input type="text" name="tipo_empresa" value="{{ item.get('tipo_empresa', '') }}" class="form-input" {%
+                    if not is_new %}disabled{% endif %} placeholder="Ej. Restaurante, Taller...">
+            </div>
         </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Tipo Empresa / Giro</label>
-            <input type="text" name="tipo_empresa" value="{{ item.get('tipo_empresa', '') }}" class="form-input" {% if
-                not is_new %}disabled{% endif %} placeholder="Ej. Restaurante, Taller...">
+
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Teléfono</label>
+                <input type="text" name="telefono_empresa" value="{{ item.get('telefono_empresa', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %} placeholder="Ej. 55 1234 5678">
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Dirección Completa</label>
+                <input type="text" name="direccion_empresa" value="{{ item.get('direccion_empresa', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}
+                    placeholder="Calle, Número, Colonia, Municipio...">
+            </div>
         </div>
+
+        <!-- CAMPOS EXCLUSIVOS PARA CLIENTES -->
+        {% if tipo == 'clientes' %}
+
+        <!-- 2. DATOS FISCALES Y ADMINISTRATIVOS -->
+        <h3 class="form-section-title mt-6">Datos Fiscales y Administrativos</h3>
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Razón Social</label>
+                <input type="text" name="razon_social" value="{{ item.get('razon_social', '') }}" class="form-input" {%
+                    if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Giro / Licencia</label>
+                <input type="text" name="giro_licencia" value="{{ item.get('giro_licencia', '') }}" class="form-input"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">NIS (Contrato Agua)</label>
+                <input type="text" name="nis" value="{{ item.get('nis', '') }}" class="form-input" {% if not is_new
+                    %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">No. Permiso Descargas</label>
+                <input type="text" name="no_permiso_descargas" value="{{ item.get('no_permiso_descargas', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Vigencia Permiso</label>
+                <input type="text" name="vegencia_permiso_descargas"
+                    value="{{ item.get('vegencia_permiso_descargas', '') }}" class="form-input" placeholder="dd/mm/aaaa"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Hora Apertura</label>
+                <input type="text" name="hora_apertura" value="{{ item.get('hora_apertura', '') }}" class="form-input"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Hora Cierre</label>
+                <input type="text" name="hora_cierre" value="{{ item.get('hora_cierre', '') }}" class="form-input" {% if
+                    not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <!-- 3. INFRAESTRUCTURA DE ALMACENAMIENTO -->
+        <h3 class="form-section-title mt-6">Infraestructura Hidráulica</h3>
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Total Cisternas</label>
+                <input type="text" name="total_cisternas" value="{{ item.get('total_cisternas', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Capacidad Cisternas</label>
+                <input type="text" name="cap_cisternas" value="{{ item.get('cap_cisternas', '') }}" class="form-input"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Total Tinacos</label>
+                <input type="text" name="total_tinacos" value="{{ item.get('total_tinacos', '') }}" class="form-input"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Capacidad Tinacos</label>
+                <input type="text" name="cap_tinacos" value="{{ item.get('cap_tinacos', '') }}" class="form-input" {% if
+                    not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <!-- 4. ABASTECIMIENTO -->
+        <h3 class="form-section-title mt-6">Abastecimiento de Agua</h3>
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Pozo</label>
+                <input type="text" name="pozo" value="{{ item.get('pozo', '') }}" class="form-input" placeholder="Si/No"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Num. Concesión Pozo</label>
+                <input type="text" name="num_concesion_pozo" value="{{ item.get('num_concesion_pozo', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <div class="grid-3 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Pipas</label>
+                <input type="text" name="pipas" value="{{ item.get('pipas', '') }}" class="form-input"
+                    placeholder="Si/No" {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Prom. Pipas/Mes</label>
+                <input type="text" name="prom_pipas_mes" value="{{ item.get('prom_pipas_mes', '') }}" class="form-input"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Capacidad Pipas</label>
+                <input type="text" name="capacidad_pipas" value="{{ item.get('capacidad_pipas', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Red Municipal</label>
+                <input type="text" name="red" value="{{ item.get('red', '') }}" class="form-input" placeholder="Si/No"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Num. Tomas</label>
+                <input type="text" name="num_tomas" value="{{ item.get('num_tomas', '') }}" class="form-input" {% if not
+                    is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Medidor de Agua (Si/No)</label>
+                <!-- Note: Key has trailing space in CSV 'medidor_agua ' -->
+                <input type="text" name="medidor_agua " value="{{ item.get('medidor_agua ', '') }}" class="form-input"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">No. Serie Medidor</label>
+                <input type="text" name="no_serie_medidor" value="{{ item.get('no_serie_medidor', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <!-- 5. DESCARGAS, REGISTROS Y AGUAS RESIDUALES -->
+        <h3 class="form-section-title mt-6">Descargas y Aguas Residuales</h3>
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Prom. Descarga Municipal</label>
+                <input type="text" name="prom_descarga_muni" value="{{ item.get('prom_descarga_muni', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Tiene Medidor Descargas</label>
+                <input type="text" name="tiene_medidor_descargas" value="{{ item.get('tiene_medidor_descargas', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">¿Tiene Registro?</label>
+                <input type="text" name="tiene_registro" value="{{ item.get('tiene_registro', '') }}" class="form-input"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Localización Registro</label>
+                <input type="text" name="localización_registro" value="{{ item.get('localización_registro', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <div class="grid-3 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">Profundidad Reg.</label>
+                <input type="text" name="profundidad_registro" value="{{ item.get('profundidad_registro', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Diámetro Reg.</label>
+                <input type="text" name="diametro_registro" value="{{ item.get('diametro_registro', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Material Reg.</label>
+                <input type="text" name="material_registro" value="{{ item.get('material_registro', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">No. Trampas Grasa</label>
+                <input type="text" name="no_trampas_grasa" value="{{ item.get('no_trampas_grasa', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Cap. Trampas</label>
+                <input type="text" name="cap_trampas" value="{{ item.get('cap_trampas', '') }}" class="form-input" {% if
+                    not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        <div class="grid-2 mb-4">
+            <div class="form-group">
+                <label class="form-label mb-1">¿Tiene Comedor?</label>
+                <input type="text" name="tiene_comedor" value="{{ item.get('tiene_comedor', '') }}" class="form-input"
+                    {% if not is_new %}disabled{% endif %}>
+            </div>
+            <div class="form-group">
+                <label class="form-label mb-1">Mecanismos Ahorro</label>
+                <input type="text" name="mecanismos_ahorro" value="{{ item.get('mecanismos_ahorro', '') }}"
+                    class="form-input" {% if not is_new %}disabled{% endif %}>
+            </div>
+        </div>
+
+        {% endif %} <!-- Fin de campos exclusivos de Clientes -->
+
+        <div class="text-right mt-8 flex justify-end gap-4">
+            <a href="{{ url_for('ver_directorio', tipo=tipo) }}" class="btn btn-secondary">Volver</a>
+            <button type="submit" class="btn btn-primary {% if not is_new %}hidden{% endif %}" id="btn-submit">
+                {{ 'Guardar' if is_new else 'Guardar Cambios' }}
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- PESTAÑA 2: COTIZACIONES -->
+<div id="tab-cotizaciones" class="tab-content hidden">
+    <div class="card table-container">
+        <h3>Historial de Cotizaciones</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Folio</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Items</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if cotizaciones %}
+                {% for data in cotizaciones %}
+                <tr>
+                    <td><strong>{{ data.folio_cot }}</strong></td>
+                    <td>{{ data.fecha_cot }}</td>
+                    <td>${{ data.total }}</td>
+                    <td>{{ data.items_count }}</td>
+                    <td>
+                        <a href="{{ url_for('detalle_cotizacion', folio=data.folio_cot) }}"
+                            class="btn btn-secondary btn-small">Ver Cotización</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted p-8">No hay cotizaciones registradas.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- PESTAÑA 3: ORDENES DE TRABAJO -->
+<div id="tab-ordenes" class="tab-content hidden">
+    <div class="card table-container mb-6">
+        <h3 class="mb-2">Desazolves</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Folio</th>
+                    <th>Fecha</th>
+                    <th>Ubicación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if ordenes_des %}
+                {% for orden in ordenes_des|reverse %}
+                <tr>
+                    <td><strong>{{ orden.folio_des }}</strong></td>
+                    <td>{{ orden.fecha_des }}</td>
+                    <td>{{ orden.ubicacion_area }}</td>
+                    <td>
+                        <a href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_des) }}"
+                            class="btn btn-secondary btn-small">Ver Detalle</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No hay órdenes.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
 
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Teléfono</label>
-            <input type="text" name="telefono_empresa" value="{{ item.get('telefono_empresa', '') }}" class="form-input"
-                {% if not is_new %}disabled{% endif %} placeholder="Ej. 55 1234 5678">
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Dirección Completa</label>
-            <input type="text" name="direccion_empresa" value="{{ item.get('direccion_empresa', '') }}"
-                class="form-input" {% if not is_new %}disabled{% endif %}
-                placeholder="Calle, Número, Colonia, Municipio...">
-        </div>
+    <div class="card table-container mb-6">
+        <h3 class="mb-2">Trampas de Grasa</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Folio</th>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Capacidad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if ordenes_trampa %}
+                {% for orden in ordenes_trampa|reverse %}
+                <tr>
+                    <td><strong>{{ orden.folio_lt }}</strong></td>
+                    <td>{{ orden.fecha_lt }}</td>
+                    <td>{{ orden.tipo_trampa }}</td>
+                    <td>{{ orden.capacidad_trampa }}</td>
+                    <td>
+                        <a href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_lt) }}"
+                            class="btn btn-secondary btn-small">Ver Detalle</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No hay órdenes.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
 
-    <!-- CAMPOS EXCLUSIVOS PARA CLIENTES -->
-    {% if tipo == 'clientes' %}
-
-    <!-- 2. DATOS FISCALES Y ADMINISTRATIVOS -->
-    <h3 class="form-section-title mt-6">Datos Fiscales y Administrativos</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Razón Social</label>
-            <input type="text" name="razon_social" value="{{ item.get('razon_social', '') }}" class="form-input" {% if
-                not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Giro / Licencia</label>
-            <input type="text" name="giro_licencia" value="{{ item.get('giro_licencia', '') }}" class="form-input" {% if
-                not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">NIS (Contrato Agua)</label>
-            <input type="text" name="nis" value="{{ item.get('nis', '') }}" class="form-input" {% if not is_new
-                %}disabled{% endif %}>
-        </div>
+    <div class="card table-container">
+        <h3 class="mb-2">Visitas Técnicas</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Folio</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if ordenes_visita %}
+                {% for orden in ordenes_visita|reverse %}
+                <tr>
+                    <td><strong>{{ orden.folio_vt }}</strong></td>
+                    <td>{{ orden.fecha_vt }}</td>
+                    <td>
+                        <a href="{{ url_for('detalle_orden', tipo='visita', folio=orden.folio_vt) }}"
+                            class="btn btn-secondary btn-small">Ver Detalle</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No hay visitas.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
+</div>
 
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">No. Permiso Descargas</label>
-            <input type="text" name="no_permiso_descargas" value="{{ item.get('no_permiso_descargas', '') }}"
-                class="form-input" {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Vigencia Permiso</label>
-            <input type="text" name="vegencia_permiso_descargas"
-                value="{{ item.get('vegencia_permiso_descargas', '') }}" class="form-input" placeholder="dd/mm/aaaa" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
+<!-- PESTAÑA 4: TARIFICADOR -->
+<div id="tab-tarificador" class="tab-content hidden">
+    <div class="card table-container">
+        <h3>Informes de Tarificación</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Folio</th>
+                    <th>Fecha</th>
+                    <th>Precio m3</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if tarificadores %}
+                {% for data in tarificadores %}
+                <tr>
+                    <td><strong>{{ data.folio_tar }}</strong></td>
+                    <td>{{ data.fecha_tar }}</td>
+                    <td>${{ data.precio_m3_total }}</td>
+                    <td>
+                        <a href="{{ url_for('detalle_tarificador', folio=data.folio_tar) }}"
+                            class="btn btn-secondary btn-small">Ver Detalle</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted p-8">No hay registros.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
+</div>
 
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Hora Apertura</label>
-            <input type="text" name="hora_apertura" value="{{ item.get('hora_apertura', '') }}" class="form-input" {% if
-                not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Hora Cierre</label>
-            <input type="text" name="hora_cierre" value="{{ item.get('hora_cierre', '') }}" class="form-input" {% if not
-                is_new %}disabled{% endif %}>
-        </div>
+<!-- PESTAÑA 5: PERMISOS DE DESCARGA -->
+<div id="tab-permisos" class="tab-content hidden">
+    <div class="card table-container">
+        <h3>Permisos de Descarga</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>NIS</th>
+                    <th>Propietario</th>
+                    <th>Fecha Acuse</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if permisos %}
+                {% for p in permisos %}
+                <tr>
+                    <td><strong>{{ p.nis }}</strong></td>
+                    <td>{{ p.arr_nombre or p.prop_nombre }}</td>
+                    <td>{{ p.fecha_acuse }}</td>
+                    <td>
+                        <a href="{{ url_for('detalle_permiso_descarga', nis=p.nis) }}"
+                            class="btn btn-secondary btn-small">Ver Detalle</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted p-8">No hay permisos.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
+</div>
 
-    <!-- 3. INFRAESTRUCTURA DE ALMACENAMIENTO -->
-    <h3 class="form-section-title mt-6">Infraestructura Hidráulica</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Total Cisternas</label>
-            <input type="text" name="total_cisternas" value="{{ item.get('total_cisternas', '') }}" class="form-input"
-                {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Capacidad Cisternas</label>
-            <input type="text" name="cap_cisternas" value="{{ item.get('cap_cisternas', '') }}" class="form-input" {% if
-                not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Total Tinacos</label>
-            <input type="text" name="total_tinacos" value="{{ item.get('total_tinacos', '') }}" class="form-input" {% if
-                not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Capacidad Tinacos</label>
-            <input type="text" name="cap_tinacos" value="{{ item.get('cap_tinacos', '') }}" class="form-input" {% if not
-                is_new %}disabled{% endif %}>
-        </div>
+<!-- PESTAÑA 6: CONSUMOS DE AGUA -->
+<div id="tab-consumos" class="tab-content hidden">
+    <div class="card table-container">
+        <h3>Consumos de Agua</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Folio</th>
+                    <th>Fecha Lectura</th>
+                    <th>Consumo (m³)</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if consumos %}
+                {% for data in consumos %}
+                <tr>
+                    <td><strong>{{ data.folio }}</strong></td>
+                    <td>{{ data.fecha_lectura }}</td>
+                    <td>{{ data.consumo }}</td>
+                    <td>
+                        <a href="{{ url_for('detalle_consumo', folio=data.folio) }}"
+                            class="btn btn-secondary btn-small">Ver Consumo</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted p-8">No hay consumos.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
-
-    <!-- 4. ABASTECIMIENTO -->
-    <h3 class="form-section-title mt-6">Abastecimiento de Agua</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Pozo</label>
-            <input type="text" name="pozo" value="{{ item.get('pozo', '') }}" class="form-input" placeholder="Si/No" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Num. Concesión Pozo</label>
-            <input type="text" name="num_concesion_pozo" value="{{ item.get('num_concesion_pozo', '') }}"
-                class="form-input" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="grid-3 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Pipas</label>
-            <input type="text" name="pipas" value="{{ item.get('pipas', '') }}" class="form-input" placeholder="Si/No"
-                {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Prom. Pipas/Mes</label>
-            <input type="text" name="prom_pipas_mes" value="{{ item.get('prom_pipas_mes', '') }}" class="form-input" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Capacidad Pipas</label>
-            <input type="text" name="capacidad_pipas" value="{{ item.get('capacidad_pipas', '') }}" class="form-input"
-                {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Red Municipal</label>
-            <input type="text" name="red" value="{{ item.get('red', '') }}" class="form-input" placeholder="Si/No" {% if
-                not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Num. Tomas</label>
-            <input type="text" name="num_tomas" value="{{ item.get('num_tomas', '') }}" class="form-input" {% if not
-                is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Medidor de Agua (Si/No)</label>
-            <!-- Note: Key has trailing space in CSV 'medidor_agua ' -->
-            <input type="text" name="medidor_agua " value="{{ item.get('medidor_agua ', '') }}" class="form-input" {% if
-                not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">No. Serie Medidor</label>
-            <input type="text" name="no_serie_medidor" value="{{ item.get('no_serie_medidor', '') }}" class="form-input"
-                {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <!-- 5. DESCARGAS, REGISTROS Y AGUAS RESIDUALES -->
-    <h3 class="form-section-title mt-6">Descargas y Aguas Residuales</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Prom. Descarga Municipal</label>
-            <input type="text" name="prom_descarga_muni" value="{{ item.get('prom_descarga_muni', '') }}"
-                class="form-input" {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Tiene Medidor Descargas</label>
-            <input type="text" name="tiene_medidor_descargas" value="{{ item.get('tiene_medidor_descargas', '') }}"
-                class="form-input" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">¿Tiene Registro?</label>
-            <input type="text" name="tiene_registro" value="{{ item.get('tiene_registro', '') }}" class="form-input" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Localización Registro</label>
-            <input type="text" name="localización_registro" value="{{ item.get('localización_registro', '') }}"
-                class="form-input" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="grid-3 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">Profundidad Reg.</label>
-            <input type="text" name="profundidad_registro" value="{{ item.get('profundidad_registro', '') }}"
-                class="form-input" {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Diámetro Reg.</label>
-            <input type="text" name="diametro_registro" value="{{ item.get('diametro_registro', '') }}"
-                class="form-input" {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Material Reg.</label>
-            <input type="text" name="material_registro" value="{{ item.get('material_registro', '') }}"
-                class="form-input" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">No. Trampas Grasa</label>
-            <input type="text" name="no_trampas_grasa" value="{{ item.get('no_trampas_grasa', '') }}" class="form-input"
-                {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Cap. Trampas</label>
-            <input type="text" name="cap_trampas" value="{{ item.get('cap_trampas', '') }}" class="form-input" {% if not
-                is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label class="form-label mb-1">¿Tiene Comedor?</label>
-            <input type="text" name="tiene_comedor" value="{{ item.get('tiene_comedor', '') }}" class="form-input" {% if
-                not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label class="form-label mb-1">Mecanismos Ahorro</label>
-            <input type="text" name="mecanismos_ahorro" value="{{ item.get('mecanismos_ahorro', '') }}"
-                class="form-input" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    {% endif %} <!-- Fin de campos exclusivos de Clientes -->
-
-    <div class="text-right mt-8 flex justify-end gap-4">
-        <a href="{{ url_for('ver_directorio', tipo=tipo) }}" class="btn btn-secondary">Volver</a>
-        <button type="submit" class="btn btn-primary {% if not is_new %}hidden{% endif %}" id="btn-submit">
-            {{ 'Guardar' if is_new else 'Guardar Cambios' }}
-        </button>
-    </div>
-
-</form>
+</div>
 
 <script>
     function enableEdit() {
@@ -286,6 +549,27 @@
 
         const btnEdit = document.getElementById('btn-editar');
         if (btnEdit) btnEdit.classList.add('hidden');
+    }
+
+    function showTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        // Show selected
+        document.getElementById('tab-' + tabName).classList.remove('hidden');
+
+        // Update Nav Buttons
+        document.querySelectorAll('button[id^="btn-"]').forEach(btn => {
+            if (btn.id !== 'btn-submit' && btn.id !== 'btn-editar') {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-secondary');
+            }
+        });
+
+        const activeBtn = document.getElementById('btn-' + tabName);
+        if (activeBtn) {
+            activeBtn.classList.remove('btn-secondary');
+            activeBtn.classList.add('btn-primary');
+        }
     }
 </script>
 {% endblock %}

@@ -1385,7 +1385,8 @@ def detalle_directorio(tipo, id_val):
     data = read_csv(csv_file)
     
     # Find item
-    key = 'ID' if tipo == 'clientes' else 'folio'
+    # Find item
+    key = 'id_cliente' if tipo == 'clientes' else 'folio'
     item = next((r for r in data if str(r.get(key, '')).strip() == str(id_val).strip()), None)
     
     # Fallback to name if not found by ID (for records with missing IDs like KHEIRO)
@@ -1396,8 +1397,59 @@ def detalle_directorio(tipo, id_val):
     if not item:
         flash('Registro no encontrado.', 'error')
         return redirect(url_for('ver_directorio', tipo=tipo))
+
+    # Load Related Data for Clients
+    related_data = {}
+    if tipo == 'clientes' and item:
+        client_id = item.get('id_cliente', '').strip()
+        client_name = item.get('nombre_empresa', '').strip().lower()
         
-    return render_template('crear_directorio.html', tipo=tipo, is_new=False, item=item)
+        def filter_rows(rows, id_keys, name_key='nombre_cliente'):
+            res = []
+            seen_ids = set() # For avoiding duplicates if multiple lines per entity (like quot items)
+            # But duplicate check depends on entity type. 
+            # For simplicity, filtering all rows here, dedupe later if needed.
+            for r in rows:
+                # Check IDs
+                match = False
+                if client_id:
+                    for k in id_keys:
+                        if r.get(k, '').strip() == client_id:
+                            match = True
+                            break
+                if not match and client_name:
+                    if client_name == r.get(name_key, '').strip().lower():
+                        match = True
+                
+                if match:
+                    res.append(r)
+            return res
+
+        # Cotizaciones (Deduplicate by folio_cot)
+        raw_cots = filter_rows(read_csv(COTIZACIONES_CSV), ['id_cliente'], 'nombre_cliente')
+        unique_cots = {}
+        for c in raw_cots:
+            f = c.get('folio_cot')
+            if f and f not in unique_cots:
+                unique_cots[f] = c
+        related_data['cotizaciones'] = list(unique_cots.values())
+
+        # Ordenes
+        related_data['ordenes_des'] = filter_rows(read_csv(ORDENES_CSV), ['no_cliente'], 'nombre_cliente')
+        related_data['ordenes_trampa'] = filter_rows(read_csv(TRAMPAS_CSV), ['no_cliente'], 'nombre_cliente')
+        # Visitas (maybe not requested explicitly but good to have)
+        related_data['ordenes_visita'] = filter_rows(read_csv(VISITAS_CSV), ['no_cliente'], 'nombre_cliente')
+
+        # Tarificador
+        related_data['tarificadores'] = filter_rows(read_csv(TARIFICADOR_CSV), ['no_cliente'], 'nombre_cliente')
+
+        # Permisos (Name key might be nombre_empresa)
+        related_data['permisos'] = filter_rows(read_csv(PERMISOS_CSV), ['nis'], 'nombre_empresa')
+
+        # Consumos
+        related_data['consumos'] = filter_rows(read_csv(CONSUMOS_CSV), ['ID_cliente'], 'nombre_cliente')
+        
+    return render_template('crear_directorio.html', tipo=tipo, is_new=False, item=item, **related_data)
 
 @app.route('/directorio/guardar/<tipo>', methods=['POST'])
 def guardar_directorio(tipo):
@@ -1409,12 +1461,12 @@ def guardar_directorio(tipo):
         headers = list(existing[0].keys())
     else:
         if tipo == 'clientes':
-            headers = ['ID', 'nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa', 'razon_social']
+            headers = ['id_cliente', 'nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa', 'razon_social']
         else:
             headers = ['folio', 'nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa']
             
     # Check if update or new
-    key = 'ID' if tipo == 'clientes' else 'folio'
+    key = 'id_cliente' if tipo == 'clientes' else 'folio'
     id_val = request.form.get(key)
     
     # Handle new fields from form not in headers
