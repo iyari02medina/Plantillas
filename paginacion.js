@@ -48,6 +48,7 @@ async function checkPageOverflow(page, pageNum) {
 
     // Para Grids de Imágenes aislados, permitimos un poco más de espacio
     const LIMITE_PERMISIVO_IMAGENES = 940;
+    const LIMITE_TABLAS = 980;
 
     const children = Array.from(contentWrapper.children).filter(el =>
         el.nodeType === 1 && el !== footer && el.tagName !== 'SCRIPT' && !el.classList.contains('top-bar')
@@ -67,7 +68,11 @@ async function checkPageOverflow(page, pageNum) {
             child.classList.contains('images-column') ||
             child.classList.contains('photo-grid');
 
-        const limiteActual = esGridImagenes ? LIMITE_PERMISIVO_IMAGENES : PIXEL_DE_LA_MUERTE;
+        const esTabla = child.classList.contains('table-container') || child.classList.contains('table-container-alcance-table');
+
+        let limiteActual = PIXEL_DE_LA_MUERTE;
+        if (esGridImagenes) limiteActual = LIMITE_PERMISIVO_IMAGENES;
+        if (esTabla) limiteActual = LIMITE_TABLAS;
 
         // Caso: Salto de página forzado manual
         if (child.classList.contains('force-break')) {
@@ -170,6 +175,43 @@ async function checkPageOverflow(page, pageNum) {
 
             // ESTRATEGIA 2: Si no es divisible o no cabía ni el primer elemento, MOVER TODO
             if (i > firstContentIdx) {
+
+                // --- PROTECCIÓN DE HUÉRFANOS (Tabla + Totales) ---
+                // Si el elemento que causa el salto es "financial-summary" (o similar) y el anterior es una tabla,
+                // tratamos de llevar una fila de la tabla para que no quede sola.
+                const prev = children[i - 1];
+                if (prev && (prev.classList.contains('table-container') || prev.classList.contains('table-container-alcance-table'))) {
+                    const table = prev.querySelector('table');
+                    if (table && table.tBodies[0]) {
+                        const rows = Array.from(table.tBodies[0].rows);
+                        if (rows.length > 0) {
+                            console.log("Protección de huérfanos: Moviendo última fila de tabla junto con el bloque siguiente.");
+
+                            const newPage = createNewPageFrom(page);
+                            const nextNum = pageNum + 1;
+                            updatePageCounter(newPage, nextNum);
+
+                            if (rows.length === 1) {
+                                // Si solo queda 1 fila, movemos TODA la tabla
+                                moveSiblingsToPage(children.slice(i - 1), newPage);
+                            } else {
+                                // Movemos solo la última fila
+                                const lastRow = rows[rows.length - 1];
+                                // removeRow del DOM actual se hace auto al appendChild en newPage? 
+                                // moveTableRowsToPage hace appendChild, lo cual mueve el nodo.
+                                moveTableRowsToPage([lastRow], newPage, prev);
+
+                                // Y movemos el contenido actual que no cabía
+                                moveSiblingsToPage(children.slice(i), newPage);
+                            }
+
+                            await new Promise(r => setTimeout(r, 50));
+                            await checkPageOverflow(newPage, nextNum);
+                            return;
+                        }
+                    }
+                }
+
                 console.log(`Elemento ${child.className || child.tagName} toca ${relativeBottom.toFixed(0)}px y no es divisible o no cabe inicio. Moviendo bloque completo.`);
                 const newPage = createNewPageFrom(page);
                 const nextNum = pageNum + 1;
