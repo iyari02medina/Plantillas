@@ -1,649 +1,652 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
+
+{% block title %}{{ 'Nuevo' if is_new else 'Detalle' }} {{ 'Cliente' if tipo == 'clientes' else 'Prospecto' }} - Sistema
+Cophi{% endblock %}
 
 {% block content %}
-<header class="flex justify-between items-center">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
-        <h1>{{ 'Nuevo Cliente' if is_new and tipo == 'clientes' else 'Nuevo Prospecto' if is_new else 'Detalle de
-            Cliente' if tipo == 'clientes' else 'Detalle de Prospecto' }}</h1>
-        <p class="subtitle">
-            {% if is_new %}Ingrese los datos para registrar.{% else %}Consulta y edita los detalles.{% endif %}
+        <div class="flex items-center gap-2 mb-1">
+            <a href="{{ url_for('ver_directorio', tipo=tipo) }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
+                <span class="icon-[tabler--arrow-left] size-5"></span>
+            </a>
+            <h1 class="text-3xl font-bold text-base-content">{{ 'Registro de' if is_new else 'Detalle de' }} {{
+                'Cliente' if tipo == 'clientes' else 'Prospecto' }}</h1>
+        </div>
+        <p class="text-base-content/60 font-medium ml-10">
+            {% if is_new %}Ingrese los datos para registrar un nuevo registro en el directorio.{% else %}Gestión
+            integral del perfil del cliente y documentos relacionados.{% endif %}
         </p>
     </div>
     {% if not is_new %}
-    <div class="flex gap-4">
-        <button type="button" class="btn btn-primary" onclick="enableEdit()" id="btn-editar">Editar</button>
+    <div class="flex gap-2">
+        <button type="button" class="btn btn-primary shadow-sm" onclick="enableEdit()" id="btn-editar">
+            <span class="icon-[tabler--edit] size-5"></span>
+            Editar Datos
+        </button>
     </div>
     {% endif %}
-</header>
+</div>
 
-<!-- Menú de Navegación (Tabs) -->
+<!-- Navegación de Pestañas (Sticky) -->
 {% if not is_new %}
-<div style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-    <button onclick="showTab('general')" id="btn-general" class="btn btn-primary">Información General</button>
-    <button onclick="showTab('cotizaciones')" id="btn-cotizaciones" class="btn btn-secondary">Cotizaciones</button>
-    <button onclick="showTab('ordenes')" id="btn-ordenes" class="btn btn-secondary">Órdenes de Trabajo</button>
-    <button onclick="showTab('tarificador')" id="btn-tarificador" class="btn btn-secondary">Tarificador</button>
-    <button onclick="showTab('permisos')" id="btn-permisos" class="btn btn-secondary">Permisos de Descarga</button>
-    <button onclick="showTab('consumos')" id="btn-consumos" class="btn btn-secondary">Consumos de Agua</button>
+<div class="sticky top-0 z-20 bg-base-100/80 backdrop-blur-md pb-4 mb-8 border-b border-base-content/10">
+    <div class="flex flex-nowrap overflow-x-auto gap-2 py-2 no-scrollbar">
+        <button onclick="showTab('general')" id="btn-general" class="btn btn-primary btn-sm md:btn-md rounded-full">
+            <span class="icon-[tabler--info-circle] size-4"></span>
+            General
+        </button>
+        <button onclick="showTab('cotizaciones')" id="btn-cotizaciones"
+            class="btn btn-ghost btn-sm md:btn-md rounded-full border border-transparent hover:border-base-content/10">
+            <span class="icon-[tabler--file-description] size-4"></span>
+            Cotizaciones
+        </button>
+        <button onclick="showTab('ordenes')" id="btn-ordenes"
+            class="btn btn-ghost btn-sm md:btn-md rounded-full border border-transparent hover:border-base-content/10">
+            <span class="icon-[tabler--clipboard-list] size-4"></span>
+            Órdenes
+        </button>
+        <button onclick="showTab('tarificador')" id="btn-tarificador"
+            class="btn btn-ghost btn-sm md:btn-md rounded-full border border-transparent hover:border-base-content/10">
+            <span class="icon-[tabler--calculator] size-4"></span>
+            Tarificador
+        </button>
+        <button onclick="showTab('permisos')" id="btn-permisos"
+            class="btn btn-ghost btn-sm md:btn-md rounded-full border border-transparent hover:border-base-content/10">
+            <span class="icon-[tabler--file-check] size-4"></span>
+            Permisos
+        </button>
+        <button onclick="showTab('consumos')" id="btn-consumos"
+            class="btn btn-ghost btn-sm md:btn-md rounded-full border border-transparent hover:border-base-content/10">
+            <span class="icon-[tabler--droplet] size-4"></span>
+            Consumos
+        </button>
+    </div>
 </div>
 {% endif %}
 
-<!-- PESTAÑA 1: INFORMACIÓN GENERAL -->
-<div id="tab-general" class="tab-content">
-    <form action="{{ url_for('guardar_directorio', tipo=tipo) }}" method="POST" class="card">
+<!-- SECCIONES DE CONTENIDO -->
+<div class="space-y-8 pb-20">
 
-        <!-- Hidden ID field for updates -->
-        {% if not is_new %}
-        {% if tipo == 'clientes' %}
-        <input type="hidden" name="ID" value="{{ item.get('ID', '') }}">
-        {% else %}
-        <input type="hidden" name="folio" value="{{ item.get('folio', '') }}">
-        {% endif %}
-        {% endif %}
-
-        <!-- 1. INFORMACIÓN GENERAL (Común) -->
-        <h3 class="form-section-title">Información General</h3>
-
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Nombre Empresa / Negocio</label>
-                <input type="text" name="nombre_empresa" value="{{ item.get('nombre_empresa', '') }}" required
-                    class="form-input" {% if not is_new %}disabled{% endif %} placeholder="Ej. Abarrotes Don Pepe">
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Tipo Empresa / Giro</label>
-                <input type="text" name="tipo_empresa" value="{{ item.get('tipo_empresa', '') }}" class="form-input" {%
-                    if not is_new %}disabled{% endif %} placeholder="Ej. Restaurante, Taller...">
-            </div>
-        </div>
-
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Teléfono</label>
-                <input type="text" name="telefono_empresa" value="{{ item.get('telefono_empresa', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %} placeholder="Ej. 55 1234 5678">
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Dirección Completa</label>
-                <input type="text" name="direccion_empresa" value="{{ item.get('direccion_empresa', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}
-                    placeholder="Calle, Número, Colonia, Municipio...">
-            </div>
-        </div>
-
-        <!-- CAMPOS EXCLUSIVOS PARA CLIENTES -->
-        {% if tipo == 'clientes' %}
-
-        <!-- 2. DATOS FISCALES Y ADMINISTRATIVOS -->
-        <h3 class="form-section-title mt-6">Datos Fiscales y Administrativos</h3>
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Razón Social</label>
-                <input type="text" name="razon_social" value="{{ item.get('razon_social', '') }}" class="form-input" {%
-                    if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Giro / Licencia</label>
-                <input type="text" name="giro_licencia" value="{{ item.get('giro_licencia', '') }}" class="form-input"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">NIS (Contrato Agua)</label>
-                <input type="text" name="nis" value="{{ item.get('nis', '') }}" class="form-input" {% if not is_new
-                    %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">No. Permiso Descargas</label>
-                <input type="text" name="no_permiso_descargas" value="{{ item.get('no_permiso_descargas', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Vigencia Permiso</label>
-                <input type="text" name="vegencia_permiso_descargas"
-                    value="{{ item.get('vegencia_permiso_descargas', '') }}" class="form-input" placeholder="dd/mm/aaaa"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Hora Apertura</label>
-                <input type="text" name="hora_apertura" value="{{ item.get('hora_apertura', '') }}" class="form-input"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Hora Cierre</label>
-                <input type="text" name="hora_cierre" value="{{ item.get('hora_cierre', '') }}" class="form-input" {% if
-                    not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <!-- 3. INFRAESTRUCTURA DE ALMACENAMIENTO -->
-        <h3 class="form-section-title mt-6">Infraestructura Hidráulica</h3>
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Total Cisternas</label>
-                <input type="text" name="total_cisternas" value="{{ item.get('total_cisternas', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Capacidad Cisternas</label>
-                <input type="text" name="cap_cisternas" value="{{ item.get('cap_cisternas', '') }}" class="form-input"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Total Tinacos</label>
-                <input type="text" name="total_tinacos" value="{{ item.get('total_tinacos', '') }}" class="form-input"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Capacidad Tinacos</label>
-                <input type="text" name="cap_tinacos" value="{{ item.get('cap_tinacos', '') }}" class="form-input" {% if
-                    not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <!-- 4. ABASTECIMIENTO -->
-        <h3 class="form-section-title mt-6">Abastecimiento de Agua</h3>
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Pozo</label>
-                <input type="text" name="pozo" value="{{ item.get('pozo', '') }}" class="form-input" placeholder="Si/No"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Num. Concesión Pozo</label>
-                <input type="text" name="num_concesion_pozo" value="{{ item.get('num_concesion_pozo', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <div class="grid-3 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Pipas</label>
-                <input type="text" name="pipas" value="{{ item.get('pipas', '') }}" class="form-input"
-                    placeholder="Si/No" {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Prom. Pipas/Mes</label>
-                <input type="text" name="prom_pipas_mes" value="{{ item.get('prom_pipas_mes', '') }}" class="form-input"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Capacidad Pipas</label>
-                <input type="text" name="capacidad_pipas" value="{{ item.get('capacidad_pipas', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Red Municipal</label>
-                <input type="text" name="red" value="{{ item.get('red', '') }}" class="form-input" placeholder="Si/No"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Num. Tomas</label>
-                <input type="text" name="num_tomas" value="{{ item.get('num_tomas', '') }}" class="form-input" {% if not
-                    is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Medidor de Agua (Si/No)</label>
-                <!-- Note: Key has trailing space in CSV 'medidor_agua ' -->
-                <input type="text" name="medidor_agua " value="{{ item.get('medidor_agua ', '') }}" class="form-input"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">No. Serie Medidor</label>
-                <input type="text" name="no_serie_medidor" value="{{ item.get('no_serie_medidor', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <!-- 5. DESCARGAS, REGISTROS Y AGUAS RESIDUALES -->
-        <h3 class="form-section-title mt-6">Descargas y Aguas Residuales</h3>
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Prom. Descarga Municipal</label>
-                <input type="text" name="prom_descarga_muni" value="{{ item.get('prom_descarga_muni', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Tiene Medidor Descargas</label>
-                <input type="text" name="tiene_medidor_descargas" value="{{ item.get('tiene_medidor_descargas', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">¿Tiene Registro?</label>
-                <input type="text" name="tiene_registro" value="{{ item.get('tiene_registro', '') }}" class="form-input"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Localización Registro</label>
-                <input type="text" name="localización_registro" value="{{ item.get('localización_registro', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <div class="grid-3 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">Profundidad Reg.</label>
-                <input type="text" name="profundidad_registro" value="{{ item.get('profundidad_registro', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Diámetro Reg.</label>
-                <input type="text" name="diametro_registro" value="{{ item.get('diametro_registro', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Material Reg.</label>
-                <input type="text" name="material_registro" value="{{ item.get('material_registro', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">No. Trampas Grasa</label>
-                <input type="text" name="no_trampas_grasa" value="{{ item.get('no_trampas_grasa', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Cap. Trampas</label>
-                <input type="text" name="cap_trampas" value="{{ item.get('cap_trampas', '') }}" class="form-input" {% if
-                    not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        <div class="grid-2 mb-4">
-            <div class="form-group">
-                <label class="form-label mb-1">¿Tiene Comedor?</label>
-                <input type="text" name="tiene_comedor" value="{{ item.get('tiene_comedor', '') }}" class="form-input"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label class="form-label mb-1">Mecanismos Ahorro</label>
-                <input type="text" name="mecanismos_ahorro" value="{{ item.get('mecanismos_ahorro', '') }}"
-                    class="form-input" {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-
-        {% endif %} <!-- Fin de campos exclusivos de Clientes -->
-
-        <div class="text-right mt-8 flex justify-end gap-4">
-            <a href="{{ url_for('ver_directorio', tipo=tipo) }}" class="btn btn-secondary">Volver</a>
-            <button type="submit" class="btn btn-primary {% if not is_new %}hidden{% endif %}" id="btn-submit">
-                {{ 'Guardar' if is_new else 'Guardar Cambios' }}
-            </button>
-        </div>
-
-    </form>
-</div>
-
-<!-- PESTAÑA 2: COTIZACIONES -->
-<div id="tab-cotizaciones" class="tab-content hidden">
-    <div class="card table-container">
-        <h3>Historial de Cotizaciones</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Folio</th>
-                    <th>Fecha</th>
-                    <th>Total</th>
-                    <th>Items</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if cotizaciones %}
-                {% for data in cotizaciones %}
-                <tr>
-                    <td><strong>{{ data.folio_cot }}</strong></td>
-                    <td>{{ data.fecha_cot }}</td>
-                    <td>${{ data.total }}</td>
-                    <td>{{ data.items_count }}</td>
-                    <td>
-                        <a href="{{ url_for('detalle_cotizacion', folio=data.folio_cot) }}"
-                            class="btn btn-secondary btn-small">Ver Cotización</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="5" class="text-center text-muted p-8">No hay cotizaciones registradas.</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- PESTAÑA 3: ORDENES DE TRABAJO -->
-<div id="tab-ordenes" class="tab-content hidden">
-    <div class="card table-container mb-6">
-        <h3 class="mb-2">Desazolves</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Folio</th>
-                    <th>Fecha</th>
-                    <th>Ubicación</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if ordenes_des %}
-                {% for orden in ordenes_des|reverse %}
-                <tr>
-                    <td><strong>{{ orden.folio_des }}</strong></td>
-                    <td>{{ orden.fecha_des }}</td>
-                    <td>{{ orden.ubicacion_area }}</td>
-                    <td>
-                        <a href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_des) }}"
-                            class="btn btn-secondary btn-small">Ver Detalle</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="4" class="text-center text-muted">No hay órdenes.</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="card table-container mb-6">
-        <h3 class="mb-2">Trampas de Grasa</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Folio</th>
-                    <th>Fecha</th>
-                    <th>Tipo</th>
-                    <th>Capacidad</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if ordenes_trampa %}
-                {% for orden in ordenes_trampa|reverse %}
-                <tr>
-                    <td><strong>{{ orden.folio_lt }}</strong></td>
-                    <td>{{ orden.fecha_lt }}</td>
-                    <td>{{ orden.tipo_trampa }}</td>
-                    <td>{{ orden.capacidad_trampa }}</td>
-                    <td>
-                        <a href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_lt) }}"
-                            class="btn btn-secondary btn-small">Ver Detalle</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="5" class="text-center text-muted">No hay órdenes.</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="card table-container">
-        <h3 class="mb-2">Visitas Técnicas</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Folio</th>
-                    <th>Fecha</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if ordenes_visita %}
-                {% for orden in ordenes_visita|reverse %}
-                <tr>
-                    <td><strong>{{ orden.folio_vt }}</strong></td>
-                    <td>{{ orden.fecha_vt }}</td>
-                    <td>
-                        <a href="{{ url_for('detalle_orden', tipo='visita', folio=orden.folio_vt) }}"
-                            class="btn btn-secondary btn-small">Ver Detalle</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="3" class="text-center text-muted">No hay visitas.</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- PESTAÑA 4: TARIFICADOR -->
-<div id="tab-tarificador" class="tab-content hidden">
-    <div class="card table-container">
-        <h3>Informes de Tarificación</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Folio</th>
-                    <th>Fecha</th>
-                    <th>Precio m3</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if tarificadores %}
-                {% for data in tarificadores %}
-                <tr>
-                    <td><strong>{{ data.folio_tar }}</strong></td>
-                    <td>{{ data.fecha_tar }}</td>
-                    <td>${{ data.precio_m3_total }}</td>
-                    <td>
-                        <a href="{{ url_for('detalle_tarificador', folio=data.folio_tar) }}"
-                            class="btn btn-secondary btn-small">Ver Detalle</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="4" class="text-center text-muted p-8">No hay registros.</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- PESTAÑA 5: PERMISOS DE DESCARGA -->
-<div id="tab-permisos" class="tab-content hidden">
-    <div class="card table-container">
-        <h3>Permisos de Descarga</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>NIS</th>
-                    <th>Propietario</th>
-                    <th>Fecha Acuse</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if permisos %}
-                {% for p in permisos %}
-                <tr>
-                    <td><strong>{{ p.nis }}</strong></td>
-                    <td>{{ p.arr_nombre or p.prop_nombre }}</td>
-                    <td>{{ p.fecha_acuse }}</td>
-                    <td>
-                        <a href="{{ url_for('detalle_permiso_descarga', nis=p.nis) }}"
-                            class="btn btn-secondary btn-small">Ver Detalle</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="4" class="text-center text-muted p-8">No hay permisos.</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- PESTAÑA 6: CONSUMOS DE AGUA -->
-<div id="tab-consumos" class="tab-content hidden">
-
-    <!-- Widget de Tarifas y Visualizador -->
-    <div class="mb-6 grid-2" style="gap: 2rem;">
-
-        <!-- Tarjeta de Tarifas -->
-        <div class="card p-4">
-            <h4 class="mb-2 font-bold" style="color: var(--primary-color);">Tarifa Actual (Mensual)</h4>
-            {% if current_tariff %}
-            <div class="flex justify-between mb-1">
-                <span>Agua:</span>
-                <strong>${{ current_tariff.tarifa_agua }}</strong>
-            </div>
-            <div class="flex justify-between mb-1">
-                <span>Drenaje:</span>
-                <strong>${{ current_tariff.tarifa_drenaje }}</strong>
-            </div>
-            <div class="flex justify-between mb-1">
-                <span>Saneamiento:</span>
-                <strong>${{ current_tariff.tarifa_saneamiento }}</strong>
-            </div>
-            <hr class="my-2">
-            <div class="flex justify-between text-lg">
-                <span>Total:</span>
-                <strong>${{ current_tariff.total_tarifa }}</strong>
-            </div>
+    <!-- PESTAÑA 1: INFORMACIÓN GENERAL -->
+    <div id="tab-general" class="tab-content transition-all duration-300">
+        <form action="{{ url_for('guardar_directorio', tipo=tipo) }}" method="POST">
+            {% if not is_new %}
+            {% if tipo == 'clientes' %}
+            <input type="hidden" name="ID" value="{{ item.get('ID', '') }}">
             {% else %}
-            <p class="text-sm text-muted">No hay información de tarifas disponible.</p>
+            <input type="hidden" name="folio" value="{{ item.get('folio', '') }}">
             {% endif %}
-            <div class="mt-2 text-sm text-muted">Base: Último consumo registrado ({{ latest_consumo }} m³)</div>
-        </div>
+            {% endif %}
 
-        <!-- Visualizador de Consumo -->
-        <div class="card p-4 flex flex-col justify-center">
-            <div class="flex justify-between items-center mb-4">
-                <h4 class="font-bold">Nivel de Consumo</h4>
-                <div class="text-2xl font-bold" style="color: var(--primary-color);">{{ latest_consumo }} <span
-                        class="text-sm font-normal text-muted">m³ / mes</span></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Tarjeta Principal: Identificación -->
+                <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2">
+                        <span class="icon-[tabler--id] size-5 text-primary"></span>
+                        <h3 class="font-black uppercase tracking-wider text-sm">Identificación y Contacto</h3>
+                    </div>
+                    <div class="card-body p-6 space-y-4">
+                        <div class="form-control">
+                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Nombre
+                                Empresa / Negocio</label>
+                            <input type="text" name="nombre_empresa" value="{{ item.get('nombre_empresa', '') }}"
+                                required class="input input-bordered w-full font-bold" {% if not is_new %}disabled{%
+                                endif %} placeholder="Ej. Abarrotes Don Pepe">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control">
+                                <label
+                                    class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Tipo /
+                                    Giro</label>
+                                <input type="text" name="tipo_empresa" value="{{ item.get('tipo_empresa', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
+                                    placeholder="Ej. Restaurante, Taller...">
+                            </div>
+                            <div class="form-control">
+                                <label
+                                    class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Teléfono</label>
+                                <input type="text" name="telefono_empresa"
+                                    value="{{ item.get('telefono_empresa', '') }}" class="input input-bordered w-full"
+                                    {% if not is_new %}disabled{% endif %} placeholder="Ej. 55 1234 5678">
+                            </div>
+                        </div>
+                        <div class="form-control">
+                            <label
+                                class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Dirección
+                                Completa</label>
+                            <textarea name="direccion_empresa" class="textarea textarea-bordered w-full" rows="3" {% if
+                                not is_new %}disabled{% endif %}
+                                placeholder="Calle, Número, Colonia, Municipio...">{{ item.get('direccion_empresa', '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                {% if tipo == 'clientes' %}
+                <!-- Tarjeta: Datos Fiscales (Solo Clientes) -->
+                <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2">
+                        <span class="icon-[tabler--receipt-tax] size-5 text-secondary"></span>
+                        <h3 class="font-black uppercase tracking-wider text-sm">Datos Fiscales y Contrato</h3>
+                    </div>
+                    <div class="card-body p-6 space-y-4">
+                        <div class="form-control">
+                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Razón
+                                Social</label>
+                            <input type="text" name="razon_social" value="{{ item.get('razon_social', '') }}"
+                                class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control">
+                                <label
+                                    class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Giro
+                                    Licencia</label>
+                                <input type="text" name="giro_licencia" value="{{ item.get('giro_licencia', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
+                            </div>
+                            <div class="form-control">
+                                <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">NIS
+                                    (Contrato Agua)</label>
+                                <input type="text" name="nis" value="{{ item.get('nis', '') }}"
+                                    class="input input-bordered w-full font-mono text-secondary" {% if not is_new
+                                    %}disabled{% endif %}>
+                            </div>
+                            <div class="form-control">
+                                <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">No.
+                                    Permiso Descargas</label>
+                                <input type="text" name="no_permiso_descargas"
+                                    value="{{ item.get('no_permiso_descargas', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
+                            </div>
+                            <div class="form-control">
+                                <label
+                                    class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Vigencia
+                                    Permiso</label>
+                                <input type="text" name="vegencia_permiso_descargas"
+                                    value="{{ item.get('vegencia_permiso_descargas', '') }}"
+                                    class="input input-bordered w-full" placeholder="dd/mm/aaaa" {% if not is_new
+                                    %}disabled{% endif %}>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta: Servicios e Infraestructura (Solo Clientes) -->
+                <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden lg:col-span-2">
+                    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2">
+                        <span class="icon-[tabler--tool] size-5 text-info"></span>
+                        <h3 class="font-black uppercase tracking-wider text-sm">Infraestructura Hidráulica y Servicios
+                        </h3>
+                    </div>
+                    <div class="card-body p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            <!-- Almacenamiento -->
+                            <div class="space-y-4">
+                                <h4
+                                    class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                                    Almacenamiento</h4>
+                                <div class="form-control">
+                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Cisternas
+                                        (No. / Cap.)</label>
+                                    <div class="join w-full">
+                                        <input type="text" name="total_cisternas"
+                                            value="{{ item.get('total_cisternas', '') }}"
+                                            class="input input-bordered join-item w-1/3" placeholder="No." {% if not
+                                            is_new %}disabled{% endif %}>
+                                        <input type="text" name="cap_cisternas"
+                                            value="{{ item.get('cap_cisternas', '') }}"
+                                            class="input input-bordered join-item w-2/3" placeholder="Liters" {% if not
+                                            is_new %}disabled{% endif %}>
+                                    </div>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Tinacos
+                                        (No. / Cap.)</label>
+                                    <div class="join w-full">
+                                        <input type="text" name="total_tinacos"
+                                            value="{{ item.get('total_tinacos', '') }}"
+                                            class="input input-bordered join-item w-1/3" placeholder="No." {% if not
+                                            is_new %}disabled{% endif %}>
+                                        <input type="text" name="cap_tinacos" value="{{ item.get('cap_tinacos', '') }}"
+                                            class="input input-bordered join-item w-2/3" placeholder="Liters" {% if not
+                                            is_new %}disabled{% endif %}>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Abastecimiento -->
+                            <div class="space-y-4">
+                                <h4
+                                    class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                                    Abastecimiento</h4>
+                                <div class="form-control">
+                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Pozo
+                                        (Si-No / No. Conc)</label>
+                                    <div class="join w-full">
+                                        <input type="text" name="pozo" value="{{ item.get('pozo', '') }}"
+                                            class="input input-bordered join-item w-1/3" placeholder="S/N" {% if not
+                                            is_new %}disabled{% endif %}>
+                                        <input type="text" name="num_concesion_pozo"
+                                            value="{{ item.get('num_concesion_pozo', '') }}"
+                                            class="input input-bordered join-item w-2/3" placeholder="Concesión" {% if
+                                            not is_new %}disabled{% endif %}>
+                                    </div>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Tomas /
+                                        Red (No. / Red)</label>
+                                    <div class="join w-full">
+                                        <input type="text" name="num_tomas" value="{{ item.get('num_tomas', '') }}"
+                                            class="input input-bordered join-item w-1/3" placeholder="No." {% if not
+                                            is_new %}disabled{% endif %}>
+                                        <input type="text" name="red" value="{{ item.get('red', '') }}"
+                                            class="input input-bordered join-item w-2/3" placeholder="Municipal?" {% if
+                                            not is_new %}disabled{% endif %}>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pipas y Medidor -->
+                            <div class="space-y-4">
+                                <h4
+                                    class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                                    Pipas y Medidor</h4>
+                                <div class="form-control">
+                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Pipas
+                                        (Prom. / Cap.)</label>
+                                    <div class="join w-full">
+                                        <input type="text" name="prom_pipas_mes"
+                                            value="{{ item.get('prom_pipas_mes', '') }}"
+                                            class="input input-bordered join-item w-1/2" placeholder="Mes" {% if not
+                                            is_new %}disabled{% endif %}>
+                                        <input type="text" name="capacidad_pipas"
+                                            value="{{ item.get('capacidad_pipas', '') }}"
+                                            class="input input-bordered join-item w-1/2" placeholder="Cap." {% if not
+                                            is_new %}disabled{% endif %}>
+                                    </div>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Medidor
+                                        (S-N / Serie)</label>
+                                    <div class="join w-full">
+                                        <input type="text" name="medidor_agua "
+                                            value="{{ item.get('medidor_agua ', '') }}"
+                                            class="input input-bordered join-item w-1/3" placeholder="S/N" {% if not
+                                            is_new %}disabled{% endif %}>
+                                        <input type="text" name="no_serie_medidor"
+                                            value="{{ item.get('no_serie_medidor', '') }}"
+                                            class="input input-bordered join-item w-2/3" placeholder="Serie" {% if not
+                                            is_new %}disabled{% endif %}>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Descargas -->
+                            <div class="space-y-4">
+                                <h4
+                                    class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                                    Descargas</h4>
+                                <div class="form-control">
+                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Registro
+                                        (S-N / Loc.)</label>
+                                    <div class="join w-full">
+                                        <input type="text" name="tiene_registro"
+                                            value="{{ item.get('tiene_registro', '') }}"
+                                            class="input input-bordered join-item w-1/3" placeholder="S/N" {% if not
+                                            is_new %}disabled{% endif %}>
+                                        <input type="text" name="localización_registro"
+                                            value="{{ item.get('localización_registro', '') }}"
+                                            class="input input-bordered join-item w-2/3" placeholder="Ubicación" {% if
+                                            not is_new %}disabled{% endif %}>
+                                    </div>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Trampas
+                                        (No. / Cap.)</label>
+                                    <div class="join w-full">
+                                        <input type="text" name="no_trampas_grasa"
+                                            value="{{ item.get('no_trampas_grasa', '') }}"
+                                            class="input input-bordered join-item w-1/3" placeholder="No." {% if not
+                                            is_new %}disabled{% endif %}>
+                                        <input type="text" name="cap_trampas" value="{{ item.get('cap_trampas', '') }}"
+                                            class="input input-bordered join-item w-2/3" placeholder="Cap." {% if not
+                                            is_new %}disabled{% endif %}>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
+            <div class="mt-8 flex justify-end gap-3 pb-10">
+                <a href="{{ url_for('ver_directorio', tipo=tipo) }}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary btn-wide shadow-lg {% if not is_new %}hidden{% endif %}"
+                    id="btn-submit">
+                    <span class="icon-[tabler--device-floppy] size-5"></span>
+                    {{ 'Guardar Registro' if is_new else 'Guardar Cambios' }}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if not is_new %}
+    <!-- PESTAÑA 2: COTIZACIONES -->
+    <div id="tab-cotizaciones" class="tab-content hidden animate-in fade-in slide-in-from-bottom-5">
+        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
             <div
-                style="position: relative; height: 30px; background: #eee; border-radius: 15px; overflow: hidden; display: flex;">
-                <!-- Green Zone 0-40 -->
-                <div
-                    style="width: 40%; background: #4caf50; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem;">
-                    0-40</div>
-                <!-- Orange Zone 40-80 -->
-                <div
-                    style="width: 40%; background: #ff9800; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem;">
-                    41-80</div>
-                <!-- Red Zone 80+ -->
-                <div
-                    style="width: 20%; background: #f44336; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem;">
-                    80+</div>
-
-                <!-- Indicator Marker -->
-                {% set marker_pos = latest_consumo if latest_consumo < 100 else 100 %} <div
-                    style="position: absolute; left: {{ marker_pos }}%; top: -5px; bottom: -5px; width: 4px; background: black; border: 2px solid white; z-index: 10;">
+                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center">
+                <span>Historial de Cotizaciones</span>
+                <a href="{{ url_for('nueva_cotizacion') }}" class="btn btn-xs btn-primary">+ Nueva</a>
             </div>
-            <div
-                style="position: absolute; left: {{ marker_pos }}%; top: 35px; transform: translateX(-50%); font-weight: bold; font-size: 0.9rem;">
-                {{ latest_consumo }} m³
+            <div class="card-body p-0">
+                <div class="overflow-x-auto">
+                    <table class="table table-lg">
+                        <thead class="bg-base-200/30">
+                            <tr>
+                                <th>Folio</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th class="text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-base-content/5">
+                            {% for data in cotizaciones %}
+                            <tr class="hover:bg-base-200/30">
+                                <td><span class="font-bold text-primary">{{ data.folio_cot }}</span></td>
+                                <td class="text-base-content/60">{{ data.fecha_cot }}</td>
+                                <td class="font-black text-base-content">${{ data.total }}</td>
+                                <td class="text-right">
+                                    <a href="{{ url_for('detalle_cotizacion', folio=data.folio_cot) }}"
+                                        class="btn btn-soft btn-secondary btn-sm">Ver</a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-10 opacity-40">Sin cotizaciones registradas.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <div class="mt-8 text-center text-sm">
-            {% if latest_consumo <= 40 %} <span style="color: #4caf50; font-weight: bold;">Consumo Bajo (Óptimo)</span>
-                {% elif latest_consumo <= 80 %} <span style="color: #ff9800; font-weight: bold;">Consumo Medio
-                    (Precaución)</span>
+    </div>
+
+    <!-- PESTAÑA 3: ORDENES -->
+    <div id="tab-ordenes" class="tab-content hidden animate-in fade-in slide-in-from-bottom-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Desazolves -->
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-4 font-bold">Desazolves</div>
+                <div class="card-body p-0 max-h-96 overflow-y-auto">
+                    <table class="table table-sm">
+                        <tbody class="divide-y divide-base-content/5">
+                            {% for o in ordenes_des|reverse %}
+                            <tr class="hover:bg-base-200/30">
+                                <td>
+                                    <div class="font-bold text-primary">{{ o.folio_des }}</div>
+                                    <div class="text-[10px] opacity-60">{{ o.fecha_des }}</div>
+                                </td>
+                                <td class="text-right"><a
+                                        href="{{ url_for('detalle_orden', tipo='desazolve', folio=o.folio_des) }}"
+                                        class="btn btn-link btn-xs">Ver</a></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td class="text-center py-4 opacity-40">Vacío</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Trampas -->
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-4 font-bold">Trampas Grasa
+                </div>
+                <div class="card-body p-0 max-h-96 overflow-y-auto">
+                    <table class="table table-sm">
+                        <tbody class="divide-y divide-base-content/5">
+                            {% for o in ordenes_trampa|reverse %}
+                            <tr class="hover:bg-base-200/30">
+                                <td>
+                                    <div class="font-bold text-primary">{{ o.folio_lt }}</div>
+                                    <div class="text-[10px] opacity-60">{{ o.fecha_lt }}</div>
+                                </td>
+                                <td class="text-right"><a
+                                        href="{{ url_for('detalle_orden', tipo='trampa', folio=o.folio_lt) }}"
+                                        class="btn btn-link btn-xs">Ver</a></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td class="text-center py-4 opacity-40">Vacío</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Visitas -->
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-4 font-bold">Visitas Técnicas
+                </div>
+                <div class="card-body p-0 max-h-96 overflow-y-auto">
+                    <table class="table table-sm">
+                        <tbody class="divide-y divide-base-content/5">
+                            {% for o in ordenes_visita|reverse %}
+                            <tr class="hover:bg-base-200/30">
+                                <td>
+                                    <div class="font-bold text-primary">{{ o.folio_vt }}</div>
+                                    <div class="text-[10px] opacity-60">{{ o.fecha_vt }}</div>
+                                </td>
+                                <td class="text-right"><a
+                                        href="{{ url_for('detalle_orden', tipo='visita', folio=o.folio_vt) }}"
+                                        class="btn btn-link btn-xs">Ver</a></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td class="text-center py-4 opacity-40">Vacío</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PESTAÑA 4: TARIFICADOR -->
+    <div id="tab-tarificador" class="tab-content hidden animate-in fade-in slide-in-from-bottom-5">
+        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+            <div class="card-body p-0">
+                <table class="table table-lg">
+                    <thead class="bg-base-200/30">
+                        <tr>
+                            <th>Folio</th>
+                            <th>Fecha</th>
+                            <th>Precio m3</th>
+                            <th class="text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-base-content/5">
+                        {% for d in tarificadores %}
+                        <tr class="hover:bg-base-200/30">
+                            <td><span class="font-bold text-primary">{{ d.folio_tar }}</span></td>
+                            <td class="text-base-content/60">{{ d.fecha_tar }}</td>
+                            <td class="font-black text-success">${{ d.precio_m3_total }}</td>
+                            <td class="text-right"><a href="{{ url_for('detalle_tarificador', folio=d.folio_tar) }}"
+                                    class="btn btn-soft btn-secondary btn-sm">Ver</a></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-10 opacity-40">Sin reportes aún.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PESTAÑA 5: PERMISOS -->
+    <div id="tab-permisos" class="tab-content hidden animate-in fade-in slide-in-from-bottom-5">
+        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+            <div class="card-body p-0">
+                <table class="table table-lg">
+                    <thead class="bg-base-200/30">
+                        <tr>
+                            <th>NIS</th>
+                            <th>Interesado</th>
+                            <th>Fecha</th>
+                            <th class="text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-base-content/5">
+                        {% for p in permisos %}
+                        <tr class="hover:bg-base-200/30">
+                            <td><span class="font-mono font-bold text-secondary">{{ p.nis }}</span></td>
+                            <td>
+                                <div class="font-medium">{{ p.arr_nombre or p.prop_nombre }}</div>
+                            </td>
+                            <td class="text-base-content/60">{{ p.fecha_acuse }}</td>
+                            <td class="text-right"><a href="{{ url_for('detalle_permiso_descarga', nis=p.nis) }}"
+                                    class="btn btn-soft btn-secondary btn-sm">Ver</a></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-10 opacity-40">No hay permisos de descarga.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PESTAÑA 6: CONSUMOS -->
+    <div id="tab-consumos" class="tab-content hidden animate-in fade-in slide-in-from-bottom-5">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Tarifas -->
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+                <div class="card-body p-6">
+                    <h4
+                        class="text-xs font-black uppercase tracking-widest text-primary mb-4 border-b border-primary/10 pb-2">
+                        Tarifa Actual (Mensual)</h4>
+                    {% if current_tariff %}
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm"><span>Agua:</span><span class="font-bold">${{
+                                current_tariff.tarifa_agua }}</span></div>
+                        <div class="flex justify-between text-sm"><span>Drenaje:</span><span class="font-bold">${{
+                                current_tariff.tarifa_drenaje }}</span></div>
+                        <div class="flex justify-between text-sm"><span>Saneamiento:</span><span class="font-bold">${{
+                                current_tariff.tarifa_saneamiento }}</span></div>
+                        <div
+                            class="pt-2 border-t border-base-content/5 flex justify-between text-lg font-black text-primary">
+                            <span>Total:</span><span>${{ current_tariff.total_tarifa }}</span></div>
+                    </div>
                     {% else %}
-                    <span style="color: #f44336; font-weight: bold;">Consumo Alto (Crítico)</span>
+                    <div class="text-center py-4 opacity-30 italic text-sm">Sin datos de tarifa.</div>
                     {% endif %}
+                </div>
+            </div>
+
+            <!-- Nivel Consumo -->
+            <div class="lg:col-span-2 card bg-base-100 border border-base-content/10 shadow-sm">
+                <div class="card-body p-6 relative">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-xs font-black uppercase tracking-widest text-base-content/40">Monitor de Consumo
+                            Mensual ({{ latest_consumo }} m³)</h4>
+                        <span
+                            class="badge badge-soft {% if latest_consumo > 80 %}badge-error{% elif latest_consumo > 40 %}badge-warning{% else %}badge-success{% endif %} font-black">{{
+                            'ALTO' if latest_consumo > 80 else 'MEDIO' if latest_consumo > 40 else 'BAJO' }}</span>
+                    </div>
+
+                    <div class="h-4 bg-base-200 rounded-full overflow-hidden flex relative">
+                        <div class="h-full bg-success w-[40%]"></div>
+                        <div class="h-full bg-warning w-[40%]"></div>
+                        <div class="h-full bg-error w-[20%]"></div>
+                        <!-- Marker -->
+                        {% set pos = latest_consumo if latest_consumo < 100 else 100 %} <div
+                            class="absolute h-8 w-1 bg-base-content top-[-8px] shadow-sm transform transition-all duration-1000"
+                            style="left: {{ pos }}%;">
+                            <div
+                                class="absolute top-[-25px] left-1/2 -translate-x-1/2 font-black text-[10px] whitespace-nowrap bg-base-content text-base-100 px-1.5 py-0.5 rounded">
+                                {{ latest_consumo }} m³</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-2 text-[10px] font-bold text-base-content/30 tracking-tighter">
+                    <span>0</span><span>40</span><span>80</span><span>100+</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div class="card-body p-0">
+            <table class="table table-lg">
+                <thead class="bg-base-200/30">
+                    <tr>
+                        <th>Folio</th>
+                        <th>Lectura</th>
+                        <th>Consumo (m³)</th>
+                        <th class="text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-base-content/5">
+                    {% for d in consumos %}
+                    <tr class="hover:bg-base-200/30">
+                        <td><span class="font-bold text-primary">{{ d.folio }}</span></td>
+                        <td class="text-base-content/60">{{ d.fecha_lectura }}</td>
+                        <td><span class="badge badge-outline border-base-content/10 font-black text-base-content">{{
+                                d.consumo }} m³</span></td>
+                        <td class="text-right"><a href="{{ url_for('detalle_consumo', folio=d.folio) }}"
+                                class="btn btn-soft btn-secondary btn-sm">Ver</a></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-10 opacity-40">Sin consumos registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+{% endif %}
 
-<div class="card table-container">
-    <h3>Consumos de Agua</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Folio</th>
-                <th>Fecha Lectura</th>
-                <th>Consumo (m³)</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if consumos %}
-            {% for data in consumos %}
-            <tr>
-                <td><strong>{{ data.folio }}</strong></td>
-                <td>{{ data.fecha_lectura }}</td>
-                <td>{{ data.consumo }}</td>
-                <td>
-                    <a href="{{ url_for('detalle_consumo', folio=data.folio) }}" class="btn btn-secondary btn-small">Ver
-                        Consumo</a>
-                </td>
-            </tr>
-            {% endfor %}
-            {% else %}
-            <tr>
-                <td colspan="4" class="text-center text-muted p-8">No hay consumos.</td>
-            </tr>
-            {% endif %}
-        </tbody>
-    </table>
-</div>
 </div>
 
 <script>
     function enableEdit() {
-        // Enable inputs
         document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
-
-        // Toggle buttons
         const btnSubmit = document.getElementById('btn-submit');
         if (btnSubmit) btnSubmit.classList.remove('hidden');
-
         const btnEdit = document.getElementById('btn-editar');
         if (btnEdit) btnEdit.classList.add('hidden');
     }
 
     function showTab(tabName) {
-        // Hide all tabs
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        // Show selected
         document.getElementById('tab-' + tabName).classList.remove('hidden');
 
-        // Update Nav Buttons
         document.querySelectorAll('button[id^="btn-"]').forEach(btn => {
             if (btn.id !== 'btn-submit' && btn.id !== 'btn-editar') {
-                btn.classList.remove('btn-primary');
-                btn.classList.add('btn-secondary');
+                btn.classList.remove('btn-primary', 'shadow-md');
+                btn.classList.add('btn-ghost');
             }
         });
 
         const activeBtn = document.getElementById('btn-' + tabName);
         if (activeBtn) {
-            activeBtn.classList.remove('btn-secondary');
-            activeBtn.classList.add('btn-primary');
+            activeBtn.classList.remove('btn-ghost');
+            activeBtn.classList.add('btn-primary', 'shadow-md');
         }
+
+        // Horizontal scroll to button on mobile
+        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
 </script>
 {% endblock %}

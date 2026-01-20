@@ -1,70 +1,120 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
+
+{% block title %}Cotizaciones - Sistema Cophi{% endblock %}
 
 {% block content %}
-<header class="flex justify-between items-center">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
-        <h1>Cotizaciones</h1>
-        <p class="subtitle">Historial completo de cotizaciones realizadas.</p>
+        <h1 class="text-3xl font-bold text-base-content mb-1">Cotizaciones</h1>
+        <p class="text-base-content/60 font-medium">Historial completo de cotizaciones realizadas.</p>
     </div>
-    <a href="{{ url_for('nueva_cotizacion') }}" class="btn btn-primary">Nueva Cotización</a>
-</header>
+    <a href="{{ url_for('nueva_cotizacion') }}" class="btn btn-primary shadow-sm">
+        <span class="icon-[tabler--plus] size-5"></span>
+        Nueva Cotización
+    </a>
+</div>
 
-<div class="card table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>Folio</th>
-                <th>Cliente</th>
-                <th>Fecha</th>
-                <th>Total</th>
-                <th>Items</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in cotizaciones %}
-            <tr>
-                <td><strong>{{ data.folio }}</strong></td>
-                <td>{{ data.cliente }}</td>
-                <td>{{ data.fecha }}</td>
-                <td>${{ data.total }}</td>
-                <td>{{ data.items_count }}</td>
-                <td>
-                    <a href="{{ url_for('detalle_cotizacion', folio=data.folio) }}"
-                        class="btn btn-secondary btn-small">Ver Cotización</a>
-                    <!-- Later link to generate PDF or HTML view -->
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="6" class="text-center text-muted p-8">No hay cotizaciones
-                    registradas.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table table-lg">
+                <thead class="bg-base-200/50">
+                    <tr>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Folio</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Cliente</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Fecha</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Total</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-center">Items
+                        </th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-right">Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-base-content/5">
+                    {% for data in cotizaciones %}
+                    <tr class="hover:bg-base-200/30 transition-colors">
+                        <td>
+                            <span class="font-bold text-primary">{{ data.folio }}</span>
+                        </td>
+                        <td class="max-w-xs truncate font-medium text-base-content">{{ data.cliente }}</td>
+                        <td class="text-base-content/60">{{ data.fecha }}</td>
+                        <td>
+                            <span class="font-bold text-base-content">${{ data.total }}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge badge-soft badge-info font-bold">{{ data.items_count }}</span>
+                        </td>
+                        <td class="text-right">
+                            <div class="flex justify-end gap-2">
+                                <a href="{{ url_for('detalle_cotizacion', folio=data.folio) }}"
+                                    class="btn btn-soft btn-secondary btn-sm" title="Editar/Ver">
+                                    <span class="icon-[tabler--edit] size-4"></span>
+                                    <span>Editar</span>
+                                </a>
+                                <a href="{{ url_for('ver_cotizacion', folio=data.folio) }}" target="_blank"
+                                    class="btn btn-soft btn-primary btn-sm" title="Ver PDF/HTML">
+                                    <span class="icon-[tabler--file-text] size-4"></span>
+                                    <span>Ver Doc</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-20">
+                            <div class="flex flex-col items-center gap-4">
+                                <span class="icon-[tabler--file-search] size-16 text-base-content/20"></span>
+                                <p class="text-base-content/40 font-medium">No hay cotizaciones registradas.</p>
+                                <a href="{{ url_for('nueva_cotizacion') }}"
+                                    class="btn btn-outline btn-primary btn-sm mt-2">Crear mi primera cotización</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     {% if total_pages > 1 %}
-    <div class="pagination">
-        <!-- Previous Button -->
-        {% if page > 1 %}
-        <a href="{{ url_for('cotizaciones', page=page-1) }}" class="btn btn-secondary btn-small">&laquo; Anterior</a>
-        {% else %}
-        <span class="btn btn-secondary btn-small disabled-link">&laquo; Anterior</span>
-        {% endif %}
-
-        <!-- Page Numbers -->
-        {% for p in range(1, total_pages + 1) %}
-        <a href="{{ url_for('cotizaciones', page=p) }}"
-            class="btn {% if p == page %}btn-primary{% else %}btn-secondary{% endif %} page-link">{{ p }}</a>
-        {% endfor %}
-
-        <!-- Next Button -->
-        {% if page < total_pages %} <a href="{{ url_for('cotizaciones', page=page+1) }}"
-            class="btn btn-secondary btn-small">Siguiente &raquo;</a>
+    <div class="card-footer bg-base-200/30 border-t border-base-content/10 p-4">
+        <div class="flex justify-center flex-wrap gap-2">
+            <!-- Previous Button -->
+            {% if page > 1 %}
+            <a href="{{ url_for('cotizaciones', page=page-1) }}" class="btn btn-soft btn-secondary btn-sm">
+                <span class="icon-[tabler--chevron-left] size-4"></span>
+                Anterior
+            </a>
             {% else %}
-            <span class="btn btn-secondary btn-small disabled-link">Siguiente &raquo;</span>
+            <button class="btn btn-soft btn-secondary btn-sm opacity-50 cursor-not-allowed" disabled>
+                <span class="icon-[tabler--chevron-left] size-4"></span>
+                Anterior
+            </button>
             {% endif %}
+
+            <!-- Page Numbers -->
+            <div class="join">
+                {% for p in range(1, total_pages + 1) %}
+                <a href="{{ url_for('cotizaciones', page=p) }}"
+                    class="join-item btn btn-sm {% if p == page %}btn-primary{% else %}btn-ghost{% endif %}">
+                    {{ p }}
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Next Button -->
+            {% if page < total_pages %} <a href="{{ url_for('cotizaciones', page=page+1) }}"
+                class="btn btn-soft btn-secondary btn-sm">
+                Siguiente
+                <span class="icon-[tabler--chevron-right] size-4"></span>
+                </a>
+                {% else %}
+                <button class="btn btn-soft btn-secondary btn-sm opacity-50 cursor-not-allowed" disabled>
+                    Siguiente
+                    <span class="icon-[tabler--chevron-right] size-4"></span>
+                </button>
+                {% endif %}
+        </div>
     </div>
     {% endif %}
 </div>

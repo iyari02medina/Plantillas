@@ -1,120 +1,141 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
+
+{% block title %}Permisos de Descarga - Sistema Cophi{% endblock %}
 
 {% block content %}
-<header class="flex justify-between items-center">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
-        <h1>Permisos de Descarga</h1>
-        <p class="subtitle">Gestión de cuestionarios y trámites de permiso de descarga.</p>
+        <h1 class="text-3xl font-bold text-base-content mb-1">Permisos de Descarga</h1>
+        <p class="text-base-content/60 font-medium">Gestión de cuestionarios, trámites y acuses de descarga municipal.
+        </p>
     </div>
-    <a href="{{ url_for('nuevo_permiso_descarga') }}" class="btn btn-primary">Nuevo Permiso de Descarga</a>
-</header>
+    <a href="{{ url_for('nuevo_permiso_descarga') }}" class="btn btn-primary shadow-sm">
+        <span class="icon-[tabler--plus] size-5"></span>
+        Nuevo Permiso
+    </a>
+</div>
 
-<div class="card table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>NIS</th>
-                <th>Negocio</th>
-                <th>Propietario / Arrendatario</th>
-                <th>Fecha Acuse</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in permisos %}
-            <tr>
-                <td><strong>{{ p.nis }}</strong></td>
-                <td>{{ p.nombre_negocio }}</td>
-                <td>
-                    <div class="text-sm font-bold">{{ p.arr_nombre or p.prop_nombre }}</div>
-                    <div class="text-xs text-gray-500">{{ 'Arrendatario' if p.arr_nombre else 'Propietario' }}</div>
-                </td>
-                <td>{{ p.fecha_acuse }}</td>
-                <td>
-                    <div class="flex gap-2">
-                        <a href="{{ url_for('detalle_permiso_descarga', nis=p.nis) }}"
-                            class="btn btn-secondary btn-small">Ver Detalle</a>
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table table-lg">
+                <thead class="bg-base-200/50">
+                    <tr>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">NIS</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Establecimiento</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Interesado</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-center">Fecha
+                            Acuse</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-right">Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-base-content/5">
+                    {% for p in permisos %}
+                    <tr class="hover:bg-base-200/30 transition-colors">
+                        <td>
+                            <span class="font-bold text-primary">{{ p.nis }}</span>
+                        </td>
+                        <td>
+                            <div class="font-medium text-base-content">{{ p.nombre_negocio }}</div>
+                        </td>
+                        <td>
+                            <div class="font-medium text-base-content">{{ p.arr_nombre or p.prop_nombre }}</div>
+                            <div class="text-[10px] uppercase font-bold text-base-content/40">{{ 'Arrendatario' if
+                                p.arr_nombre else 'Propietario' }}</div>
+                        </td>
+                        <td class="text-center text-base-content/60">{{ p.fecha_acuse }}</td>
+                        <td class="text-right">
+                            <div class="flex justify-end gap-2">
+                                <a href="{{ url_for('detalle_permiso_descarga', nis=p.nis) }}"
+                                    class="btn btn-soft btn-secondary btn-sm">
+                                    <span class="icon-[tabler--edit] size-4"></span>
+                                    <span>Detalle</span>
+                                </a>
 
-                        <div class="dropdown" style="position: relative;">
-                            <button class="btn btn-secondary btn-small dropdown-toggle" type="button"
-                                onclick="toggleDropdown(this)">
-                                Documentos ▾
-                            </button>
-                            <div class="dropdown-menu"
-                                style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; padding: 0.5rem; z-index: 100; min-width: 150px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                                <a href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Cuestionario') }}"
-                                    target="_blank"
-                                    style="display: block; padding: 0.25rem 0.5rem; color: var(--text-color); text-decoration: none;">Ver
-                                    Cuestionario</a>
-                                <a href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Acuse') }}" target="_blank"
-                                    style="display: block; padding: 0.25rem 0.5rem; color: var(--text-color); text-decoration: none;">Ver
-                                    Acuse</a>
-                                <a href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Carta_Poder') }}"
-                                    target="_blank"
-                                    style="display: block; padding: 0.25rem 0.5rem; color: var(--text-color); text-decoration: none;">Ver
-                                    Carta Poder</a>
+                                <div class="dropdown">
+                                    <button class="btn btn-soft btn-primary btn-sm" type="button"
+                                        id="dropdown-{{ p.nis }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="icon-[tabler--file-download] size-4"></span>
+                                        <span>Documentos</span>
+                                        <span class="icon-[tabler--chevron-down] size-4 opacity-50"></span>
+                                    </button>
+                                    <ul class="dropdown-menu shadow-lg border border-base-content/10"
+                                        aria-labelledby="dropdown-{{ p.nis }}">
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Cuestionario') }}"
+                                                target="_blank">
+                                                <span class="icon-[tabler--file-text] size-4 text-primary"></span>
+                                                Cuestionario
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Acuse') }}"
+                                                target="_blank">
+                                                <span
+                                                    class="icon-[tabler--clipboard-check] size-4 text-secondary"></span>
+                                                Acuse
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Carta_Poder') }}"
+                                                target="_blank">
+                                                <span class="icon-[tabler--certificate] size-4 text-info"></span>
+                                                Carta Poder
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="5" class="text-center text-muted p-8">No hay permisos registrados.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-20">
+                            <div class="flex flex-col items-center gap-4">
+                                <span class="icon-[tabler--file-off] size-16 text-base-content/20"></span>
+                                <p class="text-base-content/40 font-medium">No se encontraron permisos registrados.</p>
+                                <a href="{{ url_for('nuevo_permiso_descarga') }}"
+                                    class="btn btn-outline btn-primary btn-sm mt-2">Crear nuevo permiso</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     {% if total_pages > 1 %}
-    <div class="pagination">
-        <!-- Anterior -->
-        {% if page > 1 %}
-        <a href="{{ url_for('permisos_descarga', page=page-1) }}" class="btn btn-secondary btn-small">&laquo;
-            Anterior</a>
-        {% else %}
-        <span class="btn btn-secondary btn-small disabled-link">&laquo; Anterior</span>
-        {% endif %}
-
-        <!-- Números de página -->
-        {% for num in range(1, total_pages + 1) %}
-        {% if num == page %}
-        <span class="btn btn-primary btn-small">{{ num }}</span>
-        {% else %}
-        <a href="{{ url_for('permisos_descarga', page=num) }}" class="btn btn-secondary btn-small">{{ num }}</a>
-        {% endif %}
-        {% endfor %}
-
-        <!-- Siguiente -->
-        {% if page < total_pages %} <a href="{{ url_for('permisos_descarga', page=page+1) }}"
-            class="btn btn-secondary btn-small">Siguiente &raquo;</a>
-            {% else %}
-            <span class="btn btn-secondary btn-small disabled-link">Siguiente &raquo;</span>
+    <div class="card-footer bg-base-200/30 border-t border-base-content/10 p-4">
+        <div class="flex justify-center flex-wrap gap-2">
+            {% if page > 1 %}
+            <a href="{{ url_for('permisos_descarga', page=page-1) }}" class="btn btn-soft btn-secondary btn-sm">
+                <span class="icon-[tabler--chevron-left] size-4"></span>
+                Anterior
+            </a>
             {% endif %}
+
+            <div class="join">
+                {% for p in range(1, total_pages + 1) %}
+                <a href="{{ url_for('permisos_descarga', page=p) }}"
+                    class="join-item btn btn-sm {% if p == page %}btn-primary{% else %}btn-ghost{% endif %}">
+                    {{ p }}
+                </a>
+                {% endfor %}
+            </div>
+
+            {% if page < total_pages %} <a href="{{ url_for('permisos_descarga', page=page+1) }}"
+                class="btn btn-soft btn-secondary btn-sm">
+                Siguiente
+                <span class="icon-[tabler--chevron-right] size-4"></span>
+                </a>
+                {% endif %}
+        </div>
     </div>
     {% endif %}
 </div>
-<script>
-    function toggleDropdown(btn) {
-        // Cerrar otros dropdowns abiertos
-        document.querySelectorAll('.dropdown-menu').forEach(menu => {
-            if (menu !== btn.nextElementSibling) {
-                menu.style.display = 'none';
-            }
-        });
-
-        const menu = btn.nextElementSibling;
-        const isVisible = menu.style.display === 'block';
-        menu.style.display = isVisible ? 'none' : 'block';
-    }
-
-    // Cerrar al hacer clic fuera
-    document.addEventListener('click', function (e) {
-        if (!e.target.classList.contains('dropdown-toggle')) {
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.style.display = 'none';
-            });
-        }
-    });
-</script>
 {% endblock %}

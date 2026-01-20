@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light" dir="ltr" class="scroll-smooth">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>{% block title %}Sist. Gestión - Cophi{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='flyonui/img/favicon/favicon.ico') }}" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap"
+        rel="stylesheet" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='flyonui/dist/css/output.css') }}" />
+
+    <!-- Existing Styles (optional fallback) -->
+    <style>
+        /* Small adjustments to integrate existing card logic if needed */
+        .msg-error {
+            border-left: 4px solid #ef4444 !important;
+        }
+
+        .msg-success {
+            border-left: 4px solid #10b981 !important;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <!-- Layout Wrapper -->
+    <div class="bg-base-200 flex min-h-screen flex-col">
+
+        <!-- HEADER -->
+        <header class="bg-base-100 border-base-content/20 lg:ps-75 sticky top-0 z-50 flex border-b">
+            <div class="w-full max-w-7xl" style="margin-left: 24px; margin-right: 24px;">
+                <nav class="navbar py-2 px-4">
+                    <div class="navbar-start items-center gap-2">
+                        <button type="button" class="btn btn-soft btn-square btn-sm lg:hidden" aria-haspopup="dialog"
+                            aria-expanded="false" aria-controls="layout-sidebar" data-overlay="#layout-sidebar">
+                            <span class="icon-[tabler--menu-2] size-4.5"></span>
+                        </button>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl font-bold text-primary hidden lg:block">Cophi Panel</span>
+                        </div>
+                    </div>
+
+                    <div class="navbar-end items-center gap-4">
+                        <!-- Profile Dropdown (Simplified) -->
+                        <div class="dropdown relative inline-flex [--offset:21]">
+                            <button id="profile-dropdown" type="button" class="dropdown-toggle avatar"
+                                aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+                                <span class="rounded-field size-9.5">
+                                    <img src="{{ url_for('static', filename='flyonui/img/avatars/2.png') }}"
+                                        alt="User Avatar" />
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-open:opacity-100 max-w-75 hidden w-full space-y-0.5"
+                                role="menu" aria-orientation="vertical" aria-labelledby="profile-dropdown">
+                                <li class="dropdown-header pt-4.5 mb-1 gap-4 px-5 pb-3.5">
+                                    <div class="avatar avatar-online-top">
+                                        <div class="w-10 rounded-full">
+                                            <img src="{{ url_for('static', filename='flyonui/img/avatars/2.png') }}"
+                                                alt="avatar" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-base-content mb-0.5 font-semibold">Usuario Cophi</h6>
+                                        <p class="text-base-content/80 font-medium">Administrador</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <hr class="border-base-content/20 -mx-2 my-1" />
+                                </li>
+                                <li class="dropdown-footer p-2 pt-1">
+                                    <a class="btn btn-text btn-error btn-block h-11 justify-start px-3 font-normal"
+                                        href="#">
+                                        <span class="icon-[tabler--logout] size-5"></span>
+                                        Cerrar Sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside id="layout-sidebar"
+            class="overlay overlay-open:translate-x-0 drawer drawer-start sm:w-75 inset-y-0 start-0 hidden h-full [--auto-close:lg] lg:z-50 lg:block lg:translate-x-0 lg:shadow-none"
+            aria-label="Sidebar" tabindex="-1">
+            <div class="drawer-body border-base-content/20 h-full p-0 bg-base-100">
+                <div class="flex h-full max-h-full flex-col">
+                    <button type="button" class="btn btn-text btn-circle btn-sm absolute end-3 top-3 lg:hidden"
+                        aria-label="Close" data-overlay="#layout-sidebar">
+                        <span class="icon-[tabler--x] size-4.5"></span>
+                    </button>
+
+                    <div
+                        class="text-base-content border-base-content/20 flex flex-col items-center gap-4 border-b px-4 py-8">
+                        <div class="avatar">
+                            <div class="size-20 rounded-full border-2 border-primary/20 p-1">
+                                <img src="{{ url_for('static', filename='flyonui/img/favicon/favicon.ico') }}"
+                                    alt="logo" />
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-base-content text-xl font-bold uppercase tracking-wider">COPHI</h3>
+                            <p class="text-base-content/60 text-xs font-medium">SISTEMA DE GESTIÓN</p>
+                        </div>
+                    </div>
+
+                    <div class="h-full overflow-y-auto pt-4">
+                        <ul class="menu menu-sm gap-1 px-4">
+                            <li>
+                                <a href="{{ url_for('index') }}"
+                                    class="{% if request.endpoint == 'index' %}menu-active{% endif %} flex items-center gap-3 px-4 py-3 rounded-lg transition-all">
+                                    <span class="icon-[tabler--dashboard] size-5"></span>
+                                    <span class="font-medium">Dashboard</span>
+                                </a>
+                            </li>
+
+                            <li class="text-base-content/40 mt-4 px-4 text-xs font-bold uppercase tracking-widest">
+                                Módulos</li>
+
+                            <li>
+                                <a href="{{ url_for('cotizaciones') }}"
+                                    class="{% if request.endpoint == 'cotizaciones' %}menu-active{% endif %} flex items-center gap-3 px-4 py-3 rounded-lg transition-all">
+                                    <span class="icon-[tabler--file-description] size-5"></span>
+                                    <span class="font-medium">Cotizaciones</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('ordenes') }}"
+                                    class="{% if request.endpoint == 'ordenes' %}menu-active{% endif %} flex items-center gap-3 px-4 py-3 rounded-lg transition-all">
+                                    <span class="icon-[tabler--clipboard-list] size-5"></span>
+                                    <span class="font-medium">Órdenes de Trabajo</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('tarificador') }}"
+                                    class="{% if request.endpoint == 'tarificador' %}menu-active{% endif %} flex items-center gap-3 px-4 py-3 rounded-lg transition-all">
+                                    <span class="icon-[tabler--calculator] size-5"></span>
+                                    <span class="font-medium">Tarificador</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('permisos_descarga') }}"
+                                    class="{% if request.endpoint == 'permisos_descarga' %}menu-active{% endif %} flex items-center gap-3 px-4 py-3 rounded-lg transition-all">
+                                    <span class="icon-[tabler--file-certificate] size-5"></span>
+                                    <span class="font-medium">Permisos de Descarga</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('consumos') }}"
+                                    class="{% if request.endpoint == 'consumos' %}menu-active{% endif %} flex items-center gap-3 px-4 py-3 rounded-lg transition-all">
+                                    <span class="icon-[tabler--droplet] size-5"></span>
+                                    <span class="font-medium">Consumos de Agua</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('directorio') }}"
+                                    class="{% if request.endpoint == 'directorio' %}menu-active{% endif %} flex items-center gap-3 px-4 py-3 rounded-lg transition-all">
+                                    <span class="icon-[tabler--users] size-5"></span>
+                                    <span class="font-medium">Directorio</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <div class="lg:ps-75 flex-1 transition-all duration-300" style="max-width: 97vw;">
+            <main style="margin-left: 24px; margin-top: 24px; width: auto;">
+
+                <!-- FLASH MESSAGES -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for category, message in messages %}
+                    <div class="alert {% if category=='error' %}alert-soft alert-error{% else %}alert-soft alert-success{% endif %} flex items-center gap-3 shadow-sm"
+                        role="alert">
+                        <span class="icon-[tabler--info-circle] size-5"></span>
+                        <p class="text-sm font-medium">{{ message }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <!-- PAGE CONTENT -->
+                {% block content %}{% endblock %}
+            </main>
+
+            <!-- Footer -->
+            <footer class="mt-12 py-6 border-t border-base-content/10">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-base-content/60 text-sm">
+                    <p>© 2026 Cophi - Sistema de Gestión de Agua</p>
+                    <div class="flex items-center gap-6">
+                        <span class="flex items-center gap-1">
+                            <span class="icon-[tabler--code] size-4"></span>
+                            v1.2.0
+                        </span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- FlyonUI JS -->
+    <script src="{{ url_for('static', filename='flyonui/dist/libs/flyonui/flyonui.js') }}"></script>
+    <!-- Theme Utils JS -->
+    <script src="{{ url_for('static', filename='flyonui/dist/js/theme-utils.js') }}"></script>
+    <!-- Main JS -->
+    <script src="{{ url_for('static', filename='flyonui/dist/js/main.js') }}"></script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

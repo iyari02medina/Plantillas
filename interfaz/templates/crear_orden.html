@@ -1,541 +1,241 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
+
+{% block title %}{{ 'Detalle Orden' if orden else 'Nueva Orden de Trabajo' }} - Sistema Cophi{% endblock %}
 
 {% block content %}
-<header class="flex justify-between items-center">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
-        <h1>
-            {% if tipo == 'desazolve' %}Orden de Desazolve
-            {% elif tipo == 'trampa' %}Orden de Trampa de Grasa
-            {% elif tipo == 'visita' %}Visita Técnica
-            {% else %}Orden de Trabajo{% endif %}
-        </h1>
-        <p class="subtitle">
-            {% if is_new %}Complete el formulario para crear un nuevo registro.{% else %}Consulta y edita los
-            detalles.{% endif %}
+        <div class="flex items-center gap-2 mb-1">
+            <a href="{{ url_for('ordenes') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
+                <span class="icon-[tabler--arrow-left] size-5"></span>
+            </a>
+            <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle' if orden else 'Nueva' }} Orden de Trabajo</h1>
+        </div>
+        <p class="text-base-content/60 font-medium ml-10 uppercase tracking-widest text-xs font-black">
+            Módulo de {{ tipo|upper if tipo else 'ORDEN' }}
         </p>
     </div>
-    {% if not is_new %}
-    <div class="flex gap-4">
-        <a href="{{ url_for('ver_orden_pdf', tipo=tipo, folio=folio) }}" target="_blank" class="btn btn-secondary">Ver
-            PDF</a>
-        <button type="button" class="btn btn-primary" onclick="enableEdit()" id="btn-editar">Editar</button>
-    </div>
-    {% endif %}
-</header>
-
-<form action="{{ url_for('nueva_orden', tipo=tipo) if is_new else url_for('detalle_orden', tipo=tipo, folio=folio) }}"
-    method="POST" class="card">
-    <!-- Common Fields (Mapped by Logic or Raw Key Access) -->
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label>Folio</label>
-            <input type="text"
-                name="{{ 'folio_des' if tipo == 'desazolve' else 'folio_lt' if tipo == 'trampa' else 'folio_vt' }}"
-                value="{{ folio }}" readonly class="readonly-bg">
-        </div>
-        <div class="form-group">
-            <label>Fecha</label>
-            <input type="text"
-                name="{{ 'fecha_des' if tipo == 'desazolve' else 'fecha_lt' if tipo == 'trampa' else 'fecha_vt' }}"
-                value="{{ orden.get('fecha_des') if tipo == 'desazolve' else orden.get('fecha_lt') if tipo == 'trampa' else orden.get('fecha_vt') }}"
-                {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <!-- Client Section -->
-    <div class="grid-2 mb-4">
-        <div class="form-group relative">
-            <label>Empresa</label>
-            <input type="text" id="nombre_cliente" name="nombre_cliente" value="{{ orden.nombre_cliente }}" {% if not
-                is_new %}disabled{% endif %} required autocomplete="off" oninput="fillClient(this)">
-            <div id="suggestions-box"></div>
-        </div>
-        <div class="form-group">
-            <label>Dirección</label>
-            <input type="text" id="direccion_cliente" name="direccion_cliente" value="{{ orden.direccion_cliente }}" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>no. cliente</label>
-            <input type="text" name="no_cliente" value="{{ orden.no_cliente }}" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <hr class="mb-4">
-
-    <!-- DESAZOLVE SPECIFIC -->
-    {% if tipo == 'desazolve' %}
-
-    <!-- 3. Datos del Área a Tratar -->
-    <h3>Datos del Área a Tratar</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label>Ubicación</label>
-            <input type="text" name="ubicacion_area" value="{{ orden.ubicacion_area }}"
-                placeholder="Registro, tarja, bajadas, wc, coladera..." {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Tipo de Tubería</label>
-            <input type="text" name="tipo_tuberia" value="{{ orden.tipo_tuberia }}"
-                placeholder="Concreto, PVC, Albañal..." {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Diámetro Aprox.</label>
-            <input type="text" name="diametro_tuberia" value="{{ orden.diametro_tuberia }}" placeholder='4", 6", 8"...'
-                {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Longitud Sondeada (m)</label>
-            <input type="text" name="longitud_sondeada" value="{{ orden.longitud_sondeada }}"
-                placeholder="Metros lineales trabajados" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="mb-4">
-        <label class="font-bold mb-2 block">Nivel de Flujo Inicial:</label>
-        <div class="flex gap-4 flex-wrap">
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="flujo_nulo" value="x" {% if orden.flujo_nulo=='x' or orden.flujo_nulo==True
-                    %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Nulo / Tapado total
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="flujo_lento" value="x" {% if orden.flujo_lento=='x' or
-                    orden.flujo_lento==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Lento
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="flujo_normal" value="x" {% if orden.flujo_normal=='x' or
-                    orden.flujo_normal==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Normal /
-                Preventivo
-            </label>
-        </div>
-    </div>
-
-    <!-- 4. Detalle del Servicio (Técnico) -->
-    <h3>Detalle del Servicio (Técnico)</h3>
-    <div class="mb-4">
-        <label class="font-bold mb-2 block">Equipo Utilizado:</label>
-        <div class="flex gap-4 flex-wrap">
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="equipo_guia" value="x" {% if orden.equipo_guia=='x' or
-                    orden.equipo_guia==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Guía Eléctrica
-                (K-50/1500)
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="equipo_hidro" value="x" {% if orden.equipo_hidro=='x' or
-                    orden.equipo_hidro==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Hidrolavadora
-                / Jet
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="equipo_vactor" value="x" {% if orden.equipo_vactor=='x' or
-                    orden.equipo_vactor==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Camión
-                Succión (Vactor)
-            </label>
-        </div>
-    </div>
-
-    <!-- 5. Hallazgos y Residuos -->
-    <h3>Hallazgos y Residuos</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label>Tipo de Obstrucción Encontrada</label>
-            <input type="text" name="tipo_obstruccion" value="{{ orden.tipo_obstruccion }}"
-                placeholder="Grasa, raíces, objetos, azolve..." {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Volumen de azolve retirado</label>
-            <input type="text" name="volumen_azolve" value="{{ orden.volumen_azolve }}"
-                placeholder="Litros / Cubetas / m³" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <!-- 6. Diagnóstico y Recomendaciones -->
-    <h3>Diagnóstico y Recomendaciones</h3>
-    <div class="mb-4">
-        <label class="font-bold mb-2 block">Estado de la Tubería:</label>
-        <div class="flex gap-4 flex-wrap">
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="estado_bueno" value="x" {% if orden.estado_bueno=='x' or
-                    orden.estado_bueno==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Bueno
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="estado_danado" value="x" {% if orden.estado_danado=='x' or
-                    orden.estado_danado==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}> Fracturada /
-                Dañada
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="estado_obstruido" value="x" {% if orden.estado_obstruido=='x' or
-                    orden.estado_obstruido==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Obstrucción Persistente
-            </label>
-        </div>
-    </div>
-    <div class="form-group mb-4">
-        <label>Observaciones</label>
-        <textarea name="observaciones" rows="3" placeholder="Comentarios adicionales del técnico..." {% if not is_new
-            %}disabled{% endif %}>{{ orden.observaciones }}</textarea>
-    </div>
-
-    <!-- 7. Evidencia Fotográfica -->
-    <h3>Evidencia Fotográfica</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label>Registro saturado / Nivel alto (Antes)</label>
-            <input type="text" name="obs_evidencia_01" value="{{ orden.obs_evidencia_01 }}"
-                placeholder="Descripción evidencia 1" {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Flujo corriente / Limpia (Después)</label>
-            <input type="text" name="obs_evidencia_02" value="{{ orden.obs_evidencia_02 }}"
-                placeholder="Descripción evidencia 2" {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Equipo en operación</label>
-            <input type="text" name="obs_evidencia_03" value="{{ orden.obs_evidencia_03 }}"
-                placeholder="Descripción evidencia 3" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <!-- 8. Comentarios Adicionales -->
-    <h3>Comentarios Adicionales</h3>
-    <div class="form-group mb-4">
-        <textarea name="comentarios_cliente" rows="2" placeholder="Espacio para notas del cliente..." {% if not is_new
-            %}disabled{% endif %}>{{ orden.comentarios_cliente }}</textarea>
-    </div>
-    {% endif %}
-
-    <!-- TRAMPA SPECIFIC -->
-    {% if tipo == 'trampa' %}
-
-    <!-- 2. Datos del Equipo -->
-    <h3>Datos del Equipo</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label>Ubicación</label>
-            <input type="text" name="ubicacion_equipo" value="{{ orden.ubicacion_equipo }}"
-                placeholder="Ej. Cocina, Exterior..." {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Tipo de Trampa</label>
-            <input type="text" name="tipo_trampa" value="{{ orden.tipo_trampa }}" placeholder="Acero, Obra, Plástico..."
-                {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Capacidad Estimada</label>
-            <input type="text" name="capacidad_trampa" value="{{ orden.capacidad_trampa }}" placeholder="Kg / Litros" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Estado Inicial de Tapa</label>
-            <input type="text" name="estado_tapa" value="{{ orden.estado_tapa }}"
-                placeholder="Sellada, rota, sin tornillos..." {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <!-- 4. Detalle del Servicio -->
-    <h3>Detalle del Servicio</h3>
-    <div class="form-group mb-4">
-        <label>Nivel de Saturación Inicial (%):</label>
-        <input type="text" name="nivel_saturacion" value="{{ orden.nivel_saturacion }}" placeholder="25%, 50%, 90%..."
-            {% if not is_new %}disabled{% endif %}>
-    </div>
-
-    <div class="mb-4">
-        <label class="font-bold mb-2 block">Acciones Realizadas:</label>
-        <div class="flex gap-4 flex-wrap">
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="accion_retiro_solidos" value="x" {% if orden.accion_retiro_solidos=='x' or
-                    orden.accion_retiro_solidos==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Retiro de sólidos superficiales (Nata)
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="accion_succion_liquidos" value="x" {% if orden.accion_succion_liquidos=='x'
-                    or orden.accion_succion_liquidos==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Succión de líquidos y lodos (Vaciado)
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="accion_raspado_paredes" value="x" {% if orden.accion_raspado_paredes=='x'
-                    or orden.accion_raspado_paredes==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Raspado de paredes y difusores
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="accion_lavado_presion" value="x" {% if orden.accion_lavado_presion=='x' or
-                    orden.accion_lavado_presion==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Lavado a presión interno
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="accion_aplicacion_bacterias" value="x" {% if
-                    orden.accion_aplicacion_bacterias=='x' or orden.accion_aplicacion_bacterias==True %}checked{% endif
-                    %} {% if not is_new %}disabled{% endif %}> Aplicación de bacterias/enzimas
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="accion_prueba_flujo" value="x" {% if orden.accion_prueba_flujo=='x' or
-                    orden.accion_prueba_flujo==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Prueba de flujo (Grifos abiertos)
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="accion_limpieza_perimetral" value="x" {% if
-                    orden.accion_limpieza_perimetral=='x' or orden.accion_limpieza_perimetral==True %}checked{% endif %}
-                    {% if not is_new %}disabled{% endif %}>
-                Limpieza del área perimetral y desodorización
-            </label>
-        </div>
-    </div>
-
-    <!-- 5. Registro de Residuos -->
-    <h3>Registro de Residuos</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label>Volumen Total Extraído</label>
-            <input type="text" name="volumen_extraido" value="{{ orden.volumen_extraido }}" placeholder="Litros / m³" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Características del Residuo</label>
-            <input type="text" name="caracteristicas_residuo" value="{{ orden.caracteristicas_residuo }}"
-                placeholder="Ej. Exceso de sólidos, objetos extraños..." {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <!-- 6. Diagnóstico Técnico -->
-    <h3>Diagnóstico Técnico y Recomendaciones</h3>
-    <div class="mb-4">
-        <label class="font-bold mb-2 block">Estado físico de la trampa:</label>
-        <div class="flex gap-4 flex-wrap">
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="estado_bueno" value="x" {% if orden.estado_bueno=='x' or
-                    orden.estado_bueno==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Bueno
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="estado_reparacion" value="x" {% if orden.estado_reparacion=='x' or
-                    orden.estado_reparacion==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Requiere Reparación
-            </label>
-            <label class="flex items-center gap-2">
-                <input type="checkbox" name="estado_faltantes" value="x" {% if orden.estado_faltantes=='x' or
-                    orden.estado_faltantes==True %}checked{% endif %} {% if not is_new %}disabled{% endif %}>
-                Faltan Componentes
-            </label>
-        </div>
-    </div>
-    <div class="form-group">
-        <label>Observaciones / Recomendaciones</label>
-        <textarea name="observaciones_tecnico" rows="3" placeholder="Comentarios del técnico..." {% if not is_new
-            %}disabled{% endif %}>{{ orden.observaciones_tecnico }}</textarea>
-    </div>
-
-    <!-- 7. Evidencia Fotográfica -->
-    <h3>Evidencia Fotográfica</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label>Trampa Llena (Antes)</label>
-            <input type="text" name="obs_evidencia_01" value="{{ orden.obs_evidencia_01 }}"
-                placeholder="Descripción evidencia 1" {% if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Trampa Vacía y Limpia (Después)</label>
-            <input type="text" name="obs_evidencia_02" value="{{ orden.obs_evidencia_02 }}"
-                placeholder="Descripción evidencia 2" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- VISITA SPECIFIC -->
-    {% if tipo == 'visita' %}
-
-    <!-- 1. Inventario de Equipos Principales -->
-    <h3>Inventario de Equipos Principales (Registro de Activos)</h3>
-
-    <h4 class="mt-2 font-semibold">Almacenamiento y Suministro</h4>
-    <div class="grid-2 mb-2">
-        <div class="form-group">
-            <label>Cisterna</label>
-            <div class="flex gap-2">
-                <input type="text" name="inv_cisterna_no" placeholder="No." value="{{ orden.inv_cisterna_no }}" {% if
-                    not is_new %}disabled{% endif %}>
-                <input type="text" name="inv_cisterna_cap" placeholder="Capacidad" value="{{ orden.inv_cisterna_cap }}"
-                    {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Tinaco(s)</label>
-            <div class="flex gap-2">
-                <input type="text" name="inv_tinacos_no" placeholder="No." value="{{ orden.inv_tinacos_no }}" {% if not
-                    is_new %}disabled{% endif %}>
-                <input type="text" name="inv_tinacos_cap" placeholder="Capacidad Unit."
-                    value="{{ orden.inv_tinacos_cap }}" {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid-2 mb-2">
-        <div class="form-group">
-            <label>Medidor de Agua</label>
-            <div class="flex gap-2">
-                <input type="text" name="inv_medidor_serie" placeholder="No. Serie"
-                    value="{{ orden.inv_medidor_serie }}" {% if not is_new %}disabled{% endif %}>
-                <input type="text" name="inv_medidor_lectura" placeholder="Lectura Actual"
-                    value="{{ orden.inv_medidor_lectura }}" {% if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Pipas de Agua</label>
-            <div class="flex gap-2">
-                <input type="text" name="inv_pipas_sn" placeholder="Si/No" value="{{ orden.inv_pipas_sn }}" {% if not
-                    is_new %}disabled{% endif %}>
-                <input type="text" name="inv_pipas_m3" placeholder="m3 mensual" value="{{ orden.inv_pipas_m3 }}" {% if
-                    not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-    </div>
-
-    <h4 class="mt-2 font-semibold">Equipos de Bombeo y Red</h4>
-    <div class="grid-2 mb-2">
-        <div class="form-group">
-            <label>Sistema de Bombeo</label>
-            <input type="text" name="inv_bombas" placeholder="Ej. 2 Bombas 3HP Evans" value="{{ orden.inv_bombas }}" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Tanque Hidroneumático</label>
-            <input type="text" name="inv_tanque_hidro" placeholder="Ej. 80L / 40-60 PSI"
-                value="{{ orden.inv_tanque_hidro }}" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="grid-2 mb-2">
-        <div class="form-group">
-            <label>Tomas Conectadas</label>
-            <input type="text" name="inv_tomas_no" placeholder="No." value="{{ orden.inv_tomas_no }}" {% if not is_new
-                %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Registros</label>
-            <input type="text" name="inv_registro_no" placeholder="No." value="{{ orden.inv_registro_no }}" {% if not
-                is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group col-span-2">
-            <label>Trampa de Grasa</label>
-            <div class="flex gap-2">
-                <input type="text" name="inv_trampas_no" placeholder="No." value="{{ orden.inv_trampas_no }}" {% if not
-                    is_new %}disabled{% endif %}>
-                <input type="text" name="inv_trampas_cap" placeholder="Capacidad" value="{{ orden.inv_trampas_cap }}" {%
-                    if not is_new %}disabled{% endif %}>
-            </div>
-        </div>
-    </div>
-
-    <h4 class="mt-2 font-semibold">Muebles Sanitarios y Eficiencia</h4>
-    <div class="grid-3 mb-2">
-        <div class="form-group">
-            <label>WC</label>
-            <input type="text" name="inv_wc_no" placeholder="Cant." value="{{ orden.inv_wc_no }}" {% if not is_new
-                %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Lavamanos</label>
-            <input type="text" name="inv_lavamanos_no" placeholder="Cant." value="{{ orden.inv_lavamanos_no }}" {% if
-                not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Fregaderos</label>
-            <input type="text" name="inv_fregaderos_no" placeholder="Cant." value="{{ orden.inv_fregaderos_no }}" {% if
-                not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="form-group mb-4">
-        <label>Mecanismos para ahorro de agua</label>
-        <div class="flex gap-2">
-            <input type="text" name="inv_ahorro_sn" placeholder="Si/No" value="{{ orden.inv_ahorro_sn }}"
-                style="flex: 0 0 80px;" {% if not is_new %}disabled{% endif %}>
-            <input type="text" name="inv_ahorro_lista" placeholder="¿Qué mecanismos utiliza?"
-                value="{{ orden.inv_ahorro_lista }}" class="flex-grow" {% if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <!-- 2. Matriz de Inspección Detallada -->
-    <h3>Matriz de Inspección Detallada</h3>
-    <div class="overflow-x-auto mb-4">
-        <table class="w-full text-sm border-collapse">
-            <thead>
-                <tr class="bg-gray-100 text-left">
-                    <th class="p-2 border">Componente / Área</th>
-                    <th class="p-2 border w-1/4">Estado</th>
-                    <th class="p-2 border w-1/2">Hallazgos y Observaciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set items = [
-                ('Cisterna', 'st_cisterna', 'obs_cisterna'),
-                ('Tinaco(s)', 'st_tinacos', 'obs_tinacos'),
-                ('Tomas conectadas', 'st_tomas', 'obs_tomas'),
-                ('Registro', 'st_registro', 'obs_registro'),
-                ('Trampas de grasa', 'st_trampas', 'obs_trampas'),
-                ('Válvulas', 'st_valvulas', 'obs_valvulas'),
-                ('Bombas', 'st_bombas', 'obs_bombas'),
-                ('Tuberías', 'st_tuberias', 'obs_tuberias'),
-                ('Grifería', 'st_griferia', 'obs_griferia'),
-                ('Medidores de agua', 'st_medidores', 'obs_medidores'),
-                ('Fregadero', 'st_fregadero', 'obs_fregadero'),
-                ('Céspol', 'st_cespol', 'obs_cespol'),
-                ('Coladeras y Rejillas', 'st_coladeras', 'obs_coladeras'),
-                ('Bajadas Pluviales', 'st_pluviales', 'obs_pluviales'),
-                ('WC', 'st_wc', 'obs_wc')
-                ] %}
-                {% for label, st_key, obs_key in items %}
-                <tr>
-                    <td class="p-2 border font-medium">{{ label }}</td>
-                    <td class="p-2 border"><input type="text" name="{{ st_key }}" value="{{ orden[st_key] }}"
-                            class="w-full border-gray-300 rounded" {% if not is_new %}disabled{% endif %}></td>
-                    <td class="p-2 border"><input type="text" name="{{ obs_key }}" value="{{ orden[obs_key] }}"
-                            class="w-full border-gray-300 rounded" {% if not is_new %}disabled{% endif %}></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 3. Evidencia Fotográfica -->
-    <h3>Evidencia Fotográfica</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label>Evidencia 01</label>
-            <input type="text" name="obs_evidencia_01" value="{{ orden.obs_evidencia_01 }}" placeholder="Descripción" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Evidencia 02</label>
-            <input type="text" name="obs_evidencia_02" value="{{ orden.obs_evidencia_02 }}" placeholder="Descripción" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Evidencia 03</label>
-            <input type="text" name="obs_evidencia_03" value="{{ orden.obs_evidencia_03 }}" placeholder="Descripción" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label>Evidencia 04</label>
-            <input type="text" name="obs_evidencia_04" value="{{ orden.obs_evidencia_04 }}" placeholder="Descripción" {%
-                if not is_new %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <div class="form-section mb-4">
-        <h3>Comentarios adicionales</h3>
-        <div class="form-group">
-            <label>Comentarios:</label>
-            <textarea name="hallazgos_comentarios" rows="3" {% if not is_new %}disabled{% endif
-                %}>{{ orden.hallazgos_comentarios }}</textarea>
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="text-right mt-8 flex justify-end gap-4">
-        <a href="{{ url_for('ordenes') }}" class="btn btn-secondary">Volver</a>
-        <button type="submit" class="btn btn-primary {% if not is_new %}hidden{% endif %}" id="btn-submit">
-            {{ 'Guardar Nueva Orden' if is_new else 'Guardar Cambios' }}
+    {% if orden %}
+    <div class="flex gap-2">
+        <a href="{{ url_for('ver_orden_pdf', tipo=tipo, folio=folio) }}" target="_blank"
+            class="btn btn-soft btn-secondary">
+            <span class="icon-[tabler--file-text] size-5"></span>
+            Ver PDF
+        </a>
+        <button type="button" class="btn btn-primary shadow-sm" onclick="enableEdit()" id="btn-editar">
+            <span class="icon-[tabler--edit] size-5"></span>
+            Editar
         </button>
+    </div>
+    {% endif %}
+</div>
+
+<form action="{{ url_for('guardar_orden', tipo=tipo) }}" method="POST" enctype="multipart/form-data"
+    class="space-y-8 pb-20">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Columna Izquierda: Identificación -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--hash] size-5 text-primary"></span>
+                    <span>Datos del Folio</span>
+                </div>
+                <div class="card-body p-6 space-y-4">
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Folio</label>
+                        <input type="text" name="folio" value="{{ folio }}" readonly required
+                            class="input input-bordered w-full font-black text-primary">
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Fecha de Servicio</label>
+                        <input type="text" name="fecha"
+                            value="{{ orden.get('fecha_' + ( 'des' if tipo=='desazolve' else 'lt' if tipo=='trampa' else 'vt' ), todays_date) }}"
+                            class="input input-bordered w-full" {{ 'disabled' if orden else '' }}>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--user] size-5 text-secondary"></span>
+                    <span>Información del Cliente</span>
+                </div>
+                <div class="card-body p-6 space-y-4">
+                    <div class="form-control relative">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Nombre / Empresa</label>
+                        <input type="text" id="nombre_cliente" name="cliente" placeholder="Buscar..." autocomplete="off"
+                            class="input input-bordered w-full font-bold" oninput="fillClient(this)" required
+                            value="{{ orden.get('cliente', '') }}" {{ 'disabled' if orden else '' }}>
+                        <div id="suggestions-box"
+                            class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                        </div>
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Dirección</label>
+                        <textarea id="direccion_cliente" name="direccion" class="textarea textarea-bordered w-full"
+                            rows="2" {{ 'disabled' if orden else '' }}>{{ orden.get('direccion', '') }}</textarea>
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Teléfono</label>
+                        <input type="text" id="telefono_cliente" name="telefono" class="input input-bordered w-full"
+                            value="{{ orden.get('telefono', '') }}" {{ 'disabled' if orden else '' }}>
+                    </div>
+                </div>
+            </div>
+
+            {% if tipo == 'desazolve' or tipo == 'trampa' %}
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--clock] size-5 text-info"></span>
+                    <span>Horarios de Servicio</span>
+                </div>
+                <div class="card-body p-6 grid grid-cols-2 gap-4">
+                    <div class="form-control">
+                        <label class="label font-bold text-[10px] uppercase opacity-50">Hora Inicial</label>
+                        <input type="text" name="hora_inicial" class="input input-bordered w-full"
+                            value="{{ orden.get('hora_inicial', '') }}" {{ 'disabled' if orden else '' }}>
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-[10px] uppercase opacity-50">Hora Final</label>
+                        <input type="text" name="hora_final" class="input input-bordered w-full"
+                            value="{{ orden.get('hora_final', '') }}" {{ 'disabled' if orden else '' }}>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Columna Derecha: Detalles del Servicio -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-sm">
+                    <span class="icon-[tabler--clipboard-check] size-5 text-success"></span>
+                    <span>Detalles Técnicos y Observaciones</span>
+                </div>
+                <div class="card-body p-6 space-y-6">
+
+                    {% if tipo == 'desazolve' %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Ubicación
+                                del Servicio</label><input type="text" name="ubicacion"
+                                class="input input-bordered w-full" value="{{ orden.get('ubicacion', '') }}"
+                                {{ 'disabled' if orden else '' }}></div>
+                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Metros de
+                                Manguera</label><input type="text" name="metros_manguera"
+                                class="input input-bordered w-full" value="{{ orden.get('metros_manguera', '') }}"
+                                {{ 'disabled' if orden else '' }}></div>
+                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Tramo /
+                                Línea</label><input type="text" name="tramo" class="input input-bordered w-full"
+                                value="{{ orden.get('tramo', '') }}" {{ 'disabled' if orden else '' }}></div>
+                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Condición
+                                Final</label><input type="text" name="condicion_final"
+                                class="input input-bordered w-full" value="{{ orden.get('condicion_final', '') }}"
+                                {{ 'disabled' if orden else '' }}></div>
+                    </div>
+                    {% elif tipo == 'trampa' %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Ubicación
+                                de la Trampa</label><input type="text" name="ubicacion"
+                                class="input input-bordered w-full" value="{{ orden.get('ubicacion', '') }}"
+                                {{ 'disabled' if orden else '' }}></div>
+                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Capacidad
+                                (Litros)</label><input type="text" name="capacidad" class="input input-bordered w-full"
+                                value="{{ orden.get('capacidad', '') }}" {{ 'disabled' if orden else '' }}></div>
+                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Residuos
+                                Retirados</label><input type="text" name="residuos" class="input input-bordered w-full"
+                                value="{{ orden.get('residuos', '') }}" {{ 'disabled' if orden else '' }}></div>
+                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Estado de
+                                la Trampa</label><input type="text" name="estado_trampa"
+                                class="input input-bordered w-full" value="{{ orden.get('estado_trampa', '') }}"
+                                {{ 'disabled' if orden else '' }}></div>
+                    </div>
+                    {% elif tipo == 'visita' %}
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase opacity-60">Motivo de la Visita</label>
+                        <input type="text" name="motivo" class="input input-bordered w-full"
+                            value="{{ orden.get('motivo', '') }}" {{ 'disabled' if orden else '' }}>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase opacity-60">Observaciones Generales</label>
+                        <textarea name="observaciones" class="textarea textarea-bordered w-full" rows="4" {{ 'disabled'
+                            if orden else '' }}>{{ orden.get('observaciones', '') }}</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Nombre de
+                                quien Recibe</label><input type="text" name="nombre_recibe"
+                                class="input input-bordered w-full" value="{{ orden.get('nombre_recibe', '') }}"
+                                {{ 'disabled' if orden else '' }}></div>
+                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Nombre del
+                                Técnico</label><input type="text" name="tecnico_nombre"
+                                class="input input-bordered w-full" value="{{ orden.get('tecnico_nombre', '') }}"
+                                {{ 'disabled' if orden else '' }}></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evidencia Fotográfica -->
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-sm">
+                    <span class="icon-[tabler--camera] size-5 text-warning"></span>
+                    <span>Evidencia Fotográfica</span>
+                </div>
+                <div class="card-body p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <label class="label font-bold text-xs uppercase opacity-60 justify-center">Antes del
+                                Servicio</label>
+                            <div class="flex flex-col items-center gap-4">
+                                {% if orden.foto_antes %}
+                                <div
+                                    class="relative group w-full aspect-video rounded-xl overflow-hidden border border-base-content/10">
+                                    <img src="{{ url_for('static', filename='uploads/' + orden.foto_antes) }}"
+                                        class="w-full h-full object-cover">
+                                </div>
+                                {% endif %}
+                                <input type="file" name="foto_antes"
+                                    class="file-input file-input-bordered file-input-primary w-full max-w-xs"
+                                    {{ 'disabled' if orden else '' }}>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="label font-bold text-xs uppercase opacity-60 justify-center">Después del
+                                Servicio</label>
+                            <div class="flex flex-col items-center gap-4">
+                                {% if orden.foto_despues %}
+                                <div
+                                    class="relative group w-full aspect-video rounded-xl overflow-hidden border border-base-content/10">
+                                    <img src="{{ url_for('static', filename='uploads/' + orden.foto_despues) }}"
+                                        class="w-full h-full object-cover">
+                                </div>
+                                {% endif %}
+                                <input type="file" name="foto_despues"
+                                    class="file-input file-input-bordered file-input-primary w-full max-w-xs"
+                                    {{ 'disabled' if orden else '' }}>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <a href="{{ url_for('ordenes') }}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary btn-wide shadow-lg {{ 'hidden' if orden else '' }}"
+                    id="btn-submit">
+                    <span class="icon-[tabler--device-floppy] size-5"></span>
+                    {{ 'Actualizar Orden' if orden else 'Guardar Orden de Trabajo' }}
+                </button>
+            </div>
+        </div>
     </div>
 </form>
 
@@ -544,84 +244,52 @@
 <script>
     const clientsData = JSON.parse(document.getElementById('clients-data').textContent);
 
+    function enableEdit() {
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            if (el.name !== 'folio') el.disabled = false;
+        });
+
+        const btnSubmit = document.getElementById('btn-submit');
+        if (btnSubmit) btnSubmit.classList.remove('hidden');
+        const btnEdit = document.getElementById('btn-editar');
+        if (btnEdit) btnEdit.classList.add('hidden');
+    }
+
     function normalizeStr(str) {
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     }
 
     function fillClient(input) {
-        // Same logic as crear_cotizacion.js, duplicated here for simplicity or could be imported
         const val = normalizeStr(input.value);
-        const suggestionsBox = document.getElementById('suggestions-box');
-        suggestionsBox.innerHTML = '';
-        suggestionsBox.style.display = 'none';
+        const box = document.getElementById('suggestions-box');
+        box.innerHTML = '';
+        box.classList.add('hidden');
 
         if (!val) return;
 
-        const matches = clientsData.filter(c => {
-            const nombre = c.nombre_empresa || '';
-            return normalizeStr(nombre).includes(val);
-        });
+        const matches = clientsData.filter(c => normalizeStr(c.nombre_empresa || '').includes(val));
 
         if (matches.length > 0) {
-            suggestionsBox.style.display = 'block';
+            box.classList.remove('hidden');
             matches.forEach(match => {
                 const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.textContent = match.nombre_empresa;
-                div.onclick = () => {
-                    document.getElementById('nombre_cliente').value = match.nombre_empresa;
-                    document.getElementById('direccion_cliente').value = match.direccion_empresa || '';
-                    if (document.getElementById('telefono_contacto')) {
-                        document.getElementById('telefono_contacto').value = match.telefono_empresa || '';
-                    }
-                    suggestionsBox.style.display = 'none';
-                };
-                suggestionsBox.appendChild(div);
+                div.className = 'p-3 hover:bg-base-200 cursor-pointer border-b border-base-content/5 last:border-0';
+                div.innerHTML = `<div class="font-bold text-sm text-base-content">${match.nombre_empresa}</div><div class="text-xs text-base-content/50">${match.id_cliente || ''}</div>`;
+                div.onclick = () => selectClient(match);
+                box.appendChild(div);
             });
         }
     }
 
-    function enableEdit() {
-        document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
-        document.querySelectorAll('input[readonly]').forEach(el => {
-            // Keep folio readonly usually, but user might want to edit it? Assuming no for ID.
-            if (!el.name.includes('folio')) {
-                el.readOnly = false;
-                el.classList.remove('readonly-bg');
-            }
-        });
-
-        const btnSubmit = document.getElementById('btn-submit');
-        if (btnSubmit) btnSubmit.classList.remove('hidden');
-
-        const btnEdit = document.getElementById('btn-editar');
-        if (btnEdit) btnEdit.classList.add('hidden');
+    function selectClient(client) {
+        document.getElementById('nombre_cliente').value = client.nombre_empresa;
+        if (document.getElementById('direccion_cliente')) document.getElementById('direccion_cliente').value = client.direccion_empresa || '';
+        if (document.getElementById('telefono_cliente')) document.getElementById('telefono_cliente').value = client.telefono_empresa || '';
+        document.getElementById('suggestions-box').classList.add('hidden');
     }
 
-    // Checkbox hack: HTML forms don't send anything for unchecked checkboxes.
-    // We need to ensure that if we uncheck something, it sends a distinct value or handle it in backend.
-    // A common trick is a hidden input with the same name before the checkbox, but Flask/dict usage might conflict.
-    // For now, simple text editing is safer. For checkboxes, if the user unchecks, the key is missing.
-    // My backend logic loops over form keys. Implicitly this means missing keys (unchecked) won't update the COPY of the data if I iterate form keys.
-    // TO FIX THIS: Backend should iterate over EXPECTED keys or I should ensure checkboxes send '0' or empty.
-    // JavaScript can intercept submit and add hidden fields for unchecked boxes.
-
-    document.querySelector('form').addEventListener('submit', function (e) {
-        // Find all unchecked checkboxes and append a hidden input or handle logic
-        // Easier: In backend, I need to know which fields ARE checkboxes to unset them if missing.
-        // Or, simpler: Just set value to '' if not checked before submit? No, unchecked inputs aren't sent.
-
-        // Let's add hidden inputs for all unchecked checkboxes
-        const checkboxes = this.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(cb => {
-            if (!cb.checked) {
-                const hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = cb.name;
-                hidden.value = ''; // Empty string for unchecked
-                this.appendChild(hidden);
-            }
-        });
+    document.addEventListener('click', () => {
+        document.getElementById('suggestions-box').classList.add('hidden');
     });
 </script>
 {% endblock %}

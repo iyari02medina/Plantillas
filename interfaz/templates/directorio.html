@@ -1,43 +1,52 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
+
+{% block title %}Directorio - Sistema Cophi{% endblock %}
 
 {% block content %}
-<div class="main-section">
-    <div class="main-title-row">
-        <h2 class="main-title">Directorio</h2>
-    </div>
-
-    <div class="details-layout" style="align-items: center; justify-content: center; min-height: 50vh; gap: 4rem;">
-
-        <a href="{{ url_for('ver_directorio', tipo='clientes') }}" class="directorio-card"
-            style="text-decoration: none;">
-            <div class="info-box"
-                style="padding: 2rem; width: 250px; text-align: center; cursor: pointer; transition: transform 0.2s;">
-                <div style="font-size: 3rem; color: var(--brand-600); margin-bottom: 1rem;">🏢</div>
-                <h3 style="color: var(--brand-800); font-size: 1.25rem;">Clientes</h3>
-                <p style="color: var(--slate-500); font-size: 0.85rem; margin-top: 0.5rem;">Gestionar base de datos de
-                    empresas y clientes activos.</p>
-            </div>
-        </a>
-
-        <a href="{{ url_for('ver_directorio', tipo='prospectos') }}" class="directorio-card"
-            style="text-decoration: none;">
-            <div class="info-box"
-                style="padding: 2rem; width: 250px; text-align: center; cursor: pointer; transition: transform 0.2s;">
-                <div style="font-size: 3rem; color: var(--green); margin-bottom: 1rem;">🚀</div>
-                <h3 style="color: var(--brand-800); font-size: 1.25rem;">Prospectos</h3>
-                <p style="color: var(--slate-500); font-size: 0.85rem; margin-top: 0.5rem;">Gestionar clientes
-                    potenciales y seguimiento.</p>
-            </div>
-        </a>
-
-    </div>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-base-content mb-1">Directorio</h1>
+    <p class="text-base-content/60 font-medium">Seleccione el tipo de base de datos que desea gestionar.</p>
 </div>
 
-<style>
-    .directorio-card:hover .info-box {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        border-color: var(--brand-500);
-    }
-</style>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto py-10">
+    <!-- Clientes Card -->
+    <a href="{{ url_for('ver_directorio', tipo='clientes') }}"
+        class="group card bg-base-100 border border-base-content/10 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300">
+        <div class="card-body items-center text-center p-10">
+            <div class="bg-primary/10 text-primary rounded-2xl p-6 mb-6 group-hover:scale-110 transition-transform">
+                <span class="icon-[tabler--building-community] size-16"></span>
+            </div>
+            <h2 class="card-title text-2xl font-black text-base-content mb-2">Clientes</h2>
+            <p class="text-base-content/60 font-medium">
+                Gestionar base de datos de empresas, NIS, contratos y clientes activos con historial completo.
+            </p>
+            <div class="card-actions mt-6">
+                <span class="btn btn-primary btn-wide group-hover:gap-3 transition-all">
+                    Acceder a Clientes
+                    <span class="icon-[tabler--arrow-right] size-5"></span>
+                </span>
+            </div>
+        </div>
+    </a>
+
+    <!-- Prospectos Card -->
+    <a href="{{ url_for('ver_directorio', tipo='prospectos') }}"
+        class="group card bg-base-100 border border-base-content/10 shadow-sm hover:shadow-xl hover:border-secondary/30 transition-all duration-300">
+        <div class="card-body items-center text-center p-10">
+            <div class="bg-secondary/10 text-secondary rounded-2xl p-6 mb-6 group-hover:scale-110 transition-transform">
+                <span class="icon-[tabler--rocket] size-16"></span>
+            </div>
+            <h2 class="card-title text-2xl font-black text-base-content mb-2">Prospectos</h2>
+            <p class="text-base-content/60 font-medium">
+                Gestionar clientes potenciales, nuevos contactos y seguimiento de oportunidades comerciales.
+            </p>
+            <div class="card-actions mt-6">
+                <span class="btn btn-secondary btn-wide group-hover:gap-3 transition-all">
+                    Acceder a Prospectos
+                    <span class="icon-[tabler--arrow-right] size-5"></span>
+                </span>
+            </div>
+        </div>
+    </a>
+</div>
 {% endblock %}

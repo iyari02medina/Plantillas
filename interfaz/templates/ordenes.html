@@ -1,145 +1,202 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
+
+{% block title %}Órdenes de Trabajo - Sistema Cophi{% endblock %}
 
 {% block content %}
-<div class="content">
-    <div class="header-section">
-        <div>
-            <h1>Órdenes de Trabajo</h1>
-            <p class="subtitle">Gestión de servicios y visitas técnicas</p>
-        </div>
-        <div class="flex gap-2">
-            <a href="{{ url_for('nueva_orden', tipo='desazolve') }}" class="btn btn-primary">+ Nuevo Desazolve</a>
-            <a href="{{ url_for('nueva_orden', tipo='trampa') }}" class="btn btn-primary">+ Nueva Trampa</a>
-            <a href="{{ url_for('nueva_orden', tipo='visita') }}" class="btn btn-primary">+ Nueva Visita</a>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div>
+        <h1 class="text-3xl font-bold text-base-content mb-1">Órdenes de Trabajo</h1>
+        <p class="text-base-content/60 font-medium">Gestión de servicios y visitas técnicas.</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+        <a href="{{ url_for('nueva_orden', tipo='desazolve') }}" class="btn btn-primary btn-sm shadow-sm">
+            <span class="icon-[tabler--plus] size-4"></span>
+            Nuevo Desazolve
+        </a>
+        <a href="{{ url_for('nueva_orden', tipo='trampa') }}" class="btn btn-primary btn-sm shadow-sm">
+            <span class="icon-[tabler--plus] size-4"></span>
+            Nueva Trampa
+        </a>
+        <a href="{{ url_for('nueva_orden', tipo='visita') }}" class="btn btn-primary btn-sm shadow-sm">
+            <span class="icon-[tabler--plus] size-4"></span>
+            Nueva Visita
+        </a>
+    </div>
+</div>
+
+<!-- Tabs Navigation -->
+<div class="tabs tabs-box bg-base-100 p-1 rounded-lg border border-base-content/10 shadow-sm mb-6 max-w-2xl">
+    <button onclick="showTab('desazolve')" id="btn-desazolve"
+        class="tab tab-active flex items-center gap-2 h-10 px-6 font-bold transition-all">
+        <span class="icon-[tabler--truck] size-4"></span>
+        Desazolves
+    </button>
+    <button onclick="showTab('trampas')" id="btn-trampas"
+        class="tab flex items-center gap-2 h-10 px-6 font-medium transition-all">
+        <span class="icon-[tabler--droplet-half-2] size-4"></span>
+        Trampas de Grasa
+    </button>
+    <button onclick="showTab('visitas')" id="btn-visitas"
+        class="tab flex items-center gap-2 h-10 px-6 font-medium transition-all">
+        <span class="icon-[tabler--report-search] size-4"></span>
+        Visitas Técnicas
+    </button>
+</div>
+
+<!-- DESAZOLVES -->
+<div id="tab-desazolve" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+    <div class="card-header bg-base-200/30 p-4 border-b border-base-content/10">
+        <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
+            <span class="icon-[tabler--list-details] size-5"></span>
+            Lista de Desazolves
+        </h3>
+    </div>
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table table-lg">
+                <thead class="bg-base-200/50">
+                    <tr>
+                        <th>Folio</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Ubicación</th>
+                        <th>Servicio</th>
+                        <th class="text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-base-content/5">
+                    {% for orden in desazolves|reverse %}
+                    {% if orden.folio_des %}
+                    <tr class="hover:bg-base-200/30 transition-colors">
+                        <td><span class="font-bold text-primary">{{ orden.folio_des }}</span></td>
+                        <td class="text-base-content/60">{{ orden.fecha_des }}</td>
+                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
+                        <td class="text-sm truncate max-w-xs">{{ orden.ubicacion_area }}</td>
+                        <td>
+                            <div class="flex gap-1">
+                                {% if orden.equipo_vactor == 'x' %}<span
+                                    class="badge badge-soft badge-primary text-[10px]">Vactor</span>{% endif %}
+                                {% if orden.equipo_hidro == 'x' %}<span
+                                    class="badge badge-soft badge-info text-[10px]">Hidro</span>{% endif %}
+                                {% if orden.equipo_guia == 'x' %}<span
+                                    class="badge badge-soft badge-secondary text-[10px]">Guía</span>{% endif %}
+                            </div>
+                        </td>
+                        <td class="text-right">
+                            <a href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_des) }}"
+                                class="btn btn-soft btn-secondary btn-sm">Ver Detalle</a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-16 text-base-content/40 font-medium">No hay órdenes de
+                            desazolve registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
-<div style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
-    <button onclick="showTab('desazolve')" id="btn-desazolve" class="btn btn-primary">Desazolves</button>
-    <button onclick="showTab('trampas')" id="btn-trampas" class="btn btn-secondary">Trampas de Grasa</button>
-    <button onclick="showTab('visitas')" id="btn-visitas" class="btn btn-secondary">Visitas Técnicas</button>
-</div>
-
-<!-- DESAZOLVES -->
-<div id="tab-desazolve" class="card table-container">
-    <h3>Ordenes de Desazolve</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Folio</th>
-                <th>Fecha</th>
-                <th>Cliente</th>
-                <th>Ubicación</th>
-                <th>Servicio</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for orden in desazolves|reverse %}
-            {% if orden.folio_des %}
-            <tr>
-                <td><strong>{{ orden.folio_des }}</strong></td>
-                <td>{{ orden.fecha_des }}</td>
-                <td>{{ orden.nombre_cliente }}</td>
-                <td>{{ orden.ubicacion_area }}</td>
-                <td>
-                    {% if orden.equipo_vactor == 'x' %}Vactor{% endif %}
-                    {% if orden.equipo_hidro == 'x' %}Hidro{% endif %}
-                    {% if orden.equipo_guia == 'x' %}Guía{% endif %}
-                </td>
-                <td>
-                    <a href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_des) }}"
-                        class="btn btn-secondary btn-small">Ver Detalle</a>
-                </td>
-            </tr>
-            {% endif %}
-            {% else %}
-            <tr>
-                <td colspan="7" class="text-center text-muted p-8">No hay órdenes de desazolve registradas.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
 <!-- TRAMPAS -->
-<div id="tab-trampas" class="card table-container hidden">
-    <h3>Limpieza de Trampas</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Folio</th>
-                <th>Fecha</th>
-                <th>Cliente</th>
-                <th>Tipo</th>
-                <th>Capacidad</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for orden in trampas|reverse %}
-            {% if orden.folio_lt %}
-            <tr>
-                <td><strong>{{ orden.folio_lt }}</strong></td>
-                <td>{{ orden.fecha_lt }}</td>
-                <td>{{ orden.nombre_cliente }}</td>
-                <td>{{ orden.tipo_trampa }}</td>
-                <td>{{ orden.capacidad_trampa }}</td>
-                <td>
-                    <a href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_lt) }}"
-                        class="btn btn-secondary btn-small">Ver Detalle</a>
-                </td>
-            </tr>
-            {% endif %}
-            {% else %}
-            <tr>
-                <td colspan="6" class="text-center text-muted p-8">No hay órdenes de trampas registradas.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div id="tab-trampas" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden hidden">
+    <div class="card-header bg-base-200/30 p-4 border-b border-base-content/10">
+        <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
+            <span class="icon-[tabler--list-details] size-5"></span>
+            Lista de Trampas de Grasa
+        </h3>
+    </div>
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table table-lg">
+                <thead class="bg-base-200/50">
+                    <tr>
+                        <th>Folio</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Tipo</th>
+                        <th>Capacidad</th>
+                        <th class="text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-base-content/5">
+                    {% for orden in trampas|reverse %}
+                    {% if orden.folio_lt %}
+                    <tr class="hover:bg-base-200/30 transition-colors">
+                        <td><span class="font-bold text-primary">{{ orden.folio_lt }}</span></td>
+                        <td class="text-base-content/60">{{ orden.fecha_lt }}</td>
+                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
+                        <td>{{ orden.tipo_trampa }}</td>
+                        <td>{{ orden.capacidad_trampa }}</td>
+                        <td class="text-right">
+                            <a href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_lt) }}"
+                                class="btn btn-soft btn-secondary btn-sm">Ver Detalle</a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-16 text-base-content/40 font-medium">No hay órdenes de
+                            trampas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- VISITAS -->
-<div id="tab-visitas" class="card table-container hidden">
-    <h3>Visitas Técnicas</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Folio VT</th>
-                <th>Fecha</th>
-                <th>Cliente</th>
-                <th>Dirección</th>
-                <th>No. Cliente</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for orden in visitas|reverse %}
-            {% if orden.folio_vt %}
-            <tr>
-                <td><strong>{{ orden.folio_vt }}</strong></td>
-                <td>{{ orden.fecha_vt }}</td>
-                <td>{{ orden.nombre_cliente }}</td>
-                <td>{{ orden.direccion_cliente }}</td>
-                <td>{{ orden.no_cliente }}</td>
-                <td>
-                    <a href="{{ url_for('detalle_orden', tipo='visita', folio=orden.folio_vt) }}"
-                        class="btn btn-secondary btn-small">Ver Detalle</a>
-                </td>
-            </tr>
-            {% endif %}
-            {% else %}
-            <tr>
-                <td colspan="6" class="text-center text-muted p-8">No hay visitas técnicas registradas.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div id="tab-visitas" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden hidden">
+    <div class="card-header bg-base-200/30 p-4 border-b border-base-content/10">
+        <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
+            <span class="icon-[tabler--list-details] size-5"></span>
+            Lista de Visitas Técnicas
+        </h3>
+    </div>
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table table-lg">
+                <thead class="bg-base-200/50">
+                    <tr>
+                        <th>Folio VT</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Dirección</th>
+                        <th>No. Cliente</th>
+                        <th class="text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-base-content/5">
+                    {% for orden in visitas|reverse %}
+                    {% if orden.folio_vt %}
+                    <tr class="hover:bg-base-200/30 transition-colors">
+                        <td><span class="font-bold text-primary">{{ orden.folio_vt }}</span></td>
+                        <td class="text-base-content/60">{{ orden.fecha_vt }}</td>
+                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
+                        <td class="text-sm truncate max-w-xs">{{ orden.direccion_cliente }}</td>
+                        <td>{{ orden.no_cliente }}</td>
+                        <td class="text-right">
+                            <a href="{{ url_for('detalle_orden', tipo='visita', folio=orden.folio_vt) }}"
+                                class="btn btn-soft btn-secondary btn-sm">Ver Detalle</a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-16 text-base-content/40 font-medium">No hay visitas
+                            técnicas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-
+{% block scripts %}
 <script>
     function showTab(tabName) {
         // Hide all
@@ -150,16 +207,17 @@
         // Show selected
         document.getElementById('tab-' + tabName).classList.remove('hidden');
 
-        // Update buttons
-        document.querySelectorAll('button').forEach(btn => {
-            btn.classList.remove('btn-primary');
-            btn.classList.add('btn-secondary');
+        // Update tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('tab-active', 'font-bold');
+            tab.classList.add('font-medium');
         });
 
-        // Highlight active btn
-        const activeBtn = document.getElementById('btn-' + tabName);
-        activeBtn.classList.remove('btn-secondary');
-        activeBtn.classList.add('btn-primary');
+        // Highlight active tab
+        const activeTab = document.getElementById('btn-' + tabName);
+        activeTab.classList.add('tab-active', 'font-bold');
+        activeTab.classList.remove('font-medium');
     }
 </script>
+{% endblock %}
 {% endblock %}

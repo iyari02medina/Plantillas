@@ -1,186 +1,220 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
 
-{% block extra_head %}
-{% endblock %}
+{% block title %}{{ 'Detalle Cotización' if cotizacion else 'Nueva Cotización' }} - Sistema Cophi{% endblock %}
 
 {% block content %}
-<header class="flex justify-between items-center">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
-        <h1>{{ 'Detalle Cotización' if cotizacion else 'Nueva Cotización' }}</h1>
-        <p class="subtitle">{{ 'Consulta y edita los detalles.' if cotizacion else 'Complete el formulario para
-            registrar una nueva cotización.' }}</p>
+        <div class="flex items-center gap-2 mb-1">
+            <a href="{{ url_for('cotizaciones') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
+                <span class="icon-[tabler--arrow-left] size-5"></span>
+            </a>
+            <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle' if cotizacion else 'Nueva' }} Cotización</h1>
+        </div>
+        <p class="text-base-content/60 font-medium ml-10">
+            {{ 'Consulta y edita los conceptos de esta cotización.' if cotizacion else 'Ingrese los datos del cliente y
+            los conceptos a cotizar.' }}
+        </p>
     </div>
     {% if cotizacion %}
-    <div class="flex gap-4">
+    <div class="flex gap-2">
         <a href="{{ url_for('ver_cotizacion', folio=cotizacion.folio_cot) }}" target="_blank"
-            class="btn btn-secondary">Ver PDF</a>
-        <button type="button" class="btn btn-primary" onclick="enableEdit()" id="btn-editar">Editar</button>
+            class="btn btn-soft btn-secondary">
+            <span class="icon-[tabler--file-text] size-5"></span>
+            Ver PDF
+        </a>
+        <button type="button" class="btn btn-primary shadow-sm" onclick="enableEdit()" id="btn-editar">
+            <span class="icon-[tabler--edit] size-5"></span>
+            Editar
+        </button>
     </div>
     {% endif %}
-</header>
+</div>
 
-<form action="{{ url_for('nueva_cotizacion') }}" method="POST" class="card">
-    <input type="hidden" name="original_folio" value="{{ cotizacion.folio_cot if cotizacion else '' }}">
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label for="folio_cot">Folio Cotización</label>
-            <input type="text" id="folio_cot" name="folio_cot" placeholder="Ej. COT-COPHI-001"
-                value="{{ suggested_folio }}" required {% if cotizacion %}readonly class="readonly-bg" {% endif %}>
-        </div>
-        <div class="form-group">
-            <label for="fecha_cot">Fecha</label>
-            <input type="date" id="fecha_cot" name="fecha_cot" value="{{ cotizacion.fecha_cot if cotizacion else '' }}"
-                {% if cotizacion %}disabled{% endif %}>
-        </div>
-    </div>
+<form
+    action="{{ url_for('nueva_cotizacion' if not cotizacion else 'detalle_cotizacion', folio=cotizacion.folio_cot if cotizacion else '') }}"
+    method="POST" class="space-y-8 pb-20">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-    <div class="grid-2 mb-4">
-        <div class="form-group relative">
-            <label for="nombre_cliente">Cliente</label>
-            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar o escribir nuevo..."
-                autocomplete="off" oninput="fillClient(this)" required
-                value="{{ cotizacion.nombre_cliente if cotizacion else '' }}" {% if cotizacion %}disabled{% endif %}>
-            <div id="suggestions-box"></div>
-        </div>
-        <div class="form-group">
-            <label for="razon_social_cliente">Razón Social</label>
-            <input type="text" id="razon_social_cliente" name="razon_social_cliente"
-                value="{{ cotizacion.razon_social_cliente if cotizacion else '' }}" {% if cotizacion %}disabled{% endif
-                %}>
-        </div>
-        <div class="form-group col-span-2">
-            <label for="direccion_cliente">Dirección</label>
-            <input type="text" id="direccion_cliente" name="direccion_cliente"
-                value="{{ cotizacion.direccion_cliente if cotizacion else '' }}" {% if cotizacion %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label for="nombre_contacto">Contacto</label>
-            <input type="text" id="nombre_contacto" name="nombre_contacto"
-                value="{{ cotizacion.nombre_contacto if cotizacion else '' }}" {% if cotizacion %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label for="telefono_contacto">Teléfono</label>
-            <input type="text" id="telefono_contacto" name="telefono_contacto"
-                value="{{ cotizacion.telefono_contacto if cotizacion else '' }}" {% if cotizacion %}disabled{% endif %}>
-        </div>
-    </div>
+        <!-- Columna Izquierda: Datos Cliente -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--file-info] size-5 text-primary"></span>
+                    <span>Información General</span>
+                </div>
+                <div class="card-body p-6 space-y-4">
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Folio Cotización</label>
+                        <input type="text" name="folio_cot"
+                            value="{{ suggested_folio if not cotizacion else cotizacion.folio_cot }}"
+                            class="input input-bordered w-full font-black text-primary" readonly required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Fecha</label>
+                        <input type="text" name="fecha_cot"
+                            value="{{ cotizacion.fecha_cot if cotizacion else todays_date }}"
+                            class="input input-bordered w-full" readonly>
+                    </div>
+                </div>
+            </div>
 
-    <h3>Detalles del Servicio</h3>
-    <div class="form-group">
-        <label for="alcance_cot">Alcance (Descripción General)</label>
-        <textarea id="alcance_cot" name="alcance_cot" rows="3" {% if cotizacion %}disabled{% endif
-            %}>{{ cotizacion.alcance_cot if cotizacion else '' }}</textarea>
-    </div>
-
-    <h3>Items / Conceptos</h3>
-    <div id="items-container">
-        {% if cotizacion and cotizacion.conceptos %}
-        {% for item in cotizacion.conceptos %}
-        <div class="items-section item-row">
-            <div>
-                <label class="label-small">Nombre Item</label>
-                <input type="text" name="nombre_item[]" list="inventory_list" onchange="fillItem(this)" required
-                    placeholder="Buscar item..." value="{{ item.nombre_item }}" disabled>
-            </div>
-            <div>
-                <label class="label-small">Descripción</label>
-                <input type="text" name="descripcion_item[]" value="{{ item.descripcion_item }}" disabled>
-            </div>
-            <div>
-                <label class="label-small">Unidad</label>
-                <input type="text" name="unidad_item[]" placeholder="pza, servicio..." value="{{ item.unidad_item }}"
-                    disabled>
-            </div>
-            <div>
-                <label class="label-small">Cant.</label>
-                <input type="number" step="1" name="cantidad_item[]" required value="{{ item.cantidad_item }}" disabled
-                    oninput="calculateTotals()">
-            </div>
-            <div>
-                <label class="label-small">Precio U.</label>
-                <input type="number" step="0.01" name="precio_unitario_item[]" required
-                    value="{{ item.precio_unitario_item }}" disabled oninput="calculateTotals()">
-            </div>
-            <div class="pt-6">
-                <span class="remove-item {% if cotizacion %}hidden{% endif %}" onclick="removeItem(this)">✕</span>
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--user] size-5 text-secondary"></span>
+                    <span>Datos del Cliente</span>
+                </div>
+                <div class="card-body p-6 space-y-4">
+                    <div class="form-control relative">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Nombre / Empresa</label>
+                        <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar..."
+                            autocomplete="off" class="input input-bordered w-full font-bold" oninput="fillClient(this)"
+                            required value="{{ cotizacion.nombre_cliente if cotizacion else '' }}" {{ 'disabled' if
+                            cotizacion else '' }}>
+                        <div id="suggestions-box"
+                            class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                        </div>
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Razón Social</label>
+                        <input type="text" id="razon_social_cliente" name="razon_social_cliente"
+                            class="input input-bordered w-full"
+                            value="{{ cotizacion.razon_social_cliente if cotizacion else '' }}" {{ 'disabled' if
+                            cotizacion else '' }}>
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Dirección</label>
+                        <textarea id="direccion_cliente" name="direccion_cliente"
+                            class="textarea textarea-bordered w-full" rows="2" {{ 'disabled' if cotizacion else ''
+                            }}>{{ cotizacion.direccion_cliente if cotizacion else '' }}</textarea>
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Teléfono</label>
+                        <input type="text" id="telefono_contacto" name="telefono_contacto"
+                            class="input input-bordered w-full"
+                            value="{{ cotizacion.telefono_contacto if cotizacion else '' }}" {{ 'disabled' if cotizacion
+                            else '' }}>
+                    </div>
+                </div>
             </div>
         </div>
-        {% endfor %}
-        {% endif %}
-    </div>
 
-    <button type="button" class="btn btn-secondary mb-4 {% if cotizacion %}hidden{% endif %}" onclick="addItem()"
-        id="btn-add-item">+ Agregar Item</button>
+        <!-- Columna Derecha: Conceptos -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="flex justify-between items-center px-2">
+                <h3 class="text-sm font-black uppercase tracking-widest text-base-content/40">Conceptos de la Cotización
+                </h3>
+                <button type="button" class="btn btn-primary btn-sm rounded-full shadow-md" onclick="addItem()"
+                    id="btn-add-item" {{ 'hidden' if cotizacion else '' }}>
+                    <span class="icon-[tabler--plus] size-4"></span>
+                    Agregar Concepto
+                </button>
+            </div>
 
-    <div class="card bg-gray-50 mt-4 p-4">
-        <div class="flex flex-col items-end gap-2">
-            <div class="flex justify-between w-64">
-                <span class="font-bold">Subtotal:</span>
-                <span id="subtotal-display">$0.00</span>
+            <div id="items-container" class="space-y-4">
+                {% if cotizacion %}
+                {% for item in items %}
+                <div
+                    class="item-row grid grid-cols-1 md:grid-cols-12 gap-4 p-5 bg-base-100 border border-base-content/10 rounded-xl shadow-sm relative group">
+                    <div class="md:col-span-3">
+                        <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Nombre
+                            Item</label>
+                        <input type="text" name="nombre_item[]" value="{{ item.nombre_item }}" required disabled
+                            class="input input-bordered input-sm w-full font-bold">
+                    </div>
+                    <div class="md:col-span-3">
+                        <label
+                            class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Descripción</label>
+                        <input type="text" name="descripcion_item[]" value="{{ item.descripcion_item }}" disabled
+                            class="input input-bordered input-sm w-full">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Unidad</label>
+                        <input type="text" name="unidad_item[]" value="{{ item.unidad_item }}" disabled
+                            class="input input-bordered input-sm w-full">
+                    </div>
+                    <div class="md:col-span-1">
+                        <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Cant.</label>
+                        <input type="number" step="1" name="cantidad_item[]" value="{{ item.cantidad_item }}" required
+                            disabled class="input input-bordered input-sm w-full font-bold text-center">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Precio U.</label>
+                        <input type="number" step="0.01" name="precio_unitario_item[]"
+                            value="{{ item.precio_unitario_item }}" required disabled
+                            class="input input-bordered input-sm w-full font-bold text-primary">
+                    </div>
+                    <div class="md:col-span-1 flex items-end justify-center pb-1">
+                        <button type="button" class="btn btn-ghost btn-sm btn-circle text-error hidden"
+                            onclick="removeItem(this)">
+                            <span class="icon-[tabler--trash] size-5"></span>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
             </div>
-            <div class="flex justify-between w-64 text-gray-600">
-                <span>IVA (16%):</span>
-                <span id="iva-display">$0.00</span>
+
+            <!-- Totales -->
+            <div class="card bg-base-100 border border-base-content/10 shadow-lg overflow-hidden">
+                <div class="card-body p-0">
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-base-content/10">
+                        <div class="p-6 flex flex-col items-center justify-center gap-1">
+                            <span class="text-[10px] font-black uppercase tracking-widest opacity-40">Subtotal</span>
+                            <div class="text-2xl font-bold" id="subtotal-display">$0.00</div>
+                        </div>
+                        <div class="p-6 flex flex-col items-center justify-center gap-1">
+                            <span class="text-[10px] font-black uppercase tracking-widest opacity-40">IVA (16%)</span>
+                            <div class="text-2xl font-bold" id="iva-display">$0.00</div>
+                        </div>
+                        <div
+                            class="p-6 bg-primary text-primary-content flex flex-col items-center justify-center gap-1">
+                            <span class="text-[10px] font-black uppercase tracking-widest opacity-70">Total Final</span>
+                            <div class="text-4xl font-black" id="total-display">$0.00</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="flex justify-between w-64 text-xl font-bold border-t pt-2 mt-2">
-                <span>Total:</span>
-                <span id="total-display" class="text-primary">$0.00</span>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <a href="{{ url_for('cotizaciones') }}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary btn-wide shadow-lg {{ 'hidden' if cotizacion else '' }}"
+                    id="btn-submit">
+                    <span class="icon-[tabler--device-floppy] size-5"></span>
+                    {{ 'Actualizar Cotización' if cotizacion else 'Guardar Cotización' }}
+                </button>
             </div>
         </div>
-    </div>
-
-
-    <h3>Términos y Condiciones</h3>
-    <div class="form-group">
-        <label for="terminos">Texto de Términos</label>
-        <textarea id="terminos" name="terminos" rows="4" {% if cotizacion %}disabled{% endif
-            %}>{{ cotizacion.terminos if cotizacion else 'El pago se realizará 50% anticipo y 50% contra entrega. Precios más IVA. Validez de la oferta: 15 días.' }}</textarea>
-    </div>
-
-    <div class="text-right mt-8 flex justify-end gap-4">
-        <a href="{{ url_for('cotizaciones') }}" class="btn btn-secondary">Cancelar</a>
-        <button type="submit" class="btn btn-primary {% if cotizacion %}hidden{% endif %}" id="btn-submit">Guardar
-            Cotización</button>
     </div>
 </form>
 
-<!-- Datalist for items (hidden, used by JS) -->
 <datalist id="inventory_list">
-    {% for item in inventario %}
-    <option value="{{ item.Nombre }}" data-desc="{{ item.Nombre }}" data-unit="{{ item.Unidad }}"
-        data-price="{{ item.Precio }}">{{ item.Nombre }}</option>
+    {% for item in items_inventario %}
+    <option value="{{ item.nombre }}" data-desc="{{ item.descripcion }}" data-unit="{{ item.unidad }}"
+        data-price="{{ item.precio }}">
+        ${{ item.precio }} - {{ item.descripcion }}
+    </option>
     {% endfor %}
 </datalist>
 
 <script id="clients-data" type="application/json">{{ clientes|tojson|safe }}</script>
+<script src="{{ url_for('static', filename='crear_cotizacion.js') }}"></script>
 
 <script>
     const clientsData = JSON.parse(document.getElementById('clients-data').textContent);
 
     function enableEdit() {
-        // Enable all inputs
-        document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
-
-        // Unlock Readonly inputs (except Folio)
-        document.querySelectorAll('input[readonly]:not(#folio_cot)').forEach(el => {
-            el.readOnly = false;
-            el.classList.remove('readonly-bg');
-        });
-
-        // Show buttons
-        const btnAdd = document.getElementById('btn-add-item');
-        if (btnAdd) btnAdd.classList.remove('hidden');
+        document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+        document.querySelectorAll('.btn-ghost.text-error').forEach(el => el.classList.remove('hidden'));
+        document.getElementById('btn-add-item').hidden = false;
 
         const btnSubmit = document.getElementById('btn-submit');
         if (btnSubmit) btnSubmit.classList.remove('hidden');
-
-        // Show delete icons
-        document.querySelectorAll('.remove-item').forEach(el => el.classList.remove('hidden'));
-
-        // Hide Edit button itself
         const btnEdit = document.getElementById('btn-editar');
         if (btnEdit) btnEdit.classList.add('hidden');
     }
 </script>
-<script src="{{ url_for('static', filename='crear_cotizacion.js') }}"></script>
 {% endblock %}

@@ -1,229 +1,309 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
 
-{% block extra_head %}
-<!-- Reusing styles from crear_cotizacion if needed, but mostly base is enough -->
-{% endblock %}
+{% block title %}{{ 'Detalle Tarificador' if tarificador else 'Nuevo Tarificador' }} - Sistema Cophi{% endblock %}
 
 {% block content %}
-<header class="flex justify-between items-center">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
-        <h1>{{ 'Detalle Tarificador' if tarificador else 'Nuevo Tarificador' }}</h1>
-        <p class="subtitle">{{ 'Consulta y edita los detalles de análisis de laboratorio.' if tarificador else 'Complete
-            el formulario para registrar un registro de tarificación.' }}</p>
+        <div class="flex items-center gap-2 mb-1">
+            <a href="{{ url_for('tarificador') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
+                <span class="icon-[tabler--arrow-left] size-5"></span>
+            </a>
+            <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle Tarificador' if tarificador else 'Nuevo
+                Tarificador' }}</h1>
+        </div>
+        <p class="text-base-content/60 font-medium ml-10">
+            {{ 'Consulta y edita los detalles de análisis de laboratorio.' if tarificador else 'Complete el formulario
+            para registrar un registro de tarificación.' }}
+        </p>
     </div>
     {% if tarificador %}
-    <div class="flex gap-4">
+    <div class="flex gap-2">
         <a href="{{ url_for('ver_tarificador', folio=tarificador.folio_tar) }}" target="_blank"
-            class="btn btn-secondary">Ver PDF</a>
-        <button type="button" class="btn btn-primary" onclick="enableEdit()" id="btn-editar">Editar</button>
+            class="btn btn-soft btn-secondary">
+            <span class="icon-[tabler--file-text] size-5"></span>
+            Ver PDF
+        </a>
+        <button type="button" class="btn btn-primary shadow-sm" onclick="enableEdit()" id="btn-editar">
+            <span class="icon-[tabler--edit] size-5"></span>
+            Editar
+        </button>
     </div>
     {% endif %}
-</header>
+</div>
 
-<form action="{{ url_for('nuevo_tarificador') }}" method="POST" class="card">
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label for="folio_tar">Folio</label>
-            <input type="text" id="folio_tar" name="folio_tar" placeholder="Ej. TAR-001"
-                value="{{ suggested_folio if not tarificador else tarificador.folio_tar }}" required {% if tarificador
-                %}readonly class="readonly-bg" {% endif %}>
-        </div>
-        <div class="form-group">
-            <label for="fecha_tar">Fecha</label>
-            <input type="text" id="fecha_tar" name="fecha_tar"
-                value="{{ tarificador.fecha_tar if tarificador else todays_date }}" {% if tarificador %}disabled{% endif
-                %}>
-        </div>
-    </div>
-
-    <h3>Datos del Cliente</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group relative">
-            <label for="nombre_cliente">Cliente / Empresa</label>
-            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar..." autocomplete="off"
-                oninput="fillClient(this)" required value="{{ tarificador.nombre_cliente if tarificador else '' }}" {%
-                if tarificador %}disabled{% endif %}>
-            <div id="suggestions-box"></div>
-        </div>
-        <div class="form-group">
-            <label for="no_cliente">No. Cliente</label>
-            <input type="text" id="no_cliente" name="no_cliente"
-                value="{{ tarificador.no_cliente if tarificador else '' }}" {% if tarificador %}disabled{% endif %}>
-        </div>
-        <div class="form-group col-span-2">
-            <label for="direccion_cliente">Dirección</label>
-            <input type="text" id="direccion_cliente" name="direccion_cliente"
-                value="{{ tarificador.direccion_cliente if tarificador else '' }}" {% if tarificador %}disabled{% endif
-                %}>
-        </div>
-        <div class="form-group">
-            <label for="no_permiso_descargas">No. Permiso Descargas</label>
-            <input type="text" id="no_permiso_descargas" name="no_permiso_descargas"
-                value="{{ tarificador.no_permiso_descargas if tarificador else '' }}" {% if tarificador %}disabled{%
-                endif %}>
-        </div>
-        <div class="form-group">
-            <label for="vigencia_permiso_descargas">Vigencia Permiso</label>
-            <input type="text" id="vigencia_permiso_descargas" name="vigencia_permiso_descargas"
-                value="{{ tarificador.vigencia_permiso_descargas if tarificador else '' }}" {% if tarificador
-                %}disabled{% endif %}>
-        </div>
-    </div>
-
-    <h3>Datos del Informe</h3>
-    <div class="grid-2 mb-4">
-        <div class="form-group">
-            <label for="laboratorio">Laboratorio</label>
-            <input type="text" id="laboratorio" name="laboratorio"
-                value="{{ tarificador.laboratorio if tarificador else '' }}" {% if tarificador %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label for="fecha_muestreo">Fecha de Muestreo</label>
-            <input type="text" id="fecha_muestreo" name="fecha_muestreo"
-                value="{{ tarificador.fecha_muestreo if tarificador else '' }}" {% if tarificador %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label for="tipo_muestreo">Tipo de Muestreo</label>
-            <input type="text" id="tipo_muestreo" name="tipo_muestreo"
-                value="{{ tarificador.tipo_muestreo if tarificador else '' }}" {% if tarificador %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label for="no_informe">No. de Informe</label>
-            <input type="text" id="no_informe" name="no_informe"
-                value="{{ tarificador.no_informe if tarificador else '' }}" {% if tarificador %}disabled{% endif %}>
-        </div>
-        <div class="form-group">
-            <label for="volumen_promedio_descargado">Volumen Promedio Descargado (m³)</label>
-            <input type="number" step="0.01" id="volumen_promedio_descargado" name="volumen_promedio_descargado"
-                value="{{ tarificador.volumen_promedio_descargado if tarificador else '' }}" {% if tarificador
-                %}disabled{% endif %} oninput="calculatePrices()">
-        </div>
-    </div>
-
-    <h3>Resultados de Análisis</h3>
-    <div class="table-container mb-4">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 35%">Parámetro</th>
-                    <th style="width: 20%">Resultado</th>
-                    <th style="width: 20%">LMP</th>
-                    <th style="width: 25%">Precio ($/m³)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows manually defined to match expected structure -->
-                {% set rows = [
-                ('sst', 'SÓLIDOS SUSPENDIDOS TOTALES'),
-                ('dbo', 'DEMANDA BIOQUÍMICA DE OXÍGENO'),
-                ('gya', 'GRASA Y ACEITES'),
-                ('ss', 'SÓLIDOS SEDIMENTABLES'),
-                ('mf', 'MATERIA FLOTANTE'),
-                ('temp', 'TEMPERATURA'),
-                ('saam', 'SUSTANCIA ACTIVAS AL AZUL DE METILENO'),
-                ('dqo', 'DEMANDA QUÍMICA DE OXÍGENO'),
-                ('nt', 'NITROGENO TOTAL'),
-                ('fen', 'FENOLES'),
-                ('color', 'COLOR')
-                ] %}
-
-                {% for key, label in rows %}
-                <tr>
-                    <td>{{ label }}</td>
-                    <td>
-                        <input type="text" name="{{ key }}_resultado"
-                            value="{{ tarificador[key + '_resultado'] if tarificador else '' }}" class="w-full" {% if
-                            tarificador %}disabled{% endif %} oninput="calculatePrices()">
-                    </td>
-                    <td>
-                        <input type="text" name="{{ key }}_lmp"
-                            value="{{ tarificador[key + '_lmp'] if tarificador else default_lmps.get(key + '_lmp', '') }}"
-                            class="w-full always-locked readonly-bg" readonly>
-                    </td>
-                    <td>
-                        <input type="text" name="{{ key }}_precio"
-                            value="{{ tarificador[key + '_precio'] if tarificador else '' }}" class="w-full" {% if
-                            tarificador %}disabled{% endif %} readonly>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="card bg-gray-50 mt-4 p-4">
-        <div class="flex flex-col items-end gap-2">
-            <div class="flex justify-between w-64">
-                <span class="font-bold">Precio m³:</span>
-                <span id="subtotal-display">{{ tarificador.precio_m3_total if tarificador else '0.00' }}</span>
+<form action="{{ url_for('nuevo_tarificador') }}" method="POST">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Columna Izquierda: Datos Generales -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold">Información del
+                    Folio</div>
+                <div class="card-body p-6 flex flex-col gap-4">
+                    <div class="form-control">
+                        <label
+                            class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Folio</label>
+                        <input type="text" id="folio_tar" name="folio_tar" placeholder="Ej. TAR-001"
+                            class="input input-bordered w-full font-bold text-primary"
+                            value="{{ suggested_folio if not tarificador else tarificador.folio_tar }}" required {% if
+                            tarificador %}readonly{% endif %}>
+                    </div>
+                    <div class="form-control">
+                        <label
+                            class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Fecha</label>
+                        <input type="text" id="fecha_tar" name="fecha_tar" class="input input-bordered w-full"
+                            value="{{ tarificador.fecha_tar if tarificador else todays_date }}" {% if tarificador
+                            %}disabled{% endif %}>
+                    </div>
+                </div>
             </div>
-            <div class="flex justify-between w-64 text-xl font-bold border-t pt-2 mt-2">
-                <span>Total a Pagar:</span>
-                <span id="total-display" class="text-primary">{{ tarificador.total_pagar if tarificador else '0.00'
-                    }}</span>
-            </div>
-            <p class="text-xs text-gray-500 mt-2">* Estos valores se calculan automáticamente.</p>
-        </div>
-    </div>
 
-    <div class="text-right mt-8 flex justify-end gap-4">
-        <a href="{{ url_for('tarificador') }}" class="btn btn-secondary">Cancelar</a>
-        <button type="submit" class="btn btn-primary {% if tarificador %}hidden{% endif %}" id="btn-submit">Guardar
-            Tarificador</button>
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold">Datos del Cliente
+                </div>
+                <div class="card-body p-6 flex flex-col gap-4">
+                    <div class="form-control relative">
+                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Cliente /
+                            Empresa</label>
+                        <div class="relative">
+                            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar..."
+                                autocomplete="off" class="input input-bordered w-full" oninput="fillClient(this)"
+                                required value="{{ tarificador.nombre_cliente if tarificador else '' }}" {% if
+                                tarificador %}disabled{% endif %}>
+                            <div id="suggestions-box"
+                                class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">No.
+                            Cliente</label>
+                        <input type="text" id="no_cliente" name="no_cliente" class="input input-bordered w-full"
+                            value="{{ tarificador.no_cliente if tarificador else '' }}" {% if tarificador %}disabled{%
+                            endif %}>
+                    </div>
+                    <div class="form-control">
+                        <label
+                            class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Dirección</label>
+                        <textarea id="direccion_cliente" name="direccion_cliente"
+                            class="textarea textarea-bordered w-full" rows="2" {% if tarificador %}disabled{% endif
+                            %}>{{ tarificador.direccion_cliente if tarificador else '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold">Permisos
+                    Relacionados</div>
+                <div class="card-body p-6 flex flex-col gap-4">
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">No. Permiso
+                            Descargas</label>
+                        <input type="text" id="no_permiso_descargas" name="no_permiso_descargas"
+                            class="input input-bordered w-full"
+                            value="{{ tarificador.no_permiso_descargas if tarificador else '' }}" {% if tarificador
+                            %}disabled{% endif %}>
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Vigencia
+                            Permiso</label>
+                        <input type="text" id="vigencia_permiso_descargas" name="vigencia_permiso_descargas"
+                            class="input input-bordered w-full"
+                            value="{{ tarificador.vigencia_permiso_descargas if tarificador else '' }}" {% if
+                            tarificador %}disabled{% endif %}>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Informe y Tabla -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center">
+                    <span>Datos del Informe</span>
+                    <span class="icon-[tabler--microscope] size-5 text-primary"></span>
+                </div>
+                <div class="card-body p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label
+                                class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Laboratorio</label>
+                            <input type="text" id="laboratorio" name="laboratorio" class="input input-bordered w-full"
+                                value="{{ tarificador.laboratorio if tarificador else '' }}" {% if tarificador
+                                %}disabled{% endif %}>
+                        </div>
+                        <div class="form-control">
+                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Fecha
+                                de Muestreo</label>
+                            <input type="text" id="fecha_muestreo" name="fecha_muestreo"
+                                class="input input-bordered w-full"
+                                value="{{ tarificador.fecha_muestreo if tarificador else '' }}" {% if tarificador
+                                %}disabled{% endif %}>
+                        </div>
+                        <div class="form-control">
+                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Tipo de
+                                Muestreo</label>
+                            <input type="text" id="tipo_muestreo" name="tipo_muestreo"
+                                class="input input-bordered w-full"
+                                value="{{ tarificador.tipo_muestreo if tarificador else '' }}" {% if tarificador
+                                %}disabled{% endif %}>
+                        </div>
+                        <div class="form-control">
+                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">No. de
+                                Informe</label>
+                            <input type="text" id="no_informe" name="no_informe" class="input input-bordered w-full"
+                                value="{{ tarificador.no_informe if tarificador else '' }}" {% if tarificador
+                                %}disabled{% endif %}>
+                        </div>
+                        <div class="form-control md:col-span-2">
+                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Volumen
+                                Promedio Descargado (m³)</label>
+                            <input type="number" step="0.01" id="volumen_promedio_descargado"
+                                name="volumen_promedio_descargado" class="input input-bordered w-full font-bold"
+                                value="{{ tarificador.volumen_promedio_descargado if tarificador else '' }}" {% if
+                                tarificador %}disabled{% endif %} oninput="calculatePrices()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center">
+                    <span>Resultados de Análisis</span>
+                    <span class="badge badge-soft badge-info font-bold uppercase tracking-wider text-[10px]">Cálculo
+                        Automático</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="overflow-x-auto">
+                        <table class="table table-lg">
+                            <thead class="bg-base-200/30">
+                                <tr>
+                                    <th class="text-xs uppercase tracking-wider text-base-content/70">Parámetro</th>
+                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-24">Resultado
+                                    </th>
+                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-24">LMP</th>
+                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-32">Precio ($/m³)
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set rows = [
+                                ('sst', 'SÓLIDOS SUSPENDIDOS TOTALES'),
+                                ('dbo', 'DEMANDA BIOQUÍMICA DE OXÍGENO'),
+                                ('gya', 'GRASA Y ACEITES'),
+                                ('ss', 'SÓLIDOS SEDIMENTABLES'),
+                                ('mf', 'MATERIA FLOTANTE'),
+                                ('temp', 'TEMPERATURA'),
+                                ('saam', 'SUSTANCIA ACTIVAS AL AZUL DE METILENO'),
+                                ('dqo', 'DEMANDA QUÍMICA DE OXÍGENO'),
+                                ('nt', 'NITROGENO TOTAL'),
+                                ('fen', 'FENOLES'),
+                                ('color', 'COLOR')
+                                ] %}
+
+                                {% for key, label in rows %}
+                                <tr class="hover:bg-base-200/20 divide-x divide-base-content/5">
+                                    <td class="text-xs font-bold text-base-content/80">{{ label }}</td>
+                                    <td>
+                                        <input type="text" name="{{ key }}_resultado"
+                                            class="input input-sm input-ghost w-full text-center focus:bg-base-100"
+                                            value="{{ tarificador[key + '_resultado'] if tarificador else '' }}" {% if
+                                            tarificador %}disabled{% endif %} oninput="calculatePrices()">
+                                    </td>
+                                    <td class="bg-base-200/20">
+                                        <input type="text" name="{{ key }}_lmp"
+                                            class="input input-sm input-ghost w-full text-center font-medium always-locked"
+                                            value="{{ tarificador[key + '_lmp'] if tarificador else default_lmps.get(key + '_lmp', '') }}"
+                                            readonly tabindex="-1">
+                                    </td>
+                                    <td>
+                                        <input type="text" name="{{ key }}_precio"
+                                            class="input input-sm input-ghost w-full text-right font-black text-primary"
+                                            value="{{ tarificador[key + '_precio'] if tarificador else '' }}" readonly
+                                            tabindex="-1">
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-primary text-primary-content shadow-lg">
+                <div class="card-body p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm font-bold uppercase tracking-widest opacity-70">Precio Total por
+                                m³:</span>
+                            <div class="text-4xl font-black" id="subtotal-display">{{ tarificador.precio_m3_total if
+                                tarificador else '$0.00' }}</div>
+                        </div>
+                        <div class="h-10 w-px bg-primary-content/20 hidden md:block"></div>
+                        <div class="flex flex-col gap-1 items-center md:items-end">
+                            <span class="text-sm font-bold uppercase tracking-widest opacity-70">Total Estimado a
+                                Pagar:</span>
+                            <div class="text-5xl font-black" id="total-display">{{ tarificador.total_pagar if
+                                tarificador else '$0.00' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-4 mt-4">
+                <a href="{{ url_for('tarificador') }}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary shadow-lg btn-wide {% if tarificador %}hidden{% endif %}"
+                    id="btn-submit">
+                    <span class="icon-[tabler--device-floppy] size-5"></span>
+                    Guardar Tarificador
+                </button>
+            </div>
+        </div>
     </div>
 </form>
 
 <script id="clients-data" type="application/json">{{ clientes|tojson|safe }}</script>
 <script id="rangos-data" type="application/json">{{ rangos|tojson|safe }}</script>
+
 <script>
     const clientsData = JSON.parse(document.getElementById('clients-data').textContent);
     const rangosData = JSON.parse(document.getElementById('rangos-data').textContent);
 
     function enableEdit() {
-        // Enable all inputs
         document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
+        document.querySelectorAll('input.always-locked').forEach(el => el.readOnly = true);
 
-        // Unlock Readonly inputs (except Folio)
-        document.querySelectorAll('input[readonly]:not(#folio_tar):not(.always-locked)').forEach(el => {
-            el.readOnly = false;
-            el.classList.remove('readonly-bg');
-        });
-
-        // Show submit button
         const btnSubmit = document.getElementById('btn-submit');
         if (btnSubmit) btnSubmit.classList.remove('hidden');
 
-        // Hide Edit button itself
         const btnEdit = document.getElementById('btn-editar');
         if (btnEdit) btnEdit.classList.add('hidden');
     }
 
-    // Reuse client fill logic roughly
     function normalizeStr(str) {
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     }
 
     function fillClient(input) {
         const val = normalizeStr(input.value);
-        const suggestionsBox = document.getElementById('suggestions-box');
-        suggestionsBox.innerHTML = '';
-        suggestionsBox.style.display = 'none';
+        const box = document.getElementById('suggestions-box');
+        box.innerHTML = '';
+        box.classList.add('hidden');
 
         if (!val) return;
 
-        const matches = clientsData.filter(c => {
-            const nombre = c.nombre_empresa || '';
-            return normalizeStr(nombre).includes(val);
-        });
+        const matches = clientsData.filter(c => normalizeStr(c.nombre_empresa || '').includes(val));
 
         if (matches.length > 0) {
-            suggestionsBox.style.display = 'block';
+            box.classList.remove('hidden');
             matches.forEach(match => {
                 const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.textContent = match.nombre_empresa;
+                div.className = 'p-3 hover:bg-base-200 cursor-pointer border-b border-base-content/5 last:border-0';
+                div.innerHTML = `<div class="font-bold text-sm">${match.nombre_empresa}</div><div class="text-xs opacity-60">${match.id_cliente || ''}</div>`;
                 div.onclick = () => selectClient(match);
-                suggestionsBox.appendChild(div);
+                box.appendChild(div);
             });
         }
     }
@@ -231,50 +311,26 @@
     function selectClient(client) {
         document.getElementById('nombre_cliente').value = client.nombre_empresa;
         if (document.getElementById('direccion_cliente')) document.getElementById('direccion_cliente').value = client.direccion_empresa || '';
-        document.getElementById('suggestions-box').style.display = 'none';
+        document.getElementById('suggestions-box').classList.add('hidden');
 
-        // Auto-fill other fields if available in client data (optional)
-        if (document.getElementById('no_cliente') && client.id_cliente)
-            document.getElementById('no_cliente').value = client.id_cliente;
-
-        if (document.getElementById('no_permiso_descargas') && client.no_permiso_descargas)
-            document.getElementById('no_permiso_descargas').value = client.no_permiso_descargas;
-
-        if (document.getElementById('vigencia_permiso_descargas') && client.vegencia_permiso_descargas)
-            document.getElementById('vigencia_permiso_descargas').value = client.vegencia_permiso_descargas;
+        if (document.getElementById('no_cliente')) document.getElementById('no_cliente').value = client.id_cliente || '';
+        if (document.getElementById('no_permiso_descargas')) document.getElementById('no_permiso_descargas').value = client.no_permiso_descargas || '';
+        if (document.getElementById('vigencia_permiso_descargas')) document.getElementById('vigencia_permiso_descargas').value = client.vegencia_permiso_descargas || '';
     }
 
-    document.addEventListener('click', function (e) {
-        if (e.target.id !== 'nombre_cliente') {
-            const box = document.getElementById('suggestions-box');
-            if (box) box.style.display = 'none';
-        }
+    document.addEventListener('click', (e) => {
+        if (e.target.id !== 'nombre_cliente') document.getElementById('suggestions-box').classList.add('hidden');
     });
 
-    // --- Real-time Calculation Logic ---
     const CONTAMINANTES = ['sst', 'dbo', 'gya', 'ss', 'mf', 'temp', 'saam', 'dqo', 'nt', 'fen', 'color'];
 
     function cleanFloat(val) {
         if (!val) return 0;
-        // Remove currency symbols and commas
-        val = val.toString().replace(/[$,]/g, '');
-        return parseFloat(val) || 0;
+        return parseFloat(val.toString().replace(/[$,]/g, '')) || 0;
     }
 
-    function formatMoney(amount) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2
-        }).format(amount);
-    }
-
-    // Helper to format strictly like the python backend might prefer $0.00
     function formatMoneySimple(amount) {
-        return new Intl.NumberFormat('es-MX', {
-            style: 'currency',
-            currency: 'MXN'
-        }).format(amount);
+        return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
     }
 
     function calculatePrices() {
@@ -291,7 +347,6 @@
             const lmp = cleanFloat(lmpInput.value);
 
             let price = 0;
-
             if (lmp > 0) {
                 const ratio = (res - lmp) / lmp;
                 if (ratio > 0) {
@@ -304,25 +359,16 @@
                     }
                 }
             }
-
             precioInput.value = formatMoneySimple(price);
             precioM3Total += price;
         });
 
-        const subtotalDisplay = document.getElementById('subtotal-display');
-        if (subtotalDisplay) subtotalDisplay.textContent = formatMoneySimple(precioM3Total);
-
+        document.getElementById('subtotal-display').textContent = formatMoneySimple(precioM3Total);
         const volInput = document.getElementById('volumen_promedio_descargado');
-        const volumen = volInput ? cleanFloat(volInput.value) : 0;
-        const totalPagar = precioM3Total * volumen;
-
-        const totalDisplay = document.getElementById('total-display');
-        if (totalDisplay) totalDisplay.textContent = formatMoneySimple(totalPagar);
+        const volumen = cleanFloat(volInput?.value);
+        document.getElementById('total-display').textContent = formatMoneySimple(precioM3Total * volumen);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        calculatePrices();
-    });
-
+    document.addEventListener('DOMContentLoaded', () => calculatePrices());
 </script>
 {% endblock %}

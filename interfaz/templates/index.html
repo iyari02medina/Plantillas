@@ -1,32 +1,120 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
+
+{% block title %}Dashboard - Sistema Cophi{% endblock %}
 
 {% block content %}
-<header>
-    <h1>Dashboard</h1>
-    <p class="subtitle">Bienvenido al sistema de gestión de Cophi.</p>
-</header>
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-base-content mb-1">Panel de Control</h1>
+    <p class="text-base-content/60 font-medium">Bienvenido al sistema de gestión de Cophi.</p>
+</div>
 
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-value">{{ total_cotizaciones }}</div>
-        <div class="stat-label">Cotizaciones Registradas</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <div class="card bg-base-100 shadow-sm border border-base-content/10">
+        <div class="card-body flex-row items-center gap-4 p-6">
+            <div class="bg-primary/10 text-primary rounded-full p-4">
+                <span class="icon-[tabler--file-description] size-8"></span>
+            </div>
+            <div>
+                <div class="text-base-content/60 text-sm font-bold uppercase tracking-wider">Cotizaciones</div>
+                <div class="text-3xl font-black text-base-content">{{ total_cotizaciones }}</div>
+            </div>
+        </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-value">{{ total_ordenes }}</div>
-        <div class="stat-label">Órdenes de Trabajo</div>
+
+    <div class="card bg-base-100 shadow-sm border border-base-content/10">
+        <div class="card-body flex-row items-center gap-4 p-6">
+            <div class="bg-secondary/10 text-secondary rounded-full p-4">
+                <span class="icon-[tabler--clipboard-list] size-8"></span>
+            </div>
+            <div>
+                <div class="text-base-content/60 text-sm font-bold uppercase tracking-wider">Órdenes de Trabajo</div>
+                <div class="text-3xl font-black text-base-content">{{ total_ordenes }}</div>
+            </div>
+        </div>
     </div>
-    <!-- Placeholder for more stats -->
-    <div class="stat-card">
-        <div class="stat-value">--</div>
-        <div class="stat-label">Próximos Vencimientos</div>
+
+    <div class="card bg-base-100 shadow-sm border border-base-content/10">
+        <div class="card-body flex-row items-center gap-4 p-6">
+            <div class="bg-info/10 text-info rounded-full p-4">
+                <span class="icon-[tabler--calendar-event] size-8"></span>
+            </div>
+            <div>
+                <div class="text-base-content/60 text-sm font-bold uppercase tracking-wider">Vencimientos</div>
+                <div class="text-3xl font-black text-base-content">--</div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="card">
-    <h2>Acciones Rápidas</h2>
-    <div class="flex" style="gap: 1rem;">
-        <a href="{{ url_for('nueva_cotizacion') }}" class="btn btn-primary">Crear Nueva Cotización</a>
-        <a href="{{ url_for('ordenes') }}" class="btn btn-secondary">Ver Órdenes Recientes</a>
+<!-- Quick Actions -->
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5">
+        <h2 class="text-lg font-bold flex items-center gap-2">
+            <span class="icon-[tabler--bolt] size-5 text-warning"></span>
+            Acciones Rápidas
+        </h2>
+    </div>
+    <div class="card-body p-6">
+        <div class="flex flex-wrap gap-4">
+            <a href="{{ url_for('nueva_cotizacion') }}"
+                class="btn btn-primary shadow-sm hover:scale-105 transition-transform">
+                <span class="icon-[tabler--plus] size-5"></span>
+                Nueva Cotización
+            </a>
+            <a href="{{ url_for('nuevo_tarificador') }}"
+                class="btn btn-secondary shadow-sm hover:scale-105 transition-transform">
+                <span class="icon-[tabler--calculator] size-5"></span>
+                Nuevo Tarificador
+            </a>
+            <a href="{{ url_for('ordenes') }}" class="btn btn-outline btn-primary shadow-sm">
+                <span class="icon-[tabler--eye] size-5"></span>
+                Ver Órdenes
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Placeholder for Recent Activity Table -->
+<div class="mt-8 card bg-base-100 border border-base-content/10 shadow-sm">
+    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex justify-between items-center">
+        <h2 class="text-lg font-bold">Resumen de Actividad</h2>
+        <span class="badge badge-soft badge-primary font-bold uppercase tracking-widest text-[10px]">Actualizado</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table table-lg">
+                <thead class="bg-base-200/30">
+                    <tr>
+                        <th class="text-base-content/70">Módulo</th>
+                        <th class="text-base-content/70">Estado</th>
+                        <th class="text-base-content/70">Última actualización</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-base-content/5">
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <span class="icon-[tabler--file-text] text-primary"></span>
+                                <span class="font-medium">Cotizaciones</span>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-soft badge-success">Activo</span></td>
+                        <td class="text-base-content/60">Hace unos momentos</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <span class="icon-[tabler--tool] text-secondary"></span>
+                                <span class="font-medium">Órdenes</span>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-soft badge-success">Activo</span></td>
+                        <td class="text-base-content/60">Hace 1 hora</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

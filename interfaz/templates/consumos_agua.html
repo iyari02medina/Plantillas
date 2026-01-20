@@ -1,71 +1,107 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
+
+{% block title %}Consumos de Agua - Sistema Cophi{% endblock %}
 
 {% block content %}
-<header class="flex justify-between items-center">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
-        <h1>Consumos de Agua</h1>
-        <p class="subtitle">Historial de consumos registrados por cliente.</p>
+        <h1 class="text-3xl font-bold text-base-content mb-1">Consumos de Agua</h1>
+        <p class="text-base-content/60 font-medium">Historial de consumos registrados por cliente y niveles de lectura.
+        </p>
     </div>
-    <a href="{{ url_for('crear_consumo') }}" class="btn btn-primary">Nuevo Consumo</a>
-</header>
+    <a href="{{ url_for('crear_consumo') }}" class="btn btn-primary shadow-sm">
+        <span class="icon-[tabler--plus] size-5"></span>
+        Nuevo Consumo
+    </a>
+</div>
 
-<div class="card table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>Folio</th>
-                <th>Cliente</th>
-                <th>Fecha Lectura</th>
-                <th>Consumo (m³)</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in consumos %}
-            <tr>
-                <td><strong>{{ data.folio }}</strong></td>
-                <td>
-                    <div class="font-medium">{{ data.nombre_cliente }}</div>
-                    {% if data.ID_cliente %}
-                    <div class="text-sm text-muted">{{ data.ID_cliente }}</div>
-                    {% endif %}
-                </td>
-                <td>{{ data.fecha_lectura }}</td>
-                <td>{{ data.consumo }}</td>
-                <td>
-                    <a href="{{ url_for('detalle_consumo', folio=data.folio) }}" class="btn btn-secondary btn-small">Ver
-                        Consumo</a>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="5" class="text-center text-muted p-8">No hay consumos registrados.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table table-lg">
+                <thead class="bg-base-200/50">
+                    <tr>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Folio</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Cliente</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-center">Fecha
+                            Lectura</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-center">Consumo
+                            (m³)</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-right">Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-base-content/5">
+                    {% for data in consumos %}
+                    <tr class="hover:bg-base-200/30 transition-colors">
+                        <td>
+                            <span class="font-bold text-primary">{{ data.folio }}</span>
+                        </td>
+                        <td>
+                            <div class="font-medium text-base-content">{{ data.nombre_cliente }}</div>
+                            {% if data.ID_cliente %}
+                            <div class="text-xs text-base-content/50">{{ data.ID_cliente }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="text-center text-base-content/60">{{ data.fecha_lectura }}</td>
+                        <td class="text-center">
+                            {% set consumo_val = data.consumo|float %}
+                            <span
+                                class="badge badge-soft {% if consumo_val > 80 %}badge-error{% elif consumo_val > 40 %}badge-warning{% else %}badge-success{% endif %} font-bold">
+                                {{ data.consumo }}
+                            </span>
+                        </td>
+                        <td class="text-right">
+                            <a href="{{ url_for('detalle_consumo', folio=data.folio) }}"
+                                class="btn btn-soft btn-secondary btn-sm">
+                                <span class="icon-[tabler--eye] size-4"></span>
+                                <span>Ver Consumo</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-20">
+                            <div class="flex flex-col items-center gap-4">
+                                <span class="icon-[tabler--droplet-bolt] size-16 text-base-content/20"></span>
+                                <p class="text-base-content/40 font-medium">No hay consumos registrados actualmente.</p>
+                                <a href="{{ url_for('crear_consumo') }}"
+                                    class="btn btn-outline btn-primary btn-sm mt-2">Registrar primer consumo</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     {% if total_pages > 1 %}
-    <div class="pagination">
-        <!-- Previous Button -->
-        {% if page > 1 %}
-        <a href="{{ url_for('consumos', page=page-1) }}" class="btn btn-secondary btn-small">&laquo; Anterior</a>
-        {% else %}
-        <span class="btn btn-secondary btn-small disabled-link">&laquo; Anterior</span>
-        {% endif %}
-
-        <!-- Page Numbers -->
-        {% for p in range(1, total_pages + 1) %}
-        <a href="{{ url_for('consumos', page=p) }}"
-            class="btn {% if p == page %}btn-primary{% else %}btn-secondary{% endif %} page-link">{{ p }}</a>
-        {% endfor %}
-
-        <!-- Next Button -->
-        {% if page < total_pages %} <a href="{{ url_for('consumos', page=page+1) }}"
-            class="btn btn-secondary btn-small">Siguiente &raquo;</a>
-            {% else %}
-            <span class="btn btn-secondary btn-small disabled-link">Siguiente &raquo;</span>
+    <div class="card-footer bg-base-200/30 border-t border-base-content/10 p-4">
+        <div class="flex justify-center flex-wrap gap-2">
+            {% if page > 1 %}
+            <a href="{{ url_for('consumos', page=page-1) }}" class="btn btn-soft btn-secondary btn-sm">
+                <span class="icon-[tabler--chevron-left] size-4"></span>
+                Anterior
+            </a>
             {% endif %}
+
+            <div class="join">
+                {% for p in range(1, total_pages + 1) %}
+                <a href="{{ url_for('consumos', page=p) }}"
+                    class="join-item btn btn-sm {% if p == page %}btn-primary{% else %}btn-ghost{% endif %}">
+                    {{ p }}
+                </a>
+                {% endfor %}
+            </div>
+
+            {% if page < total_pages %} <a href="{{ url_for('consumos', page=page+1) }}"
+                class="btn btn-soft btn-secondary btn-sm">
+                Siguiente
+                <span class="icon-[tabler--chevron-right] size-4"></span>
+                </a>
+                {% endif %}
+        </div>
     </div>
     {% endif %}
 </div>

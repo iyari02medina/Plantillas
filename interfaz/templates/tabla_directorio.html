@@ -1,69 +1,107 @@
-{% extends 'base.html' %}
+{% extends 'base_flyonui.html' %}
+
+{% block title %}{{ 'Clientes' if tipo == 'clientes' else 'Prospectos' }} - Sistema Cophi{% endblock %}
 
 {% block content %}
-<div class="content">
-    <div class="header-section">
-        <div>
-            <h1>{{ 'Clientes' if tipo == 'clientes' else 'Prospectos' }}</h1>
-            <p class="subtitle">Gestión de {{ tipo }}.</p>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div>
+        <div class="flex items-center gap-2 mb-1">
+            <a href="{{ url_for('directorio') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
+                <span class="icon-[tabler--arrow-left] size-5"></span>
+            </a>
+            <h1 class="text-3xl font-bold text-base-content">{{ 'Clientes' if tipo == 'clientes' else 'Prospectos' }}
+            </h1>
         </div>
-        <div class="flex gap-2">
-            <a href="{{ url_for('nuevo_directorio_item', tipo=tipo) }}" class="btn btn-primary">+ Nuevo {{ 'Cliente' if
-                tipo == 'clientes' else 'Prospecto' }}</a>
-            <a href="{{ url_for('directorio') }}" class="btn btn-secondary">Volver al Directorio</a>
+        <p class="text-base-content/60 font-medium ml-10">Gestión de base de datos de {{ tipo }}.</p>
+    </div>
+    <a href="{{ url_for('nuevo_directorio_item', tipo=tipo) }}" class="btn btn-primary shadow-sm">
+        <span class="icon-[tabler--plus] size-5"></span>
+        Nuevo {{ 'Cliente' if tipo == 'clientes' else 'Prospecto' }}
+    </a>
+</div>
+
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5">
+        <h2 class="text-lg font-bold">Listado de {{ 'Clientes' if tipo == 'clientes' else 'Prospectos' }}</h2>
+    </div>
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table table-lg">
+                <thead class="bg-base-200/30">
+                    <tr>
+                        {% for header in headers %}
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">{{
+                            header|replace('_', ' ') }}</th>
+                        {% endfor %}
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-right">Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-base-content/5">
+                    {% for row in data %}
+                    <tr class="hover:bg-base-200/30 transition-colors">
+                        {% for header in headers %}
+                        <td
+                            class="{% if loop.first %}font-bold text-base-content{% else %}text-base-content/70{% endif %}">
+                            {{ row.get(header, '') }}
+                        </td>
+                        {% endfor %}
+                        <td class="text-right">
+                            {% set id_val = (row.get('id_cliente') or row.get('ID') or row.get('nombre_empresa')) if
+                            tipo == 'clientes' else
+                            (row.get('folio') or row.get('nombre_empresa')) %}
+                            <a href="{{ url_for('detalle_directorio', tipo=tipo, id_val=id_val) }}"
+                                class="btn btn-soft btn-secondary btn-sm">
+                                <span class="icon-[tabler--edit] size-4"></span>
+                                <span>Ver Detalle</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="{{ headers|length + 1 }}" class="text-center py-20">
+                            <div class="flex flex-col items-center gap-4">
+                                <span class="icon-[tabler--users-minus] size-16 text-base-content/20"></span>
+                                <p class="text-base-content/40 font-medium">No se encontraron registros en esta lista.
+                                </p>
+                                <a href="{{ url_for('nuevo_directorio_item', tipo=tipo) }}"
+                                    class="btn btn-outline btn-primary btn-sm mt-2">Crear primer registro</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
 
-<div class="card table-container">
-    <h3>Listado de {{ 'Clientes' if tipo == 'clientes' else 'Prospectos' }}</h3>
-    <table>
-        <thead>
-            <tr>
-                {% for header in headers %}
-                <th>{{ header|replace('_', ' ')|upper }}</th>
-                {% endfor %}
-                <th class="center">ACCIONES</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in data %}
-            <tr>
-                {% for header in headers %}
-                <td>{{ row.get(header, '') }}</td>
-                {% endfor %}
-                <td class="center">
-                    {% set id_val = (row.get('ID') or row.get('nombre_empresa')) if tipo == 'clientes' else
-                    (row.get('folio') or row.get('nombre_empresa')) %}
-                    <a href="{{ url_for('detalle_directorio', tipo=tipo, id_val=id_val) }}"
-                        class="btn btn-secondary btn-small">Ver Detalle</a>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="{{ headers|length + 1 }}" class="text-center text-muted p-8">No hay registros de {{ tipo
-                    }}.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    {% if total_pages > 1 %}
+    <div class="card-footer bg-base-200/30 border-t border-base-content/10 p-4">
+        <div class="flex justify-center flex-wrap gap-2">
+            {% if page > 1 %}
+            <a href="{{ url_for('ver_directorio', tipo=tipo, page=page-1) }}" class="btn btn-soft btn-secondary btn-sm">
+                <span class="icon-[tabler--chevron-left] size-4"></span>
+                Anterior
+            </a>
+            {% endif %}
 
-<!-- Pagination -->
-{% if total_pages > 1 %}
-<div class="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem;">
-    {% if page > 1 %}
-    <a href="{{ url_for('ver_directorio', tipo=tipo, page=page-1) }}" class="btn-page"
-        style="padding: 0.25rem 0.5rem; border: 1px solid #ddd; text-decoration: none; color: #333;">&laquo;
-        Anterior</a>
+            <div class="join">
+                {% for p in range(1, total_pages + 1) %}
+                <a href="{{ url_for('ver_directorio', tipo=tipo, page=p) }}"
+                    class="join-item btn btn-sm {% if p == page %}btn-primary{% else %}btn-ghost{% endif %}">
+                    {{ p }}
+                </a>
+                {% endfor %}
+            </div>
+
+            {% if page < total_pages %} <a href="{{ url_for('ver_directorio', tipo=tipo, page=page+1) }}"
+                class="btn btn-soft btn-secondary btn-sm">
+                Siguiente
+                <span class="icon-[tabler--chevron-right] size-4"></span>
+                </a>
+                {% endif %}
+        </div>
+    </div>
     {% endif %}
-
-    <span style="font-size: 0.8rem; align-self: center;">Página {{ page }} de {{ total_pages }}</span>
-
-    {% if page < total_pages %} <a href="{{ url_for('ver_directorio', tipo=tipo, page=page+1) }}" class="btn-page"
-        style="padding: 0.25rem 0.5rem; border: 1px solid #ddd; text-decoration: none; color: #333;">Siguiente
-        &raquo;</a>
-        {% endif %}
 </div>
-{% endif %}
 {% endblock %}
