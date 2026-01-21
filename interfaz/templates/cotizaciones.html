@@ -14,6 +14,77 @@
     </a>
 </div>
 
+<!-- Search Filters -->
+<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
+    <div class="card-body p-4">
+        <form method="GET" action="{{ url_for('cotizaciones') }}" class="flex flex-row items-end gap-3 w-full">
+
+            <!-- Cliente -->
+            <div class="form-control flex-grow min-w-0">
+                <label class="label py-0 mb-1">
+                    <span class="label-text-alt uppercase font-bold text-base-content/50">Cliente</span>
+                </label>
+                <input list="lista-clientes" name="cliente" class="input input-bordered w-full h-10"
+                    placeholder="Filtrar por cliente..." value="{{ request.args.get('cliente', '') }}">
+                <datalist id="lista-clientes">
+                    {% for cliente in clientes_disponibles %}
+                    <option value="{{ cliente }}">
+                        {% endfor %}
+                </datalist>
+            </div>
+
+            <!-- Mes -->
+            <div class="form-control w-32 flex-none">
+                <label class="label py-0 mb-1">
+                    <span class="label-text-alt uppercase font-bold text-base-content/50">Mes</span>
+                </label>
+                <select name="mes" class="select select-bordered w-full h-10 min-h-0 px-3">
+                    <option value="" selected>Mes</option>
+                    <option value="01">Enero</option>
+                    <option value="02">Febrero</option>
+                    <option value="03">Marzo</option>
+                    <option value="04">Abril</option>
+                    <option value="05">Mayo</option>
+                    <option value="06">Junio</option>
+                    <option value="07">Julio</option>
+                    <option value="08">Agosto</option>
+                    <option value="09">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                </select>
+            </div>
+
+            <!-- Año -->
+            <div class="form-control w-24 flex-none">
+                <label class="label py-0 mb-1">
+                    <span class="label-text-alt uppercase font-bold text-base-content/50">Año</span>
+                </label>
+                <select name="anio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                    <option value="" selected>Año</option>
+                    {% for y in range(2023, 2031) %}
+                    <option value="{{ y }}">{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Botón -->
+            <div class="flex-none pb-0">
+                <div class="flex gap-2">
+                    <button type="submit" class="btn btn-primary h-10 min-h-0 px-4 flex items-center gap-2">
+                        <span class="icon-[tabler--search] size-5"></span>
+                        <span class="hidden md:inline">Buscar</span>
+                    </button>
+                    <a href="{{ url_for('cotizaciones') }}" class="btn btn-soft btn-secondary h-10 min-h-0 btn-square"
+                        title="Limpiar">
+                        <span class="icon-[tabler--eraser] size-5"></span>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
     <div class="card-body p-0">
         <div class="overflow-x-auto">
