@@ -29,6 +29,62 @@
         .msg-success {
             border-left: 4px solid #10b981 !important;
         }
+
+        /* TEMA PERSONALIZADO COPHI - FORZADO */
+        :root,
+        [data-theme="light"] {
+            /* Primary: #0099cf (Azul Cian) */
+            --p: 196 100% 41%;
+            --pc: 0 0% 100%;
+
+            /* Secondary: #6ebe43 (Verde Lima) */
+            --s: 99 48% 50%;
+            --sc: 0 0% 100%;
+
+            /* Base content */
+            --bc: 215 19% 35%;
+        }
+
+        /* SOBRESCRIBIR COMPONENTES ESPECÍFICOS QUE NO OBEDECEN VARIABLES */
+
+        /* Botones Primarios (Nueva Cotización, etc) */
+        .btn-primary,
+        .btn.btn-primary,
+        [class*="btn-primary"] {
+            background-color: #0099cf !important;
+            border-color: #0099cf !important;
+            color: #ffffff !important;
+        }
+
+        .btn-primary:hover,
+        .btn.btn-primary:hover {
+            background-color: #007bb5 !important;
+            /* Un poco más oscuro */
+            border-color: #007bb5 !important;
+        }
+
+        /* Botones suaves/texto (Ver Doc) */
+        .btn-soft.btn-primary {
+            background-color: rgba(0, 153, 207, 0.1) !important;
+            /* Azul muy suave */
+            color: #0099cf !important;
+            border: none !important;
+        }
+
+        .btn-soft.btn-primary:hover {
+            background-color: rgba(0, 153, 207, 0.2) !important;
+        }
+
+        /* Texto Primario (Títulos, enlaces) */
+        .text-primary {
+            color: #0099cf !important;
+        }
+
+        /* Menú Activo (Sidebar) */
+        .menu-active {
+            background-color: #0099cf !important;
+            color: white !important;
+        }
     </style>
 
     {% block extra_head %}{% endblock %}
