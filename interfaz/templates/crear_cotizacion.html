@@ -52,6 +52,13 @@
                             class="input input-bordered w-full font-black text-primary" readonly required>
                     </div>
                     <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Nombre de
+                            Cotización</label>
+                        <input type="text" name="nombre_cot" value="{{ cotizacion.nombre_cot if cotizacion else '' }}"
+                            class="input input-bordered w-full font-bold" placeholder="Ej. Servicio de Mantenimiento..."
+                            {{ 'disabled' if cotizacion else '' }} required>
+                    </div>
+                    <div class="form-control">
                         <label class="label font-bold text-xs uppercase text-base-content/60">Fecha</label>
                         <input type="text" name="fecha_cot"
                             value="{{ cotizacion.fecha_cot if cotizacion else todays_date }}"
