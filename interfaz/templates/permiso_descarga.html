@@ -15,6 +15,88 @@
     </a>
 </div>
 
+<!-- Search Filters -->
+<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
+    <div class="card-body p-4">
+        <form method="GET" action="{{ url_for('permisos_descarga') }}" class="flex flex-col gap-4 w-full">
+
+            <!-- Fila 1: NIS, Cliente, Mes, Año y Botones -->
+            <div class="flex flex-row items-end gap-3 w-full">
+                <!-- NIS -->
+                <div class="form-control w-40 flex-none">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">NIS / Folio</span>
+                    </label>
+                    <input type="text" name="p_nis" class="input input-bordered w-full h-10" placeholder="Buscar NIS..."
+                        value="{{ request.args.get('p_nis', '') }}">
+                </div>
+
+                <!-- Cliente -->
+                <div class="form-control flex-grow min-w-0">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">Cliente /
+                            Establecimiento</span>
+                    </label>
+                    <input type="text" name="p_cliente" class="input input-bordered w-full h-10"
+                        placeholder="Filtrar por nombre o empresa..." value="{{ request.args.get('p_cliente', '') }}">
+                </div>
+
+                <!-- Mes -->
+                <div class="form-control w-40 flex-none">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">Mes Acuse</span>
+                    </label>
+                    <select name="p_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
+                        <option value="" selected>Todos los meses</option>
+                        <option value="01" {{ 'selected' if request.args.get('p_mes')=='01' else '' }}>Enero</option>
+                        <option value="02" {{ 'selected' if request.args.get('p_mes')=='02' else '' }}>Febrero</option>
+                        <option value="03" {{ 'selected' if request.args.get('p_mes')=='03' else '' }}>Marzo</option>
+                        <option value="04" {{ 'selected' if request.args.get('p_mes')=='04' else '' }}>Abril</option>
+                        <option value="05" {{ 'selected' if request.args.get('p_mes')=='05' else '' }}>Mayo</option>
+                        <option value="06" {{ 'selected' if request.args.get('p_mes')=='06' else '' }}>Junio</option>
+                        <option value="07" {{ 'selected' if request.args.get('p_mes')=='07' else '' }}>Julio</option>
+                        <option value="08" {{ 'selected' if request.args.get('p_mes')=='08' else '' }}>Agosto</option>
+                        <option value="09" {{ 'selected' if request.args.get('p_mes')=='09' else '' }}>Septiembre
+                        </option>
+                        <option value="10" {{ 'selected' if request.args.get('p_mes')=='10' else '' }}>Octubre</option>
+                        <option value="11" {{ 'selected' if request.args.get('p_mes')=='11' else '' }}>Noviembre
+                        </option>
+                        <option value="12" {{ 'selected' if request.args.get('p_mes')=='12' else '' }}>Diciembre
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Año -->
+                <div class="form-control w-32 flex-none">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">Año</span>
+                    </label>
+                    <select name="p_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                        <option value="" selected>Año</option>
+                        {% for y in range(2023, 2031) %}
+                        <option value="{{ y }}" {{ 'selected' if request.args.get('p_anio')==y|string else '' }}>{{ y }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex-none flex gap-2">
+                    <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                        <span class="icon-[tabler--search] size-5"></span>
+                        <span>Buscar</span>
+                    </button>
+                    <a href="{{ url_for('permisos_descarga') }}"
+                        class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
+                        <span class="icon-[tabler--eraser] size-5"></span>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
     <div class="card-body p-0">
         <div class="overflow-x-auto">
@@ -37,7 +119,8 @@
                             <span class="font-bold text-primary">{{ p.nis }}</span>
                         </td>
                         <td>
-                            <div class="font-medium text-base-content">{{ p.nombre_negocio }}</div>
+                            <div class="font-medium text-base-content">{{ p.nombre_empresa or p.nombre_negocio or '---'
+                                }}</div>
                         </td>
                         <td>
                             <div class="font-medium text-base-content">{{ p.arr_nombre or p.prop_nombre }}</div>

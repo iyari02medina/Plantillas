@@ -20,6 +20,64 @@
     </a>
 </div>
 
+<!-- Search Filters -->
+<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
+    <div class="card-body p-4">
+        <form method="GET" action="{{ url_for('ver_directorio', tipo=tipo) }}" class="flex flex-col gap-4 w-full">
+            <div class="flex flex-row items-end gap-3 w-full">
+                <!-- Buscador general -->
+                <div class="form-control flex-grow min-w-0">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">Búsqueda General</span>
+                    </label>
+                    <input type="text" name="d_search" class="input input-bordered w-full h-10"
+                        placeholder="Buscar por nombre, ID o dirección..."
+                        value="{{ request.args.get('d_search', '') }}">
+                </div>
+
+                <!-- Tipo de Empresa -->
+                <div class="form-control w-48 flex-none">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">Tipo</span>
+                    </label>
+                    <select name="d_tipo_emp" class="select select-bordered w-full h-10 min-h-0 px-3">
+                        <option value="" selected>Todos los tipos</option>
+                        <option value="Restaurante" {{ 'selected' if request.args.get('d_tipo_emp')=='Restaurante'
+                            else '' }}>Restaurante</option>
+                        <option value="Hotel" {{ 'selected' if request.args.get('d_tipo_emp')=='Hotel' else '' }}>Hotel
+                        </option>
+                        <option value="Industrial" {{ 'selected' if request.args.get('d_tipo_emp')=='Industrial' else ''
+                            }}>Industrial</option>
+                        <option value="Comercial" {{ 'selected' if request.args.get('d_tipo_emp')=='Comercial' else ''
+                            }}>Comercial</option>
+                        <option value="Residencial" {{ 'selected' if request.args.get('d_tipo_emp')=='Residencial'
+                            else '' }}>Residencial</option>
+                        <option value="Salud" {{ 'selected' if request.args.get('d_tipo_emp')=='Salud' else '' }}>Salud
+                        </option>
+                        <option value="Educación" {{ 'selected' if request.args.get('d_tipo_emp')=='Educación' else ''
+                            }}>Educación</option>
+                        <option value="Otros" {{ 'selected' if request.args.get('d_tipo_emp')=='Otros' else '' }}>Otros
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex-none flex gap-2">
+                    <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                        <span class="icon-[tabler--search] size-5"></span>
+                        <span>Buscar</span>
+                    </button>
+                    <a href="{{ url_for('ver_directorio', tipo=tipo) }}"
+                        class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
+                        <span class="icon-[tabler--eraser] size-5"></span>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
     <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5">
         <h2 class="text-lg font-bold">Listado de {{ 'Clientes' if tipo == 'clientes' else 'Prospectos' }}</h2>
@@ -62,10 +120,10 @@
                         <td colspan="{{ headers|length + 1 }}" class="text-center py-20">
                             <div class="flex flex-col items-center gap-4">
                                 <span class="icon-[tabler--users-minus] size-16 text-base-content/20"></span>
-                                <p class="text-base-content/40 font-medium">No se encontraron registros en esta lista.
-                                </p>
+                                <p class="text-base-content/40 font-medium">No se encontraron {{ tipo }} con los
+                                    criterios de búsqueda.</p>
                                 <a href="{{ url_for('nuevo_directorio_item', tipo=tipo) }}"
-                                    class="btn btn-outline btn-primary btn-sm mt-2">Crear primer registro</a>
+                                    class="btn btn-outline btn-primary btn-sm mt-2">Crear registro</a>
                             </div>
                         </td>
                     </tr>
@@ -79,7 +137,8 @@
     <div class="card-footer bg-base-200/30 border-t border-base-content/10 p-4">
         <div class="flex justify-center flex-wrap gap-2">
             {% if page > 1 %}
-            <a href="{{ url_for('ver_directorio', tipo=tipo, page=page-1) }}" class="btn btn-soft btn-secondary btn-sm">
+            <a href="{{ url_for('ver_directorio', tipo=tipo, page=page-1, d_search=request.args.get('d_search', ''), d_tipo_emp=request.args.get('d_tipo_emp', '')) }}"
+                class="btn btn-soft btn-secondary btn-sm">
                 <span class="icon-[tabler--chevron-left] size-4"></span>
                 Anterior
             </a>
@@ -87,14 +146,15 @@
 
             <div class="join">
                 {% for p in range(1, total_pages + 1) %}
-                <a href="{{ url_for('ver_directorio', tipo=tipo, page=p) }}"
+                <a href="{{ url_for('ver_directorio', tipo=tipo, page=p, d_search=request.args.get('d_search', ''), d_tipo_emp=request.args.get('d_tipo_emp', '')) }}"
                     class="join-item btn btn-sm {% if p == page %}btn-primary{% else %}btn-ghost{% endif %}">
                     {{ p }}
                 </a>
                 {% endfor %}
             </div>
 
-            {% if page < total_pages %} <a href="{{ url_for('ver_directorio', tipo=tipo, page=page+1) }}"
+            {% if page < total_pages %} <a
+                href="{{ url_for('ver_directorio', tipo=tipo, page=page+1, d_search=request.args.get('d_search', ''), d_tipo_emp=request.args.get('d_tipo_emp', '')) }}"
                 class="btn btn-soft btn-secondary btn-sm">
                 Siguiente
                 <span class="icon-[tabler--chevron-right] size-4"></span>
@@ -103,5 +163,6 @@
         </div>
     </div>
     {% endif %}
+
 </div>
 {% endblock %}

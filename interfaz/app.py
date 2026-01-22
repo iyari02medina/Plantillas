@@ -185,20 +185,57 @@ def index():
 @app.route('/cotizaciones')
 def cotizaciones():
     raw_data = read_csv(COTIZACIONES_CSV)
-    # Group by folio
+    
+    # Extract search parameters
+    q_cliente = request.args.get('cliente', '').lower()
+    q_nombre = request.args.get('nombre_cot', '').lower()
+    q_mes = request.args.get('mes', '')
+    q_anio = request.args.get('anio', '')
+    
+    # Get available clients for datalist
+    clientes_disponibles = sorted(list(set(row.get('nombre_cliente') for row in raw_data if row.get('nombre_cliente'))))
+
+    # Group by folio and filter
     grouped_cotizaciones = {}
     for row in raw_data:
         folio = row.get('folio_cot')
         if not folio: continue
+        
+        # Apply filters during grouping (optimistic approach: filter out rows that don't match)
+        # Note: since multiple rows can have the same folio, we only need to check matches once per folio
+        # or check if ANY row for this folio matches. Standard practice here is that folio details are consistent.
+        
         if folio not in grouped_cotizaciones:
+            # Check filters
+            cliente_val = row.get('nombre_cliente', '')
+            nombre_val = row.get('nombre_cot', '')
+            fecha_val = row.get('fecha_cot', '')
+            
+            match = True
+            if q_cliente and q_cliente not in cliente_val.lower(): match = False
+            if q_nombre and q_nombre not in nombre_val.lower(): match = False
+            
+            if (q_mes or q_anio) and fecha_val:
+                parts = fecha_val.split('/')
+                if len(parts) == 3:
+                    if q_mes and parts[1] != q_mes: match = False
+                    if q_anio and parts[2] != q_anio: match = False
+                else:
+                    match = False
+            
+            if not match: continue
+
             grouped_cotizaciones[folio] = {
                 'folio': folio,
-                'cliente': row.get('nombre_cliente'),
-                'fecha': row.get('fecha_cot'),
+                'nombre_cot': nombre_val,
+                'cliente': cliente_val,
+                'fecha': fecha_val,
                 'total': row.get('total'),
                 'items_count': 0
             }
-        grouped_cotizaciones[folio]['items_count'] += 1
+        
+        if folio in grouped_cotizaciones:
+            grouped_cotizaciones[folio]['items_count'] += 1
     
     # Convert to list and reverse to show newest first
     all_cots = list(grouped_cotizaciones.values())[::-1]
@@ -219,6 +256,7 @@ def cotizaciones():
     
     return render_template('cotizaciones.html', 
                          cotizaciones=paginated_cots,
+                         clientes_disponibles=clientes_disponibles,
                          page=page,
                          total_pages=total_pages)
 
@@ -419,14 +457,102 @@ def ordenes():
             if match: filtered.append(o)
         desazolves = filtered
 
+    # Filter Trampas
+    t_folio = request.args.get('t_folio', '').lower()
+    t_cliente = request.args.get('t_cliente', '').lower()
+    t_tipo = request.args.get('t_tipo', '').lower()
+    t_capacidad = request.args.get('t_capacidad', '').lower()
+    t_mes = request.args.get('t_mes', '')
+    t_anio = request.args.get('t_anio', '')
+    
+    if t_folio or t_cliente or t_tipo or t_capacidad or t_mes or t_anio:
+        filtered_t = []
+        for o in trampas:
+            match = True
+            if t_folio and t_folio not in o.get('folio_lt', '').lower(): match = False
+            if t_cliente and t_cliente not in o.get('nombre_cliente', '').lower(): match = False
+            if t_tipo and t_tipo not in o.get('tipo_trampa', '').lower(): match = False
+            if t_capacidad and t_capacidad not in o.get('capacidad_trampa', '').lower(): match = False
+            
+            # Date filter (expected format DD/MM/YYYY)
+            fecha = o.get('fecha_lt', '')
+            if fecha and (t_mes or t_anio):
+                parts = fecha.split('/')
+                if len(parts) == 3:
+                    if t_mes and parts[1] != t_mes: match = False
+                    if t_anio and parts[2] != t_anio: match = False
+                else:
+                    match = False
+            
+            if match: filtered_t.append(o)
+        trampas = filtered_t
+
+    # Filter Visitas
+    v_folio = request.args.get('v_folio', '').lower()
+    v_cliente = request.args.get('v_cliente', '').lower()
+    v_direccion = request.args.get('v_direccion', '').lower()
+    v_no_cliente = request.args.get('v_no_cliente', '').lower()
+    v_mes = request.args.get('v_mes', '')
+    v_anio = request.args.get('v_anio', '')
+    
+    if v_folio or v_cliente or v_direccion or v_no_cliente or v_mes or v_anio:
+        filtered_v = []
+        for o in visitas:
+            match = True
+            if v_folio and v_folio not in o.get('folio_vt', '').lower(): match = False
+            if v_cliente and v_cliente not in o.get('nombre_cliente', '').lower(): match = False
+            if v_direccion and v_direccion not in o.get('direccion_cliente', '').lower(): match = False
+            if v_no_cliente and v_no_cliente not in o.get('no_cliente', '').lower(): match = False
+            
+            # Date filter (expected format DD/MM/YYYY)
+            fecha = o.get('fecha_vt', '')
+            if fecha and (v_mes or v_anio):
+                parts = fecha.split('/')
+                if len(parts) == 3:
+                    if v_mes and parts[1] != v_mes: match = False
+                    if v_anio and parts[2] != v_anio: match = False
+                else:
+                    match = False
+            
+            if match: filtered_v.append(o)
+        visitas = filtered_v
+
     return render_template('ordenes.html', desazolves=desazolves, trampas=trampas, visitas=visitas)
 
 @app.route('/tarificador')
 def tarificador():
     raw_data = read_csv(TARIFICADOR_CSV)
     
-    # Reverse to show newest first
-    all_tars = raw_data[::-1]
+    # Extract search parameters
+    q_folio = request.args.get('t_folio', '').lower()
+    q_cliente = request.args.get('t_cliente', '').lower()
+    q_mes = request.args.get('t_mes', '')
+    q_anio = request.args.get('t_anio', '')
+    
+    if q_folio or q_cliente or q_mes or q_anio:
+        filtered = []
+        for t in raw_data:
+            match = True
+            if q_folio and q_folio not in str(t.get('folio_tar', '')).lower(): match = False
+            if q_cliente and q_cliente not in str(t.get('nombre_cliente', '')).lower(): match = False
+            
+            # Date filter (expected format DD/MM/YYYY)
+            fecha = t.get('fecha_tar', '')
+            if fecha and (q_mes or q_anio):
+                parts = fecha.split('/')
+                if len(parts) == 3:
+                    if q_mes and parts[1] != q_mes: match = False
+                    if q_anio and parts[2] != q_anio: match = False
+                else:
+                    match = False
+            elif (q_mes or q_anio) and not fecha:
+                match = False
+                
+            if match: filtered.append(t)
+        all_tars = filtered[::-1]
+    else:
+        # Reverse to show newest first
+        all_tars = raw_data[::-1]
     
     # Pagination
     page = request.args.get('page', 1, type=int)
@@ -434,7 +560,6 @@ def tarificador():
     total_items = len(all_tars) if all_tars else 0
     total_pages = math.ceil(total_items / per_page)
     
-    # Correct page bounds
     if page < 1: page = 1
     if page > total_pages and total_pages > 0: page = total_pages
     
@@ -1170,8 +1295,43 @@ def detalle_permiso_descarga(nis):
 def permisos_descarga():
     raw_data = read_csv(PERMISOS_CSV)
     
-    # Invertir para mostrar los nuevos primero
-    all_permisos = raw_data[::-1]
+    # Extract search parameters
+    q_nis = request.args.get('p_nis', '').lower()
+    q_cliente = request.args.get('p_cliente', '').lower()
+    q_mes = request.args.get('p_mes', '')
+    q_anio = request.args.get('p_anio', '')
+    
+    if q_nis or q_cliente or q_mes or q_anio:
+        filtered = []
+        for p in raw_data:
+            match = True
+            if q_nis and q_nis not in str(p.get('nis', '')).lower(): match = False
+            
+            # Check business name or person name
+            cliente_match = False
+            if q_cliente:
+                if q_cliente in str(p.get('nombre_empresa', '')).lower(): cliente_match = True
+                if q_cliente in str(p.get('arr_nombre', '')).lower(): cliente_match = True
+                if q_cliente in str(p.get('prop_nombre', '')).lower(): cliente_match = True
+                # Added support for p.nombre_negocio if used in templates
+                if q_cliente in str(p.get('nombre_negocio', '')).lower(): cliente_match = True
+                if not cliente_match: match = False
+            
+            # Date filter (expected format DD/MM/YYYY)
+            fecha = p.get('fecha_acuse', '')
+            if fecha and (q_mes or q_anio):
+                parts = fecha.split('/')
+                if len(parts) == 3:
+                    if q_mes and parts[1] != q_mes: match = False
+                    if q_anio and parts[2] != q_anio: match = False
+                else:
+                    match = False
+            
+            if match: filtered.append(p)
+        all_permisos = filtered[::-1]
+    else:
+        # Invertir para mostrar los nuevos primero
+        all_permisos = raw_data[::-1]
     
     # Paginación
     page = request.args.get('page', 1, type=int)
@@ -1382,13 +1542,44 @@ def ver_directorio(tipo):
     csv_file = CLIENTES_CSV if tipo == 'clientes' else PROSPECTOS_CSV
     data = read_csv(csv_file)
     
+    # Extract search parameters
+    q_search = request.args.get('d_search', '').lower()
+    q_tipo_emp = request.args.get('d_tipo_emp', '').lower()
+    
+    # Filter data
+    filtered_data = []
+    for item in data:
+        match = True
+        
+        # General search (ID, Folio, Name, Address)
+        if q_search:
+            search_fields = ['id_cliente', 'folio', 'nombre_empresa', 'direccion_empresa']
+            row_match = False
+            for field in search_fields:
+                if q_search in str(item.get(field, '')).lower():
+                    row_match = True
+                    break
+            if not row_match: match = False
+            
+        # Type filter
+        if q_tipo_emp and q_tipo_emp != str(item.get('tipo_empresa', '')).lower():
+            match = False
+            
+        if match:
+            filtered_data.append(item)
+            
     # Pagination
     page = request.args.get('page', 1, type=int)
     per_page = 20
-    total_pages = math.ceil(len(data) / per_page)
+    total_items = len(filtered_data)
+    total_pages = math.ceil(total_items / per_page)
+    
+    if page < 1: page = 1
+    if page > total_pages and total_pages > 0: page = total_pages
+    
     start = (page - 1) * per_page
     end = start + per_page
-    paginated_data = data[start:end]
+    paginated_data = filtered_data[start:end]
     
     # Headers to show
     headers = []
@@ -1399,12 +1590,17 @@ def ver_directorio(tipo):
         headers = [k for k in priority if k in all_keys]
         # Add others up to 5 cols
         for k in all_keys:
-            if k not in headers and len(headers) < 5:
+            if k not in headers and len(headers) < 5 and k and not k.startswith('unnamed'):
                 headers.append(k)
     else:
          headers = ['nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa']
 
-    return render_template('tabla_directorio.html', tipo=tipo, data=paginated_data, headers=headers, page=page, total_pages=total_pages)
+    return render_template('tabla_directorio.html', 
+                         tipo=tipo, 
+                         data=paginated_data, 
+                         headers=headers, 
+                         page=page, 
+                         total_pages=total_pages)
 
 @app.route('/directorio/nuevo/<tipo>')
 def nuevo_directorio_item(tipo):
@@ -1639,8 +1835,39 @@ def guardar_nuevo_directorio_logic(tipo, existing, headers, csv_file):
 @app.route('/consumos')
 def consumos():
     raw_data = read_csv(CONSUMOS_CSV)
-    # Reverse to show newest first
-    all_consumos = raw_data[::-1]
+    
+    # Extract search parameters
+    q_folio = request.args.get('c_folio', '').lower()
+    q_cliente = request.args.get('c_cliente', '').lower()
+    q_mes = request.args.get('c_mes', '')
+    q_anio = request.args.get('c_anio', '')
+    
+    if q_folio or q_cliente or q_mes or q_anio:
+        filtered = []
+        for c in raw_data:
+            match = True
+            if q_folio and q_folio not in str(c.get('folio', '')).lower(): match = False
+            if q_cliente and q_cliente not in str(c.get('nombre_cliente', '')).lower(): match = False
+            
+            # Date filter (expected format YYYY-MM-DD in this CSV)
+            fecha = c.get('fecha_lectura', '')
+            if fecha and (q_mes or q_anio):
+                parts = fecha.split('-')
+                if len(parts) == 3:
+                    # YYYY-MM-DD
+                    if q_mes and parts[1] != q_mes: match = False
+                    if q_anio and parts[0] != q_anio: match = False
+                else:
+                    # Fallback if format is different
+                    match = False
+            elif (q_mes or q_anio) and not fecha:
+                match = False
+                
+            if match: filtered.append(c)
+        all_consumos = filtered[::-1]
+    else:
+        # Reverse to show newest first
+        all_consumos = raw_data[::-1]
     
     # Pagination
     page = request.args.get('page', 1, type=int)
