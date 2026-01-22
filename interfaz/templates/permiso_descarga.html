@@ -130,11 +130,41 @@
                         <td class="text-center text-base-content/60">{{ p.fecha_acuse }}</td>
                         <td class="text-right">
                             <div class="flex justify-end gap-2">
-                                <a href="{{ url_for('detalle_permiso_descarga', nis=p.nis) }}"
-                                    class="btn btn-soft btn-secondary btn-sm">
-                                    <span class="icon-[tabler--edit] size-4"></span>
-                                    <span>Detalle</span>
-                                </a>
+                                <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
+                                    <button id="dropdown-actions-{{ p.nis }}" type="button"
+                                        class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
+                                        aria-expanded="false" aria-label="Dropdown">
+                                        <span class="icon-[tabler--dots-vertical] size-4"></span>
+                                        <span>Ver Acciones</span>
+                                        <span
+                                            class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
+                                        aria-orientation="vertical" aria-labelledby="dropdown-actions-{{ p.nis }}">
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('detalle_permiso_descarga', nis=p.nis) }}">
+                                                <span class="icon-[tabler--eye] size-4"></span>
+                                                Ver Detalles
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider my-1 border-base-content/10">
+                                        </li>
+                                        <li>
+                                            <form action="{{ url_for('eliminar_permiso_descarga', nis=p.nis) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('¿Seguro que desea borrar este permiso de descarga? Esta acción no se puede deshacer.');"
+                                                class="w-full">
+                                                <button type="submit"
+                                                    class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
+                                                    <span class="icon-[tabler--trash] size-4"></span>
+                                                    Borrar
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
 
                                 <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
                                     <button id="dropdown-{{ p.nis }}" type="button"

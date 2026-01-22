@@ -1444,6 +1444,30 @@ def nuevo_permiso_descarga():
     return render_template('crear_permiso_descarga.html', clientes=clientes, suggested_nis=suggested_nis, permiso=None)
 
 
+
+@app.route('/eliminar_permiso_descarga/<nis>', methods=['POST'])
+def eliminar_permiso_descarga(nis):
+    try:
+        existing = read_csv(PERMISOS_CSV)
+        headers = []
+        if existing:
+            headers = list(existing[0].keys())
+        
+        # Filter out the permission with the matching NIS
+        updated_rows = [r for r in existing if str(r.get('nis', '')).strip() != str(nis).strip()]
+        
+        if len(updated_rows) < len(existing):
+            # Something was deleted
+            overwrite_csv(PERMISOS_CSV, headers, updated_rows)
+            flash(f'Permiso de descarga con NIS {nis} eliminado correctamente.', 'success')
+        else:
+            flash(f'No se encontró el permiso con NIS {nis}.', 'error')
+            
+    except Exception as e:
+        flash(f'Error al eliminar el permiso: {e}', 'error')
+        
+    return redirect(url_for('permisos_descarga'))
+
 @app.route('/ver_permiso_pdf/<nis>/<tipo>')
 def ver_permiso_pdf(nis, tipo):
     """
