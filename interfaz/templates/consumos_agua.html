@@ -132,11 +132,39 @@
                             </span>
                         </td>
                         <td class="text-right">
-                            <a href="{{ url_for('detalle_consumo', folio=data.folio) }}"
-                                class="btn btn-soft btn-secondary btn-sm">
-                                <span class="icon-[tabler--eye] size-4"></span>
-                                <span>Ver Consumo</span>
-                            </a>
+                            <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
+                                <button id="dropdown-actions-{{ data.folio }}" type="button"
+                                    class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
+                                    aria-expanded="false" aria-label="Dropdown">
+                                    <span class="icon-[tabler--dots-vertical] size-4"></span>
+                                    <span>Ver Acciones</span>
+                                    <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
+                                    aria-orientation="vertical" aria-labelledby="dropdown-actions-{{ data.folio }}">
+                                    <li>
+                                        <a class="dropdown-item flex items-center gap-2"
+                                            href="{{ url_for('detalle_consumo', folio=data.folio) }}">
+                                            <span class="icon-[tabler--eye] size-4"></span>
+                                            Ver Detalles
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider my-1 border-base-content/10">
+                                    </li>
+                                    <li>
+                                        <form action="{{ url_for('eliminar_consumo', folio=data.folio) }}" method="POST"
+                                            onsubmit="return confirm('¿Seguro que desea borrar este registro de consumo? Esta acción no se puede deshacer.');"
+                                            class="w-full">
+                                            <button type="submit"
+                                                class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
+                                                <span class="icon-[tabler--trash] size-4"></span>
+                                                Borrar
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                     {% else %}

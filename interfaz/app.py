@@ -794,6 +794,28 @@ def detalle_tarificador(folio):
     # We pass 'tarificador' object to template to trigger Edit Mode
     return render_template('crear_tarificador.html', tarificador=target, clientes=clientes, rangos=load_rangos(), default_lmps=get_default_lmps())
 
+@app.route('/eliminar_tarificador/<folio>', methods=['POST'])
+def eliminar_tarificador(folio):
+    try:
+        all_rows = read_csv(TARIFICADOR_CSV)
+        headers = []
+        if all_rows:
+            headers = list(all_rows[0].keys())
+        
+        # Filter out the matching folio
+        updated_rows = [r for r in all_rows if str(r.get('folio_tar', '')).strip() != str(folio).strip()]
+        
+        if len(updated_rows) < len(all_rows):
+            overwrite_csv(TARIFICADOR_CSV, headers, updated_rows)
+            flash(f'Registro de tarificación {folio} eliminado correctamente.', 'success')
+        else:
+            flash(f'No se encontró el registro {folio}.', 'error')
+            
+    except Exception as e:
+        flash(f'Error al eliminar: {e}', 'error')
+        
+    return redirect(url_for('tarificador'))
+
 TARIFICADORES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'tarificadores'))
 
 @app.route('/ver_tarificador/<folio>')
@@ -1678,6 +1700,39 @@ def ver_directorio(tipo):
                          page=page, 
                          total_pages=total_pages)
 
+@app.route('/directorio/eliminar/<tipo>/<id_val>', methods=['POST'])
+def eliminar_directorio_item(tipo, id_val):
+    if tipo not in ['clientes', 'prospectos']:
+        return redirect(url_for('directorio'))
+        
+    csv_file = CLIENTES_CSV if tipo == 'clientes' else PROSPECTOS_CSV
+    try:
+        existing = read_csv(csv_file)
+        headers = []
+        if existing:
+            headers = list(existing[0].keys())
+        
+        key = 'id_cliente' if tipo == 'clientes' else 'folio'
+        
+        # Primary deletion filter
+        updated_rows = [r for r in existing if str(r.get(key, '')).strip() != str(id_val).strip()]
+        
+        # Fallback filter mapping the logic in detalle_directorio
+        if len(updated_rows) == len(existing):
+            normalized_id_val = str(id_val).strip().lower()
+            updated_rows = [r for r in existing if str(r.get('nombre_empresa', '')).strip().lower() != normalized_id_val]
+
+        if len(updated_rows) < len(existing):
+            overwrite_csv(csv_file, headers, updated_rows)
+            flash(f'Registro eliminado correctamente del directorio de {tipo}.', 'success')
+        else:
+            flash(f'No se encontró el registro para eliminar.', 'error')
+            
+    except Exception as e:
+        flash(f'Error al eliminar: {e}', 'error')
+        
+    return redirect(url_for('ver_directorio', tipo=tipo))
+
 @app.route('/directorio/nuevo/<tipo>')
 def nuevo_directorio_item(tipo):
     return render_template('crear_directorio.html', tipo=tipo, is_new=True, item={})
@@ -2069,6 +2124,28 @@ def guardar_consumo():
         # New
         append_to_csv(CONSUMOS_CSV, headers, [row])
         flash('Consumo registrado exitosamente.', 'success')
+        
+    return redirect(url_for('consumos'))
+
+@app.route('/eliminar_consumo/<folio>', methods=['POST'])
+def eliminar_consumo(folio):
+    try:
+        all_rows = read_csv(CONSUMOS_CSV)
+        headers = []
+        if all_rows:
+            headers = list(all_rows[0].keys())
+        
+        # Filter out the matching folio
+        updated_rows = [r for r in all_rows if str(r.get('folio', '')).strip() != str(folio).strip()]
+        
+        if len(updated_rows) < len(all_rows):
+            overwrite_csv(CONSUMOS_CSV, headers, updated_rows)
+            flash(f'Registro de consumo {folio} eliminado correctamente.', 'success')
+        else:
+            flash(f'No se encontró el registro {folio}.', 'error')
+            
+    except Exception as e:
+        flash(f'Error al eliminar: {e}', 'error')
         
     return redirect(url_for('consumos'))
 
