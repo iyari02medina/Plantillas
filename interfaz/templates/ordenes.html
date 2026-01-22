@@ -156,33 +156,19 @@
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
                     <tr>
+                        <th>Acciones</th>
                         <th>Folio</th>
                         <th>Fecha</th>
                         <th>Cliente</th>
                         <th>Ubicación</th>
                         <th>Servicio</th>
-                        <th class="text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-base-content/5">
                     {% for orden in desazolves|reverse %}
                     {% if orden.folio_des %}
                     <tr class="hover:bg-base-200/30 transition-colors">
-                        <td><span class="font-bold text-primary">{{ orden.folio_des }}</span></td>
-                        <td class="text-base-content/60">{{ orden.fecha_des }}</td>
-                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
-                        <td class="text-sm truncate max-w-xs">{{ orden.ubicacion_area }}</td>
                         <td>
-                            <div class="flex gap-1">
-                                {% if orden.equipo_vactor == 'x' %}<span
-                                    class="badge badge-soft badge-primary text-[10px]">Vactor</span>{% endif %}
-                                {% if orden.equipo_hidro == 'x' %}<span
-                                    class="badge badge-soft badge-info text-[10px]">Hidro</span>{% endif %}
-                                {% if orden.equipo_guia == 'x' %}<span
-                                    class="badge badge-soft badge-secondary text-[10px]">Guía</span>{% endif %}
-                            </div>
-                        </td>
-                        <td class="text-right">
                             <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
                                 <button id="dropdown-des-{{ orden.folio_des }}" type="button"
                                     class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
@@ -225,6 +211,20 @@
                                         </form>
                                     </li>
                                 </ul>
+                            </div>
+                        </td>
+                        <td><span class="font-bold text-primary">{{ orden.folio_des }}</span></td>
+                        <td class="text-base-content/60">{{ orden.fecha_des }}</td>
+                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
+                        <td class="text-sm truncate max-w-xs">{{ orden.ubicacion_area }}</td>
+                        <td>
+                            <div class="flex gap-1">
+                                {% if orden.equipo_vactor == 'x' %}<span
+                                    class="badge badge-soft badge-primary text-[10px]">Vactor</span>{% endif %}
+                                {% if orden.equipo_hidro == 'x' %}<span
+                                    class="badge badge-soft badge-info text-[10px]">Hidro</span>{% endif %}
+                                {% if orden.equipo_guia == 'x' %}<span
+                                    class="badge badge-soft badge-secondary text-[10px]">Guía</span>{% endif %}
                             </div>
                         </td>
                     </tr>
@@ -359,24 +359,19 @@
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
                     <tr>
+                        <th>Acciones</th>
                         <th>Folio</th>
                         <th>Fecha</th>
                         <th>Cliente</th>
                         <th>Tipo</th>
                         <th>Capacidad</th>
-                        <th class="text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-base-content/5">
                     {% for orden in trampas|reverse %}
                     {% if orden.folio_lt %}
                     <tr class="hover:bg-base-200/30 transition-colors">
-                        <td><span class="font-bold text-primary">{{ orden.folio_lt }}</span></td>
-                        <td class="text-base-content/60">{{ orden.fecha_lt }}</td>
-                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
-                        <td>{{ orden.tipo_trampa }}</td>
-                        <td>{{ orden.capacidad_trampa }}</td>
-                        <td class="text-right">
+                        <td>
                             <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
                                 <button id="dropdown-tra-{{ orden.folio_lt }}" type="button"
                                     class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
@@ -421,6 +416,11 @@
                                 </ul>
                             </div>
                         </td>
+                        <td><span class="font-bold text-primary">{{ orden.folio_lt }}</span></td>
+                        <td class="text-base-content/60">{{ orden.fecha_lt }}</td>
+                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
+                        <td>{{ orden.tipo_trampa }}</td>
+                        <td>{{ orden.capacidad_trampa }}</td>
                     </tr>
                     {% endif %}
                     {% else %}
@@ -553,24 +553,19 @@
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
                     <tr>
+                        <th>Acciones</th>
                         <th>Folio VT</th>
                         <th>Fecha</th>
                         <th>Cliente</th>
                         <th>Dirección</th>
                         <th>No. Cliente</th>
-                        <th class="text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-base-content/5">
                     {% for orden in visitas|reverse %}
                     {% if orden.folio_vt %}
                     <tr class="hover:bg-base-200/30 transition-colors">
-                        <td><span class="font-bold text-primary">{{ orden.folio_vt }}</span></td>
-                        <td class="text-base-content/60">{{ orden.fecha_vt }}</td>
-                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
-                        <td class="text-sm truncate max-w-xs">{{ orden.direccion_cliente }}</td>
-                        <td>{{ orden.no_cliente }}</td>
-                        <td class="text-right">
+                        <td>
                             <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
                                 <button id="dropdown-vis-{{ orden.folio_vt }}" type="button"
                                     class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
@@ -615,6 +610,11 @@
                                 </ul>
                             </div>
                         </td>
+                        <td><span class="font-bold text-primary">{{ orden.folio_vt }}</span></td>
+                        <td class="text-base-content/60">{{ orden.fecha_vt }}</td>
+                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
+                        <td class="text-sm truncate max-w-xs">{{ orden.direccion_cliente }}</td>
+                        <td>{{ orden.no_cliente }}</td>
                     </tr>
                     {% endif %}
                     {% else %}

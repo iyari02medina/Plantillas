@@ -101,27 +101,18 @@
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
                     <tr>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Acciones</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Folio</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Cliente</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Fecha</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Precio m3</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-right">Acciones
-                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-base-content/5">
                     {% for data in tarificadores %}
                     <tr class="hover:bg-base-200/30 transition-colors">
                         <td>
-                            <span class="font-bold text-primary">{{ data.folio_tar }}</span>
-                        </td>
-                        <td class="font-medium text-base-content">{{ data.nombre_cliente }}</td>
-                        <td class="text-base-content/60">{{ data.fecha_tar }}</td>
-                        <td>
-                            <span class="badge badge-outline badge-success font-bold">${{ data.precio_m3_total }}</span>
-                        </td>
-                        <td class="text-right">
-                            <div class="flex justify-end gap-2">
+                            <div class="flex gap-2">
                                 <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
                                     <button id="dropdown-actions-{{ data.folio_tar }}" type="button"
                                         class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
@@ -164,6 +155,14 @@
                                     <span>Ver Doc</span>
                                 </a>
                             </div>
+                        </td>
+                        <td>
+                            <span class="font-bold text-primary">{{ data.folio_tar }}</span>
+                        </td>
+                        <td class="font-medium text-base-content">{{ data.nombre_cliente }}</td>
+                        <td class="text-base-content/60">{{ data.fecha_tar }}</td>
+                        <td>
+                            <span class="badge badge-outline badge-success font-bold">${{ data.precio_m3_total }}</span>
                         </td>
                     </tr>
                     {% else %}

@@ -87,24 +87,17 @@
             <table class="table table-lg">
                 <thead class="bg-base-200/30">
                     <tr>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Acciones</th>
                         {% for header in headers %}
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">{{
                             header|replace('_', ' ') }}</th>
                         {% endfor %}
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-right">Acciones
-                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-base-content/5">
                     {% for row in data %}
                     <tr class="hover:bg-base-200/30 transition-colors">
-                        {% for header in headers %}
-                        <td
-                            class="{% if loop.first %}font-bold text-base-content{% else %}text-base-content/70{% endif %}">
-                            {{ row.get(header, '') }}
-                        </td>
-                        {% endfor %}
-                        <td class="text-right">
+                        <td>
                             <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
                                 <button id="dropdown-dir-{{ loop.index }}" type="button"
                                     class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
@@ -144,6 +137,12 @@
                                 </ul>
                             </div>
                         </td>
+                        {% for header in headers %}
+                        <td
+                            class="{% if loop.first %}font-bold text-base-content{% else %}text-base-content/70{% endif %}">
+                            {{ row.get(header, '') }}
+                        </td>
+                        {% endfor %}
                     </tr>
                     {% else %}
                     <tr>

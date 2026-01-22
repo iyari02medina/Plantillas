@@ -103,33 +103,19 @@
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
                     <tr>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Acciones</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">NIS</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Establecimiento</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Interesado</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-center">Fecha
                             Acuse</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-right">Acciones
-                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-base-content/5">
                     {% for p in permisos %}
                     <tr class="hover:bg-base-200/30 transition-colors">
                         <td>
-                            <span class="font-bold text-primary">{{ p.nis }}</span>
-                        </td>
-                        <td>
-                            <div class="font-medium text-base-content">{{ p.nombre_empresa or p.nombre_negocio or '---'
-                                }}</div>
-                        </td>
-                        <td>
-                            <div class="font-medium text-base-content">{{ p.arr_nombre or p.prop_nombre }}</div>
-                            <div class="text-[10px] uppercase font-bold text-base-content/40">{{ 'Arrendatario' if
-                                p.arr_nombre else 'Propietario' }}</div>
-                        </td>
-                        <td class="text-center text-base-content/60">{{ p.fecha_acuse }}</td>
-                        <td class="text-right">
-                            <div class="flex justify-end gap-2">
+                            <div class="flex gap-2">
                                 <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
                                     <button id="dropdown-actions-{{ p.nis }}" type="button"
                                         class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
@@ -206,6 +192,19 @@
                                 </div>
                             </div>
                         </td>
+                        <td>
+                            <span class="font-bold text-primary">{{ p.nis }}</span>
+                        </td>
+                        <td>
+                            <div class="font-medium text-base-content">{{ p.nombre_empresa or p.nombre_negocio or '---'
+                                }}</div>
+                        </td>
+                        <td>
+                            <div class="font-medium text-base-content">{{ p.arr_nombre or p.prop_nombre }}</div>
+                            <div class="text-[10px] uppercase font-bold text-base-content/40">{{ 'Arrendatario' if
+                                p.arr_nombre else 'Propietario' }}</div>
+                        </td>
+                        <td class="text-center text-base-content/60">{{ p.fecha_acuse }}</td>
                     </tr>
                     {% else %}
                     <tr>

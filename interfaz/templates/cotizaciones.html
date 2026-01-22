@@ -110,6 +110,7 @@
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
                     <tr>
+                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Acciones</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Folio</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Nombre</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Cliente</th>
@@ -117,27 +118,12 @@
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Total</th>
                         <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-center">Items
                         </th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-right">Acciones
-                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-base-content/5">
                     {% for data in cotizaciones %}
                     <tr class="hover:bg-base-200/30 transition-colors">
                         <td>
-                            <span class="font-bold text-primary">{{ data.folio }}</span>
-                        </td>
-                        <td class="max-w-xs truncate font-medium text-base-content" title="{{ data.nombre_cot or '' }}">
-                            {{ data.nombre_cot or '---' }}</td>
-                        <td class="max-w-xs truncate font-medium text-base-content">{{ data.cliente }}</td>
-                        <td class="text-base-content/60">{{ data.fecha }}</td>
-                        <td>
-                            <span class="font-bold text-base-content">${{ data.total }}</span>
-                        </td>
-                        <td class="text-center">
-                            <span class="badge badge-soft badge-info font-bold">{{ data.items_count }}</span>
-                        </td>
-                        <td class="text-right">
                             <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
                                 <button id="dropdown-actions-{{ data.folio }}" type="button"
                                     class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
@@ -179,6 +165,19 @@
                                     </li>
                                 </ul>
                             </div>
+                        </td>
+                        <td>
+                            <span class="font-bold text-primary">{{ data.folio }}</span>
+                        </td>
+                        <td class="max-w-xs truncate font-medium text-base-content" title="{{ data.nombre_cot or '' }}">
+                            {{ data.nombre_cot or '---' }}</td>
+                        <td class="max-w-xs truncate font-medium text-base-content">{{ data.cliente }}</td>
+                        <td class="text-base-content/60">{{ data.fecha }}</td>
+                        <td>
+                            <span class="font-bold text-base-content">${{ data.total }}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge badge-soft badge-info font-bold">{{ data.items_count }}</span>
                         </td>
                     </tr>
                     {% else %}
