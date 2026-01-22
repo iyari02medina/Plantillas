@@ -51,6 +51,106 @@
             Lista de Desazolves
         </h3>
     </div>
+
+    <!-- Search Filters -->
+    <div class="p-4 border-b border-base-content/10 bg-base-100">
+        <form method="GET" action="{{ url_for('ordenes') }}" class="flex flex-col gap-4 w-full">
+            <input type="hidden" name="tab" value="desazolve">
+
+            <!-- Row 1: Folio, Cliente, Servicio -->
+            <div class="flex flex-row items-end gap-3 w-full">
+                <!-- Folio -->
+                <div class="form-control w-40 flex-none">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">Folio</span>
+                    </label>
+                    <input type="text" name="folio" class="input input-bordered w-full h-10" placeholder="OT-DES-..."
+                        value="{{ request.args.get('folio', '') }}">
+                </div>
+
+                <!-- Cliente -->
+                <div class="form-control flex-grow min-w-0">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">Cliente</span>
+                    </label>
+                    <input type="text" name="cliente" class="input input-bordered w-full h-10"
+                        placeholder="Filtrar por cliente..." value="{{ request.args.get('cliente', '') }}">
+                </div>
+
+                <!-- Servicio -->
+                <div class="form-control w-48 flex-none">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">Servicio</span>
+                    </label>
+                    <select name="servicio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                        <option value="" selected>Todos los servicios</option>
+                        <option value="vactor" {{ 'selected' if request.args.get('servicio')=='vactor' else '' }}>Vactor
+                        </option>
+                        <option value="hidro" {{ 'selected' if request.args.get('servicio')=='hidro' else '' }}>Hidro
+                        </option>
+                        <option value="guia" {{ 'selected' if request.args.get('servicio')=='guia' else '' }}>Guía
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Row 2: Mes, Año y Botones -->
+            <div class="flex flex-row items-end gap-3 w-full">
+                <!-- Mes -->
+                <div class="form-control w-40 flex-none">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">Mes</span>
+                    </label>
+                    <select name="mes" class="select select-bordered w-full h-10 min-h-0 px-3">
+                        <option value="" selected>Todos los meses</option>
+                        <option value="01" {{ 'selected' if request.args.get('mes')=='01' else '' }}>Enero</option>
+                        <option value="02" {{ 'selected' if request.args.get('mes')=='02' else '' }}>Febrero</option>
+                        <option value="03" {{ 'selected' if request.args.get('mes')=='03' else '' }}>Marzo</option>
+                        <option value="04" {{ 'selected' if request.args.get('mes')=='04' else '' }}>Abril</option>
+                        <option value="05" {{ 'selected' if request.args.get('mes')=='05' else '' }}>Mayo</option>
+                        <option value="06" {{ 'selected' if request.args.get('mes')=='06' else '' }}>Junio</option>
+                        <option value="07" {{ 'selected' if request.args.get('mes')=='07' else '' }}>Julio</option>
+                        <option value="08" {{ 'selected' if request.args.get('mes')=='08' else '' }}>Agosto</option>
+                        <option value="09" {{ 'selected' if request.args.get('mes')=='09' else '' }}>Septiembre</option>
+                        <option value="10" {{ 'selected' if request.args.get('mes')=='10' else '' }}>Octubre</option>
+                        <option value="11" {{ 'selected' if request.args.get('mes')=='11' else '' }}>Noviembre</option>
+                        <option value="12" {{ 'selected' if request.args.get('mes')=='12' else '' }}>Diciembre</option>
+                    </select>
+                </div>
+
+                <!-- Año -->
+                <div class="form-control w-32 flex-none">
+                    <label class="label py-0 mb-1">
+                        <span class="label-text-alt uppercase font-bold text-base-content/50">Año</span>
+                    </label>
+                    <select name="anio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                        <option value="" selected>Año</option>
+                        {% for y in range(2023, 2031) %}
+                        <option value="{{ y }}" {{ 'selected' if request.args.get('anio')==y|string else '' }}>{{ y }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="flex-grow"></div>
+
+                <!-- Botones -->
+                <div class="flex-none">
+                    <div class="flex gap-2">
+                        <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                            <span class="icon-[tabler--search] size-5"></span>
+                            <span>Buscar</span>
+                        </button>
+                        <a href="{{ url_for('ordenes') }}" class="btn btn-soft btn-secondary h-10 min-h-0 btn-square"
+                            title="Limpiar">
+                            <span class="icon-[tabler--eraser] size-5"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <div class="card-body p-0">
         <div class="overflow-x-auto">
             <table class="table table-lg">
@@ -215,9 +315,20 @@
 
         // Highlight active tab
         const activeTab = document.getElementById('btn-' + tabName);
-        activeTab.classList.add('tab-active', 'font-bold');
-        activeTab.classList.remove('font-medium');
+        if (activeTab) {
+            activeTab.classList.add('tab-active', 'font-bold');
+            activeTab.classList.remove('font-medium');
+        }
     }
+
+    // Auto-select tab from URL parameter
+    window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab');
+        if (tab && ['desazolve', 'trampas', 'visitas'].includes(tab)) {
+            showTab(tab);
+        }
+    };
 </script>
 {% endblock %}
 {% endblock %}

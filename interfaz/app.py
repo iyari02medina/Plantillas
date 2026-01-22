@@ -386,6 +386,39 @@ def ordenes():
     desazolves = read_csv(ORDENES_CSV)
     trampas = read_csv(TRAMPAS_CSV)
     visitas = read_csv(VISITAS_CSV)
+    
+    # Filter Desazolves
+    q_folio = request.args.get('folio', '').lower()
+    q_cliente = request.args.get('cliente', '').lower()
+    q_servicio = request.args.get('servicio', '').lower()
+    q_mes = request.args.get('mes', '')
+    q_anio = request.args.get('anio', '')
+    
+    if q_folio or q_cliente or q_servicio or q_mes or q_anio:
+        filtered = []
+        for o in desazolves:
+            match = True
+            if q_folio and q_folio not in o.get('folio_des', '').lower(): match = False
+            if q_cliente and q_cliente not in o.get('nombre_cliente', '').lower(): match = False
+            
+            # Servicio filter (checks columns: equipo_vactor, equipo_hidro, equipo_guia)
+            if q_servicio:
+                col = f"equipo_{q_servicio}"
+                if o.get(col) != 'x': match = False
+                
+            # Date filter (expected format DD/MM/YYYY)
+            fecha = o.get('fecha_des', '')
+            if fecha and (q_mes or q_anio):
+                parts = fecha.split('/')
+                if len(parts) == 3:
+                    if q_mes and parts[1] != q_mes: match = False
+                    if q_anio and parts[2] != q_anio: match = False
+                else:
+                    match = False
+            
+            if match: filtered.append(o)
+        desazolves = filtered
+
     return render_template('ordenes.html', desazolves=desazolves, trampas=trampas, visitas=visitas)
 
 @app.route('/tarificador')
