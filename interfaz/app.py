@@ -419,6 +419,29 @@ def nueva_cotizacion():
 
     return render_template('crear_cotizacion.html', inventario=inventario, clientes=clientes, suggested_folio=suggested_folio)
 
+@app.route('/eliminar_cotizacion/<folio>', methods=['POST'])
+def eliminar_cotizacion(folio):
+    try:
+        existing = read_csv(COTIZACIONES_CSV)
+        headers = []
+        if existing:
+            headers = list(existing[0].keys())
+        
+        # Filter out all rows with the matching folio (Quotations have multiple rows for items)
+        updated_rows = [r for r in existing if str(r.get('folio_cot', '')).strip() != str(folio).strip()]
+        
+        if len(updated_rows) < len(existing):
+            # Something was deleted
+            overwrite_csv(COTIZACIONES_CSV, headers, updated_rows)
+            flash(f'Cotización {folio} eliminada correctamente.', 'success')
+        else:
+            flash(f'No se encontró la cotización {folio}.', 'error')
+            
+    except Exception as e:
+        flash(f'Error al eliminar la cotización: {e}', 'error')
+        
+    return redirect(url_for('cotizaciones'))
+
 @app.route('/ordenes')
 def ordenes():
     desazolves = read_csv(ORDENES_CSV)
@@ -975,6 +998,35 @@ def nueva_orden(tipo):
 
     clientes = read_csv(CLIENTES_CSV)
     return render_template('crear_orden.html', orden=data, tipo=tipo, folio=data.get(id_key), clientes=clientes, is_new=True)
+
+@app.route('/eliminar_orden/<tipo>/<folio>', methods=['POST'])
+def eliminar_orden(tipo, folio):
+    try:
+        data, filepath = get_orden_data(tipo, folio)
+        if not filepath:
+            flash('Tipo de orden no válido.', 'error')
+            return redirect(url_for('ordenes'))
+            
+        all_rows = read_csv(filepath)
+        id_key = 'folio_des' if tipo == 'desazolve' else 'folio_lt' if tipo == 'trampa' else 'folio_vt'
+        
+        headers = []
+        if all_rows:
+            headers = list(all_rows[0].keys())
+            
+        # Filter out the matching folio
+        updated_rows = [r for r in all_rows if str(r.get(id_key, '')).strip() != str(folio).strip()]
+        
+        if len(updated_rows) < len(all_rows):
+            overwrite_csv(filepath, headers, updated_rows)
+            flash(f'Orden {folio} eliminada correctamente.', 'success')
+        else:
+            flash(f'No se encontró la orden {folio}.', 'error')
+            
+    except Exception as e:
+        flash(f'Error al eliminar la orden: {e}', 'error')
+        
+    return redirect(url_for('ordenes', tab=tipo if tipo != 'desazolve' else 'desazolve'))
 
 @app.route('/orden/<tipo>/<folio>', methods=['GET', 'POST'])
 def detalle_orden(tipo, folio):

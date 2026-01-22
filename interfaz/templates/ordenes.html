@@ -183,8 +183,49 @@
                             </div>
                         </td>
                         <td class="text-right">
-                            <a href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_des) }}"
-                                class="btn btn-soft btn-secondary btn-sm">Ver Detalle</a>
+                            <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
+                                <button id="dropdown-des-{{ orden.folio_des }}" type="button"
+                                    class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
+                                    aria-expanded="false" aria-label="Dropdown">
+                                    <span class="icon-[tabler--dots-vertical] size-4"></span>
+                                    <span>Ver Acciones</span>
+                                    <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
+                                    aria-orientation="vertical" aria-labelledby="dropdown-des-{{ orden.folio_des }}">
+                                    <li>
+                                        <a class="dropdown-item flex items-center gap-2"
+                                            href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_des) }}">
+                                            <span class="icon-[tabler--eye] size-4"></span>
+                                            Ver Detalles
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item flex items-center gap-2"
+                                            href="{{ url_for('ver_orden_pdf', tipo='desazolve', folio=orden.folio_des) }}"
+                                            target="_blank">
+                                            <span class="icon-[tabler--file-text] size-4 text-primary"></span>
+                                            Ver Documento
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider my-1 border-base-content/10">
+                                    </li>
+                                    <li>
+                                        <form
+                                            action="{{ url_for('eliminar_orden', tipo='desazolve', folio=orden.folio_des) }}"
+                                            method="POST"
+                                            onsubmit="return confirm('¿Seguro que desea borrar esta orden de desazolve? Esta acción no se puede deshacer.');"
+                                            class="w-full">
+                                            <button type="submit"
+                                                class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
+                                                <span class="icon-[tabler--trash] size-4"></span>
+                                                Borrar
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                     {% endif %}
@@ -336,8 +377,49 @@
                         <td>{{ orden.tipo_trampa }}</td>
                         <td>{{ orden.capacidad_trampa }}</td>
                         <td class="text-right">
-                            <a href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_lt) }}"
-                                class="btn btn-soft btn-secondary btn-sm">Ver Detalle</a>
+                            <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
+                                <button id="dropdown-tra-{{ orden.folio_lt }}" type="button"
+                                    class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
+                                    aria-expanded="false" aria-label="Dropdown">
+                                    <span class="icon-[tabler--dots-vertical] size-4"></span>
+                                    <span>Ver Acciones</span>
+                                    <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
+                                    aria-orientation="vertical" aria-labelledby="dropdown-tra-{{ orden.folio_lt }}">
+                                    <li>
+                                        <a class="dropdown-item flex items-center gap-2"
+                                            href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_lt) }}">
+                                            <span class="icon-[tabler--eye] size-4"></span>
+                                            Ver Detalles
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item flex items-center gap-2"
+                                            href="{{ url_for('ver_orden_pdf', tipo='trampa', folio=orden.folio_lt) }}"
+                                            target="_blank">
+                                            <span class="icon-[tabler--file-text] size-4 text-primary"></span>
+                                            Ver Documento
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider my-1 border-base-content/10">
+                                    </li>
+                                    <li>
+                                        <form
+                                            action="{{ url_for('eliminar_orden', tipo='trampa', folio=orden.folio_lt) }}"
+                                            method="POST"
+                                            onsubmit="return confirm('¿Seguro que desea borrar esta orden de limpieza de trampa? Esta acción no se puede deshacer.');"
+                                            class="w-full">
+                                            <button type="submit"
+                                                class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
+                                                <span class="icon-[tabler--trash] size-4"></span>
+                                                Borrar
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                     {% endif %}
@@ -489,8 +571,49 @@
                         <td class="text-sm truncate max-w-xs">{{ orden.direccion_cliente }}</td>
                         <td>{{ orden.no_cliente }}</td>
                         <td class="text-right">
-                            <a href="{{ url_for('detalle_orden', tipo='visita', folio=orden.folio_vt) }}"
-                                class="btn btn-soft btn-secondary btn-sm">Ver Detalle</a>
+                            <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
+                                <button id="dropdown-vis-{{ orden.folio_vt }}" type="button"
+                                    class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
+                                    aria-expanded="false" aria-label="Dropdown">
+                                    <span class="icon-[tabler--dots-vertical] size-4"></span>
+                                    <span>Ver Acciones</span>
+                                    <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
+                                    aria-orientation="vertical" aria-labelledby="dropdown-vis-{{ orden.folio_vt }}">
+                                    <li>
+                                        <a class="dropdown-item flex items-center gap-2"
+                                            href="{{ url_for('detalle_orden', tipo='visita', folio=orden.folio_vt) }}">
+                                            <span class="icon-[tabler--eye] size-4"></span>
+                                            Ver Detalles
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item flex items-center gap-2"
+                                            href="{{ url_for('ver_orden_pdf', tipo='visita', folio=orden.folio_vt) }}"
+                                            target="_blank">
+                                            <span class="icon-[tabler--file-text] size-4 text-primary"></span>
+                                            Ver Documento
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider my-1 border-base-content/10">
+                                    </li>
+                                    <li>
+                                        <form
+                                            action="{{ url_for('eliminar_orden', tipo='visita', folio=orden.folio_vt) }}"
+                                            method="POST"
+                                            onsubmit="return confirm('¿Seguro que desea borrar esta visita técnica? Esta acción no se puede deshacer.');"
+                                            class="w-full">
+                                            <button type="submit"
+                                                class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
+                                                <span class="icon-[tabler--trash] size-4"></span>
+                                                Borrar
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                     {% endif %}

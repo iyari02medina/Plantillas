@@ -30,8 +30,8 @@
     {% endif %}
 </div>
 
-<form action="{{ url_for('guardar_orden', tipo=tipo) }}" method="POST" enctype="multipart/form-data"
-    class="space-y-8 pb-20">
+<form action="{{ url_for('detalle_orden' if orden else 'nueva_orden', tipo=tipo, folio=folio if orden else None) }}"
+    method="POST" enctype="multipart/form-data" class="space-y-8 pb-20">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         <!-- Columna Izquierda: Identificación -->
