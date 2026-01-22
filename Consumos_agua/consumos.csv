@@ -1,4 +1,1 @@
-folio,fecha_registro,fecha_lectura,ID_cliente,nombre_cliente,lectura,consumo
-CON-001,2025-11-20,2025-11-20,CLI-001,Restaurante El Sabor Mexicano,100,100.00
-CON-002,2025-12-20,2025-12-20,CLI-001,Restaurante El Sabor Mexicano,150,50.00
-CON-003,2026-01-18,2026-01-18,CLI-001,Restaurante El Sabor Mexicano,210,60.00
+﻿folio,fecha_registro,fecha_lectura,ID_cliente,nombre_cliente,lectura,consumo
