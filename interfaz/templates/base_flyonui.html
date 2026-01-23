@@ -118,6 +118,25 @@
         #layout-sidebar .menu li {
             color: #ffffff !important;
         }
+
+        /* Buscador del Header */
+        .input-header-search {
+            background-color: #2d3e50 !important;
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
+            color: white !important;
+        }
+
+        .input-header-search input {
+            color: white !important;
+        }
+
+        .input-header-search input::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        .input-header-search .icon-[tabler--search] {
+            color: white !important;
+        }
     </style>
 
     {% block extra_head %}{% endblock %}
@@ -137,7 +156,15 @@
                             <span class="icon-[tabler--menu-2] size-4.5"></span>
                         </button>
                         <div class="flex items-center gap-2">
-                            <span class="text-xl font-bold text-primary hidden lg:block">Cophi Panel</span>
+                            <div class="input input-header-search input-md flex max-w-sm space-x-4">
+                                <span class="icon-[tabler--search] my-auto size-6 shrink-0"></span>
+                                <input type="search" class="grow" placeholder="Search" id="kbdInput" />
+                                <label class="sr-only" for="kbdInput">Search</label>
+                                <span class="my-auto flex gap-2">
+                                    <kbd class="kbd kbd-sm bg-white/10 text-white border-white/20">⌘</kbd>
+                                    <kbd class="kbd kbd-sm bg-white/10 text-white border-white/20">K</kbd>
+                                </span>
+                            </div>
                         </div>
                     </div>
 
