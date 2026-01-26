@@ -1,6 +1,6 @@
 {% extends 'base_flyonui.html' %}
 
-{% block title %}{{ 'Detalle Orden' if orden else 'Nueva Orden de Trabajo' }} - Sistema Cophi{% endblock %}
+{% block title %}{{ 'Nueva Orden de Trabajo' if is_new else 'Detalle Orden' }} - Sistema Cophi{% endblock %}
 
 {% block content %}
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -9,17 +9,18 @@
             <a href="{{ url_for('ordenes') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
                 <span class="icon-[tabler--arrow-left] size-5"></span>
             </a>
-            <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle' if orden else 'Nueva' }} Orden de Trabajo</h1>
+            <h1 class="text-3xl font-bold text-base-content">{{ 'Nueva' if is_new else 'Detalle' }} Orden de Trabajo
+            </h1>
         </div>
         <p class="text-base-content/60 font-medium ml-10 uppercase tracking-widest text-xs font-black">
             Módulo de {{ tipo|upper if tipo else 'ORDEN' }}
         </p>
     </div>
-    {% if orden %}
+    {% if not is_new %}
     <div class="flex gap-2">
         <a href="{{ url_for('ver_orden_pdf', tipo=tipo, folio=folio) }}" target="_blank"
             class="btn btn-soft btn-secondary">
-            <span class="icon-[tabler--file-text] size-5"></span>
+            <span class="icon-[tabler--file-type-pdf] size-5"></span>
             Ver PDF
         </a>
         <button type="button" class="btn btn-primary shadow-sm" onclick="enableEdit()" id="btn-editar">
@@ -30,7 +31,7 @@
     {% endif %}
 </div>
 
-<form action="{{ url_for('detalle_orden' if orden else 'nueva_orden', tipo=tipo, folio=folio if orden else None) }}"
+<form action="{{ url_for('nueva_orden', tipo=tipo) if is_new else url_for('detalle_orden', tipo=tipo, folio=folio) }}"
     method="POST" enctype="multipart/form-data" class="space-y-8 pb-20">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -45,14 +46,17 @@
                 <div class="card-body p-6 space-y-4">
                     <div class="form-control">
                         <label class="label font-bold text-xs uppercase text-base-content/60">Folio</label>
-                        <input type="text" name="folio" value="{{ folio }}" readonly required
+                        <input type="text"
+                            name="folio_{{ 'des' if tipo=='desazolve' else 'lt' if tipo=='trampa' else 'vt' }}"
+                            value="{{ folio }}" readonly required
                             class="input input-bordered w-full font-black text-primary">
                     </div>
                     <div class="form-control">
                         <label class="label font-bold text-xs uppercase text-base-content/60">Fecha de Servicio</label>
-                        <input type="text" name="fecha"
+                        <input type="text"
+                            name="fecha_{{ 'des' if tipo=='desazolve' else 'lt' if tipo=='trampa' else 'vt' }}"
                             value="{{ orden.get('fecha_' + ( 'des' if tipo=='desazolve' else 'lt' if tipo=='trampa' else 'vt' ), todays_date) }}"
-                            class="input input-bordered w-full" {{ 'disabled' if orden else '' }}>
+                            class="input input-bordered w-full" {{ 'disabled' if not is_new else '' }}>
                     </div>
                 </div>
             </div>
@@ -68,7 +72,7 @@
                         <label class="label font-bold text-xs uppercase text-base-content/60">Nombre / Empresa</label>
                         <input type="text" id="nombre_cliente" name="cliente" placeholder="Buscar..." autocomplete="off"
                             class="input input-bordered w-full font-bold" oninput="fillClient(this)" required
-                            value="{{ orden.get('cliente', '') }}" {{ 'disabled' if orden else '' }}>
+                            value="{{ orden.get('cliente', '') }}" {{ 'disabled' if not is_new else '' }}>
                         <div id="suggestions-box"
                             class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
                         </div>
@@ -76,12 +80,12 @@
                     <div class="form-control">
                         <label class="label font-bold text-xs uppercase text-base-content/60">Dirección</label>
                         <textarea id="direccion_cliente" name="direccion" class="textarea textarea-bordered w-full"
-                            rows="2" {{ 'disabled' if orden else '' }}>{{ orden.get('direccion', '') }}</textarea>
+                            rows="2" {{ 'disabled' if not is_new else '' }}>{{ orden.get('direccion', '') }}</textarea>
                     </div>
                     <div class="form-control">
                         <label class="label font-bold text-xs uppercase text-base-content/60">Teléfono</label>
                         <input type="text" id="telefono_cliente" name="telefono" class="input input-bordered w-full"
-                            value="{{ orden.get('telefono', '') }}" {{ 'disabled' if orden else '' }}>
+                            value="{{ orden.get('telefono', '') }}" {{ 'disabled' if not is_new else '' }}>
                     </div>
                 </div>
             </div>
@@ -97,12 +101,12 @@
                     <div class="form-control">
                         <label class="label font-bold text-[10px] uppercase opacity-50">Hora Inicial</label>
                         <input type="text" name="hora_inicial" class="input input-bordered w-full"
-                            value="{{ orden.get('hora_inicial', '') }}" {{ 'disabled' if orden else '' }}>
+                            value="{{ orden.get('hora_inicial', '') }}" {{ 'disabled' if not is_new else '' }}>
                     </div>
                     <div class="form-control">
                         <label class="label font-bold text-[10px] uppercase opacity-50">Hora Final</label>
                         <input type="text" name="hora_final" class="input input-bordered w-full"
-                            value="{{ orden.get('hora_final', '') }}" {{ 'disabled' if orden else '' }}>
+                            value="{{ orden.get('hora_final', '') }}" {{ 'disabled' if not is_new else '' }}>
                     </div>
                 </div>
             </div>
@@ -125,59 +129,59 @@
                         <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Ubicación
                                 del Servicio</label><input type="text" name="ubicacion"
                                 class="input input-bordered w-full" value="{{ orden.get('ubicacion', '') }}"
-                                {{ 'disabled' if orden else '' }}></div>
+                                {{ 'disabled' if not is_new else '' }}></div>
                         <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Metros de
                                 Manguera</label><input type="text" name="metros_manguera"
                                 class="input input-bordered w-full" value="{{ orden.get('metros_manguera', '') }}"
-                                {{ 'disabled' if orden else '' }}></div>
+                                {{ 'disabled' if not is_new else '' }}></div>
                         <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Tramo /
                                 Línea</label><input type="text" name="tramo" class="input input-bordered w-full"
-                                value="{{ orden.get('tramo', '') }}" {{ 'disabled' if orden else '' }}></div>
+                                value="{{ orden.get('tramo', '') }}" {{ 'disabled' if not is_new else '' }}></div>
                         <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Condición
                                 Final</label><input type="text" name="condicion_final"
                                 class="input input-bordered w-full" value="{{ orden.get('condicion_final', '') }}"
-                                {{ 'disabled' if orden else '' }}></div>
+                                {{ 'disabled' if not is_new else '' }}></div>
                     </div>
                     {% elif tipo == 'trampa' %}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Ubicación
                                 de la Trampa</label><input type="text" name="ubicacion"
                                 class="input input-bordered w-full" value="{{ orden.get('ubicacion', '') }}"
-                                {{ 'disabled' if orden else '' }}></div>
+                                {{ 'disabled' if not is_new else '' }}></div>
                         <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Capacidad
                                 (Litros)</label><input type="text" name="capacidad" class="input input-bordered w-full"
-                                value="{{ orden.get('capacidad', '') }}" {{ 'disabled' if orden else '' }}></div>
+                                value="{{ orden.get('capacidad', '') }}" {{ 'disabled' if not is_new else '' }}></div>
                         <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Residuos
                                 Retirados</label><input type="text" name="residuos" class="input input-bordered w-full"
-                                value="{{ orden.get('residuos', '') }}" {{ 'disabled' if orden else '' }}></div>
+                                value="{{ orden.get('residuos', '') }}" {{ 'disabled' if not is_new else '' }}></div>
                         <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Estado de
                                 la Trampa</label><input type="text" name="estado_trampa"
                                 class="input input-bordered w-full" value="{{ orden.get('estado_trampa', '') }}"
-                                {{ 'disabled' if orden else '' }}></div>
+                                {{ 'disabled' if not is_new else '' }}></div>
                     </div>
                     {% elif tipo == 'visita' %}
                     <div class="form-control">
                         <label class="label font-bold text-xs uppercase opacity-60">Motivo de la Visita</label>
                         <input type="text" name="motivo" class="input input-bordered w-full"
-                            value="{{ orden.get('motivo', '') }}" {{ 'disabled' if orden else '' }}>
+                            value="{{ orden.get('motivo', '') }}" {{ 'disabled' if not is_new else '' }}>
                     </div>
                     {% endif %}
 
                     <div class="form-control">
                         <label class="label font-bold text-xs uppercase opacity-60">Observaciones Generales</label>
                         <textarea name="observaciones" class="textarea textarea-bordered w-full" rows="4" {{ 'disabled'
-                            if orden else '' }}>{{ orden.get('observaciones', '') }}</textarea>
+                            if not is_new else '' }}>{{ orden.get('observaciones', '') }}</textarea>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Nombre de
                                 quien Recibe</label><input type="text" name="nombre_recibe"
                                 class="input input-bordered w-full" value="{{ orden.get('nombre_recibe', '') }}"
-                                {{ 'disabled' if orden else '' }}></div>
+                                {{ 'disabled' if not is_new else '' }}></div>
                         <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Nombre del
                                 Técnico</label><input type="text" name="tecnico_nombre"
                                 class="input input-bordered w-full" value="{{ orden.get('tecnico_nombre', '') }}"
-                                {{ 'disabled' if orden else '' }}></div>
+                                {{ 'disabled' if not is_new else '' }}></div>
                     </div>
                 </div>
             </div>
@@ -204,7 +208,7 @@
                                 {% endif %}
                                 <input type="file" name="foto_antes"
                                     class="file-input file-input-bordered file-input-primary w-full max-w-xs"
-                                    {{ 'disabled' if orden else '' }}>
+                                    {{ 'disabled' if not is_new else '' }}>
                             </div>
                         </div>
                         <div class="space-y-4">
@@ -220,7 +224,7 @@
                                 {% endif %}
                                 <input type="file" name="foto_despues"
                                     class="file-input file-input-bordered file-input-primary w-full max-w-xs"
-                                    {{ 'disabled' if orden else '' }}>
+                                    {{ 'disabled' if not is_new else '' }}>
                             </div>
                         </div>
                     </div>
@@ -229,10 +233,10 @@
 
             <div class="flex justify-end gap-3 pt-4">
                 <a href="{{ url_for('ordenes') }}" class="btn btn-ghost">Cancelar</a>
-                <button type="submit" class="btn btn-primary btn-wide shadow-lg {{ 'hidden' if orden else '' }}"
+                <button type="submit" class="btn btn-primary btn-wide shadow-lg {{ 'hidden' if not is_new else '' }}"
                     id="btn-submit">
                     <span class="icon-[tabler--device-floppy] size-5"></span>
-                    {{ 'Actualizar Orden' if orden else 'Guardar Orden de Trabajo' }}
+                    {{ 'Guardar Orden de Trabajo' if is_new else 'Actualizar Orden' }}
                 </button>
             </div>
         </div>
@@ -246,7 +250,10 @@
 
     function enableEdit() {
         document.querySelectorAll('input, select, textarea').forEach(el => {
-            if (el.name !== 'folio') el.disabled = false;
+            const name = el.getAttribute('name');
+            if (name && !name.startsWith('folio_')) { // Protegemos inputs de folio para que sigan readonly
+                el.disabled = false;
+            }
         });
 
         const btnSubmit = document.getElementById('btn-submit');
