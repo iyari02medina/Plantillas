@@ -121,7 +121,7 @@
                                         class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
                                         aria-expanded="false" aria-label="Dropdown">
                                         <span class="icon-[tabler--dots-vertical] size-4"></span>
-                                        <span>Ver Acciones</span>
+                                        <span>Ver</span>
                                         <span
                                             class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
                                     </button>
@@ -131,8 +131,34 @@
                                             <a class="dropdown-item flex items-center gap-2"
                                                 href="{{ url_for('detalle_permiso_descarga', nis=p.nis) }}">
                                                 <span class="icon-[tabler--eye] size-4"></span>
-                                                Ver Detalles
+                                                Detalles
                                             </a>
+                                        </li>
+                                        <li>
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Acuse') }}"
+                                                target="_blank">
+                                                <span class="icon-[tabler--file-type-pdf] size-4"></span>
+                                                Acuse
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Carta_Poder') }}"
+                                                target="_blank">
+                                                <span class="icon-[tabler--file-type-pdf] size-4"></span>
+                                                Carta Poder
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Cuestionario') }}"
+                                                target="_blank">
+                                                <span class="icon-[tabler--file-type-pdf] size-4"></span>
+                                                Cuestionario
+                                            </a>
+                                        </li>
                                         </li>
                                         <li>
                                             <hr class="dropdown-divider my-1 border-base-content/10">
@@ -148,45 +174,6 @@
                                                     Borrar
                                                 </button>
                                             </form>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
-                                    <button id="dropdown-{{ p.nis }}" type="button"
-                                        class="dropdown-toggle btn btn-soft btn-primary btn-sm" aria-haspopup="menu"
-                                        aria-expanded="false" aria-label="Dropdown">
-                                        <span class="icon-[tabler--file-download] size-4"></span>
-                                        <span>Documentos</span>
-                                        <span
-                                            class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-60" role="menu"
-                                        aria-orientation="vertical" aria-labelledby="dropdown-{{ p.nis }}">
-                                        <li>
-                                            <a class="dropdown-item flex items-center gap-2"
-                                                href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Acuse') }}"
-                                                target="_blank">
-                                                <span
-                                                    class="icon-[tabler--clipboard-check] size-4 text-secondary"></span>
-                                                Acuse
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item flex items-center gap-2"
-                                                href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Carta_Poder') }}"
-                                                target="_blank">
-                                                <span class="icon-[tabler--certificate] size-4 text-info"></span>
-                                                Carta Poder
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item flex items-center gap-2"
-                                                href="{{ url_for('ver_permiso_pdf', nis=p.nis, tipo='Cuestionario') }}"
-                                                target="_blank">
-                                                <span class="icon-[tabler--file-text] size-4 text-primary"></span>
-                                                Cuestionario
-                                            </a>
                                         </li>
                                     </ul>
                                 </div>
