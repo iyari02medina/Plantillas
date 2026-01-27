@@ -107,58 +107,75 @@
 
         <!-- Columna Derecha: Conceptos -->
         <div class="lg:col-span-2 space-y-6">
-            <div class="flex justify-between items-center px-2">
-                <h3 class="text-sm font-black uppercase tracking-widest text-base-content/40">Conceptos de la Cotización
-                </h3>
-                <button type="button" class="btn btn-primary btn-sm rounded-full shadow-md" onclick="addItem()"
-                    id="btn-add-item" {{ 'hidden' if cotizacion else '' }}>
-                    <span class="icon-[tabler--plus] size-4"></span>
-                    Agregar Concepto
-                </button>
-            </div>
-
-            <div id="items-container" class="space-y-4">
-                {% if cotizacion %}
-                {% for item in items %}
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                 <div
-                    class="item-row grid grid-cols-1 md:grid-cols-12 gap-4 p-5 bg-base-100 border border-base-content/10 rounded-xl shadow-sm relative group">
-                    <div class="md:col-span-3">
-                        <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Nombre
-                            Item</label>
-                        <input type="text" name="nombre_item[]" value="{{ item.nombre_item }}" required disabled
-                            class="input input-bordered input-sm w-full font-bold">
-                    </div>
-                    <div class="md:col-span-3">
-                        <label
-                            class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Descripción</label>
-                        <input type="text" name="descripcion_item[]" value="{{ item.descripcion_item }}" disabled
-                            class="input input-bordered input-sm w-full">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Unidad</label>
-                        <input type="text" name="unidad_item[]" value="{{ item.unidad_item }}" disabled
-                            class="input input-bordered input-sm w-full">
-                    </div>
-                    <div class="md:col-span-1">
-                        <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Cant.</label>
-                        <input type="number" step="1" name="cantidad_item[]" value="{{ item.cantidad_item }}" required
-                            disabled class="input input-bordered input-sm w-full font-bold text-center">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Precio U.</label>
-                        <input type="number" step="0.01" name="precio_unitario_item[]"
-                            value="{{ item.precio_unitario_item }}" required disabled
-                            class="input input-bordered input-sm w-full font-bold text-primary">
-                    </div>
-                    <div class="md:col-span-1 flex items-end justify-center pb-1">
-                        <button type="button" class="btn btn-ghost btn-sm btn-circle text-error hidden"
-                            onclick="removeItem(this)">
-                            <span class="icon-[tabler--trash] size-5"></span>
-                        </button>
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center">
+                    <h3 class="text-sm font-black uppercase tracking-widest text-base-content/40">Conceptos de la
+                        Cotización</h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="overflow-x-auto">
+                        <table class="table table-lg">
+                            <thead class="bg-base-200/30">
+                                <tr>
+                                    <th class="text-xs uppercase tracking-wider text-base-content/70 min-w-48">Nombre
+                                        Item</th>
+                                    <th class="text-xs uppercase tracking-wider text-base-content/70 min-w-48">
+                                        Descripción</th>
+                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-24">Unidad</th>
+                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-24">Cant.</th>
+                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-32">Precio U.
+                                    </th>
+                                    <th class="w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-container">
+                                {% if cotizacion %}
+                                {% for item in items %}
+                                <tr class="item-row hover:bg-base-200/20 group">
+                                    <td class="p-2">
+                                        <input type="text" name="nombre_item[]" value="{{ item.nombre_item }}" required
+                                            disabled
+                                            class="input input-bordered input-sm w-full font-bold bg-transparent">
+                                    </td>
+                                    <td class="p-2">
+                                        <input type="text" name="descripcion_item[]" value="{{ item.descripcion_item }}"
+                                            disabled class="input input-bordered input-sm w-full bg-transparent">
+                                    </td>
+                                    <td class="p-2">
+                                        <input type="text" name="unidad_item[]" value="{{ item.unidad_item }}" disabled
+                                            class="input input-bordered input-sm w-full bg-transparent">
+                                    </td>
+                                    <td class="p-2">
+                                        <input type="number" step="1" name="cantidad_item[]"
+                                            value="{{ item.cantidad_item }}" required disabled
+                                            class="input input-bordered input-sm w-full font-bold text-center bg-transparent">
+                                    </td>
+                                    <td class="p-2">
+                                        <input type="number" step="0.01" name="precio_unitario_item[]"
+                                            value="{{ item.precio_unitario_item }}" required disabled
+                                            class="input input-bordered input-sm w-full font-bold text-primary bg-transparent text-right">
+                                    </td>
+                                    <td class="p-2 text-center">
+                                        <button type="button" class="btn btn-ghost btn-sm btn-circle text-error hidden"
+                                            onclick="removeItem(this)">
+                                            <span class="icon-[tabler--trash] size-5"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                {% endfor %}
-                {% endif %}
+                <div class="p-4 border-t border-base-content/10 flex justify-end bg-base-100">
+                    <button type="button" class="btn btn-primary btn-sm rounded-full shadow-md" onclick="addItem()"
+                        id="btn-add-item" {{ 'hidden' if cotizacion else '' }}>
+                        <span class="icon-[tabler--plus] size-4"></span>
+                        Agregar Concepto
+                    </button>
+                </div>
             </div>
 
             <!-- Totales -->

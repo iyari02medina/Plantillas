@@ -70,37 +70,32 @@ function calculateTotals() {
 
 function addItem() {
     const container = document.getElementById('items-container');
-    const row = document.createElement('div');
-    row.className = 'item-row grid grid-cols-1 md:grid-cols-12 gap-4 p-5 bg-base-100 border border-base-content/10 rounded-xl shadow-sm relative group animate-in zoom-in-95 duration-200';
+    const row = document.createElement('tr');
+    row.className = 'item-row hover:bg-base-200/20 group animate-in fade-in slide-in-from-bottom-2 duration-200';
     row.innerHTML = `
-        <div class="md:col-span-3">
-            <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Nombre Item</label>
+        <td class="p-2">
             <input type="text" name="nombre_item[]" list="inventory_list" onchange="fillItem(this)" required 
-                class="input input-bordered input-sm w-full font-bold" placeholder="Buscar item...">
-        </div>
-        <div class="md:col-span-3">
-            <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Descripción</label>
-            <input type="text" name="descripcion_item[]" class="input input-bordered input-sm w-full">
-        </div>
-        <div class="md:col-span-2">
-            <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Unidad</label>
-            <input type="text" name="unidad_item[]" class="input input-bordered input-sm w-full" placeholder="pza, servicio...">
-        </div>
-        <div class="md:col-span-1">
-            <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Cant.</label>
+                class="input input-bordered input-sm w-full font-bold bg-transparent" placeholder="Buscar item...">
+        </td>
+        <td class="p-2">
+            <input type="text" name="descripcion_item[]" class="input input-bordered input-sm w-full bg-transparent">
+        </td>
+        <td class="p-2">
+            <input type="text" name="unidad_item[]" class="input input-bordered input-sm w-full bg-transparent" placeholder="pza...">
+        </td>
+        <td class="p-2">
             <input type="number" step="1" name="cantidad_item[]" required value="1" oninput="calculateTotals()"
-                class="input input-bordered input-sm w-full font-bold">
-        </div>
-        <div class="md:col-span-2">
-            <label class="label py-1 text-[10px] font-bold uppercase text-base-content/50">Precio U.</label>
+                class="input input-bordered input-sm w-full font-bold text-center bg-transparent">
+        </td>
+        <td class="p-2">
             <input type="number" step="0.01" name="precio_unitario_item[]" required oninput="calculateTotals()"
-                class="input input-bordered input-sm w-full font-bold text-primary">
-        </div>
-        <div class="md:col-span-1 flex items-end justify-center pb-1">
+                class="input input-bordered input-sm w-full font-bold text-primary bg-transparent text-right">
+        </td>
+        <td class="p-2 text-center">
             <button type="button" class="btn btn-ghost btn-sm btn-circle text-error hover:bg-error/10" onclick="removeItem(this)">
                 <span class="icon-[tabler--trash] size-5"></span>
             </button>
-        </div>
+        </td>
     `;
     container.appendChild(row);
     calculateTotals();
