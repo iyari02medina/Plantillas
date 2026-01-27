@@ -156,15 +156,16 @@
                             <span class="icon-[tabler--menu-2] size-4.5"></span>
                         </button>
                         <div class="flex items-center gap-2 flex-1 w-full">
-                            <div class="input input-header-search input-md flex w-full space-x-4">
-                                <span class="icon-[tabler--search] my-auto size-6 shrink-0"></span>
-                                <input type="search" class="grow" placeholder="Search" id="kbdInput" />
-                                <label class="sr-only" for="kbdInput">Search</label>
+                            <button type="button"
+                                class="input input-header-search input-md flex w-full space-x-4 cursor-text text-start"
+                                onclick="toggleSearchModal(true)">
+                                <span class="icon-[tabler--search] my-auto size-6 shrink-0 opacity-80"></span>
+                                <span class="grow text-white/50 my-auto text-sm font-normal">Buscar (Ctrl + K)</span>
                                 <span class="my-auto flex gap-2">
                                     <kbd class="kbd kbd-sm bg-white/10 text-white border-white/20">⌘</kbd>
                                     <kbd class="kbd kbd-sm bg-white/10 text-white border-white/20">K</kbd>
                                 </span>
-                            </div>
+                            </button>
                         </div>
                     </div>
 
@@ -478,6 +479,210 @@
     <script src="{{ url_for('static', filename='flyonui/dist/js/main.js') }}"></script>
 
     {% block scripts %}{% endblock %}
+    <!-- Command Palette Modal (Strict Width & Centering) -->
+    <div id="search-modal"
+        class="fixed inset-0 grid place-items-center opacity-0 invisible transition-opacity duration-300"
+        style="z-index: 9999; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);" role="dialog"
+        aria-modal="true" onclick="if(event.target === this) toggleSearchModal(false)">
+
+        <!-- Modal Content -->
+        <div class="modal-content bg-base-100 rounded-xl shadow-2xl relative flex flex-col transition-all duration-300 ease-in-out transform scale-95 opacity-0"
+            style="width: 600px; max-width: 90vw; max-height: 85vh; margin: auto;">
+
+            <!-- Input Header -->
+            <div class="flex items-center gap-3 px-4 py-4 border-b border-base-content/10">
+                <span class="icon-[tabler--search] size-5 text-primary"></span>
+                <input type="text" id="global-search-input"
+                    class="flex-1 bg-transparent border-0 outline-none text-lg font-medium placeholder:text-base-content/40 focus:ring-0 text-base-content"
+                    placeholder="Buscar página, módulo o acción..." autocomplete="off">
+                <button onclick="toggleSearchModal(false)"
+                    class="btn btn-sm btn-circle btn-ghost text-base-content/50 hover:bg-base-content/10">
+                    <span class="icon-[tabler--x] size-5"></span>
+                </button>
+            </div>
+
+            <!-- Results List -->
+            <div class="overflow-y-auto p-2 flex-1 scrollbar-thin" id="search-results">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Footer Hints -->
+            <div
+                class="bg-base-200/50 border-t border-base-content/5 px-4 py-2 flex items-center gap-4 text-[10px] font-medium text-base-content/40 uppercase tracking-wider rounded-b-xl">
+                <span class="flex items-center gap-1"><kbd class="kbd kbd-xs bg-base-100 border-base-content/10">↩</kbd>
+                    seleccionar</span>
+                <span class="flex items-center gap-1"><kbd
+                        class="kbd kbd-xs bg-base-100 border-base-content/10">↑↓</kbd> navegar</span>
+                <span class="flex items-center gap-1"><kbd
+                        class="kbd kbd-xs bg-base-100 border-base-content/10">esc</kbd> cerrar</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const searchModal = document.getElementById('search-modal');
+        const modalContent = searchModal ? searchModal.querySelector('.modal-content') : null;
+        const searchInput = document.getElementById('global-search-input');
+        const searchResults = document.getElementById('search-results');
+
+        let selectedIndex = 0;
+        let matchedItems = [];
+
+        // Definición de Rutas y Acciones
+        const APP_ROUTES = [
+            // Dashboards & General
+            { title: 'Dashboard', url: "{{ url_for('index') }}", icon: 'icon-[tabler--dashboard]', category: 'General' },
+            { title: 'Directorio', url: "{{ url_for('directorio') }}", icon: 'icon-[tabler--users]', category: 'General' },
+
+            // Cotizaciones
+            { title: 'Cotizaciones', url: "{{ url_for('cotizaciones') }}", icon: 'icon-[tabler--pencil-dollar]', category: 'Cotizaciones' },
+            { title: 'Nueva Cotización', url: "{{ url_for('nueva_cotizacion') }}", icon: 'icon-[tabler--plus]', category: 'Cotizaciones' },
+
+            // Órdenes
+            { title: 'Órdenes de Trabajo', url: "{{ url_for('ordenes') }}", icon: 'icon-[tabler--tool]', category: 'Órdenes' },
+
+            // Tarificador
+            { title: 'Tarificador', url: "{{ url_for('tarificador') }}", icon: 'icon-[tabler--microscope]', category: 'Laboratorio' },
+            { title: 'Nuevo Tarificador', url: "{{ url_for('nuevo_tarificador') }}", icon: 'icon-[tabler--plus]', category: 'Laboratorio' },
+
+            // Permisos
+            { title: 'Permisos de Descarga', url: "{{ url_for('permisos_descarga') }}", icon: 'icon-[tabler--radioactive]', category: 'Trámites' },
+
+            // Consumos
+            { title: 'Consumos de Agua', url: "{{ url_for('consumos') }}", icon: 'icon-[tabler--droplet-half-2]', category: 'H2O' },
+        ];
+
+        function toggleSearchModal(show) {
+            if (!searchModal || !modalContent) return;
+
+            if (show) {
+                // Open Logic
+                searchModal.classList.remove('invisible');
+                searchModal.style.pointerEvents = 'auto'; // Re-enable pointer events
+
+                // Force layout reflow
+                void searchModal.offsetWidth;
+                searchModal.classList.add('opacity-100');
+
+                // Animate Content
+                setTimeout(() => {
+                    modalContent.classList.remove('opacity-0', 'scale-95');
+                    modalContent.classList.add('opacity-100', 'scale-100');
+                    if (searchInput) {
+                        searchInput.value = '';
+                        searchInput.focus();
+                    }
+                    renderResults('');
+                }, 10);
+            } else {
+                // Close Logic
+                modalContent.classList.remove('opacity-100', 'scale-100');
+                modalContent.classList.add('opacity-0', 'scale-95');
+
+                searchModal.classList.remove('opacity-100');
+
+                setTimeout(() => {
+                    searchModal.classList.add('invisible');
+                    searchModal.style.pointerEvents = 'none';
+                }, 300);
+            }
+        }
+
+        function renderResults(query) {
+            const q = query.toLowerCase();
+            matchedItems = APP_ROUTES.filter(item =>
+                item.title.toLowerCase().includes(q) ||
+                item.category.toLowerCase().includes(q)
+            );
+
+            if (matchedItems.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="p-8 text-center text-base-content/40">
+                        <span class="icon-[tabler--search-off] size-8 mb-2 mx-auto block"></span>
+                        <p class="text-sm">No se encontraron resultados para "${query}"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Agrupar por categoría
+            const grouped = {};
+            matchedItems.forEach(item => {
+                if (!grouped[item.category]) grouped[item.category] = [];
+                grouped[item.category].push(item);
+            });
+
+            let html = '';
+            let globalIndex = 0;
+
+            for (const [category, items] of Object.entries(grouped)) {
+                html += `<div class="px-2 py-1.5 text-xs font-bold text-base-content/40 uppercase tracking-wider">${category}</div>`;
+                items.forEach(item => {
+                    const activeClass = globalIndex === selectedIndex ? 'bg-primary/10 text-primary border-primary/20' : 'hover:bg-base-200 border-transparent';
+                    const iconClass = globalIndex === selectedIndex ? 'text-primary' : 'text-base-content/50';
+
+                    html += `
+                        <a href="${item.url}" 
+                           class="flex items-center gap-3 px-3 py-3 rounded-lg mb-1 border transition-colors cursor-pointer ${activeClass}"
+                           onmouseenter="setSelectedIndex(${globalIndex})">
+                            <span class="${item.icon} size-5 ${iconClass}"></span>
+                            <span class="font-medium">${item.title}</span>
+                            <span class="ml-auto text-xs opacity-40 hidden sm:block">Ir a página</span>
+                        </a>
+                    `;
+                    globalIndex++;
+                });
+            }
+
+            searchResults.innerHTML = html;
+        }
+
+        function setSelectedIndex(index) {
+            selectedIndex = index;
+            renderResults(searchInput.value);
+        }
+
+        // Global Keyboard Shortcut
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                toggleSearchModal(true);
+            }
+
+            // Check visibility via simplified logic - if opacity exists
+            if (e.key === 'Escape' && searchModal.classList.contains('opacity-100')) {
+                toggleSearchModal(false);
+            }
+        });
+
+        // Search Input Navigation
+        searchInput.addEventListener('input', (e) => {
+            selectedIndex = 0;
+            renderResults(e.target.value);
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = Math.min(selectedIndex + 1, matchedItems.length - 1);
+                renderResults(searchInput.value);
+                // Scroll logic ideally goes here
+                const activeEl = searchResults.children[selectedIndex]; // Rough approx
+                if (activeEl) activeEl.scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = Math.max(selectedIndex - 1, 0);
+                renderResults(searchInput.value);
+                const activeEl = searchResults.children[selectedIndex]; // Rough approx
+                if (activeEl) activeEl.scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (matchedItems.length > 0) {
+                    window.location.href = matchedItems[selectedIndex].url;
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
