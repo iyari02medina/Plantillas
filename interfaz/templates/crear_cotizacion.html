@@ -131,7 +131,7 @@
                             </thead>
                             <tbody id="items-container">
                                 {% if cotizacion %}
-                                {% for item in items %}
+                                {% for item in cotizacion.conceptos %}
                                 <tr class="item-row hover:bg-base-200/20 group">
                                     <td class="p-2">
                                         <input type="text" name="nombre_item[]" value="{{ item.nombre_item }}" required
