@@ -16,9 +16,16 @@
     <a href="{{ url_for('ver_directorio', tipo='clientes') }}"
         class="group card bg-base-100 border border-base-content/10 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300">
         <div class="card-body items-center text-center p-10">
-            <div class="bg-primary/10 text-primary rounded-2xl p-6 mb-6 group-hover:scale-110 transition-transform">
-                <span class="icon-[tabler--building-community] size-16"></span>
-            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                class="size-10 icon icon-tabler icons-tabler-outline icon-tabler-building-store">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M3 21l18 0" />
+                <path d="M3 7v1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1h-18l2 -4h14l2 4" />
+                <path d="M5 21l0 -10.15" />
+                <path d="M19 21l0 -10.15" />
+                <path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4" />
+            </svg>
             <h2 class="card-title text-2xl font-black text-base-content mb-2">Clientes</h2>
             <p class="text-base-content/60 font-medium">
                 Gestionar base de datos de empresas, NIS, contratos y clientes activos con historial completo.
@@ -36,9 +43,16 @@
     <a href="{{ url_for('ver_directorio', tipo='prospectos') }}"
         class="group card bg-base-100 border border-base-content/10 shadow-sm hover:shadow-xl hover:border-secondary/30 transition-all duration-300">
         <div class="card-body items-center text-center p-10">
-            <div class="bg-secondary/10 text-secondary rounded-2xl p-6 mb-6 group-hover:scale-110 transition-transform">
-                <span class="icon-[tabler--rocket] size-16"></span>
-            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                class="size-10 icon icon-tabler icons-tabler-outline icon-tabler-target-arrow">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+                <path d="M12 7a5 5 0 1 0 5 5" />
+                <path d="M13 3.055a9 9 0 1 0 7.941 7.945" />
+                <path d="M15 6v3h3l3 -3h-3v-3l-3 3" />
+                <path d="M15 9l-3 3" />
+            </svg>
             <h2 class="card-title text-2xl font-black text-base-content mb-2">Prospectos</h2>
             <p class="text-base-content/60 font-medium">
                 Gestionar clientes potenciales, nuevos contactos y seguimiento de oportunidades comerciales.
