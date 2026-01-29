@@ -1,0 +1,70 @@
+{% extends 'base_flyonui.html' %}
+
+{% block title %}Catálogo - Sistema Cophi{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <div class="flex items-center gap-3 mb-1">
+        <span class="icon-[tabler--packages] size-10 text-primary"></span>
+        <h1 class="text-3xl font-bold text-base-content m-0">Catálogo</h1>
+    </div>
+    <p class="text-base-content/60 font-medium">Seleccione el tipo de catálogo que desea gestionar.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto py-10">
+    <!-- Productos Card -->
+    <a href="{{ url_for('ver_catalogo', tipo='productos') }}"
+        class="group card bg-base-100 border border-base-content/10 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300">
+        <div class="card-body items-center text-center p-10">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                class="size-10 icon icon-tabler icons-tabler-outline icon-tabler-package">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" />
+                <path d="M12 12l8 -4.5" />
+                <path d="M12 12l0 9" />
+                <path d="M12 12l-8 -4.5" />
+                <path d="M16 5.25l-8 4.5" />
+            </svg>
+            <h2 class="card-title text-2xl font-black text-base-content mb-2">Productos</h2>
+            <p class="text-base-content/60 font-medium">
+                Gestionar inventario de productos físicos, químicos, equipos y refacciones.
+            </p>
+            <div class="card-actions mt-6">
+                <span class="btn btn-primary btn-wide group-hover:gap-3 transition-all">
+                    Acceder a Productos
+                    <span class="icon-[tabler--arrow-right] size-5"></span>
+                </span>
+            </div>
+        </div>
+    </a>
+
+    <!-- Servicios Card -->
+    <a href="{{ url_for('ver_catalogo', tipo='servicios') }}"
+        class="group card bg-base-100 border border-base-content/10 shadow-sm hover:shadow-xl hover:border-secondary/30 transition-all duration-300">
+        <div class="card-body items-center text-center p-10">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                class="size-10 icon icon-tabler icons-tabler-outline icon-tabler-tools">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M3 21h4l13 -13a1.5 1.5 0 0 0 -4 -4l-13 13v4" />
+                <path d="M14.5 5.5l4 4" />
+                <path d="M12 8l-5 -5l-4 4l5 5" />
+                <path d="M7 8l-1.5 1.5" />
+                <path d="M16 12l5 5l-4 4l-5 -5" />
+                <path d="M16 17l-1.5 1.5" />
+            </svg>
+            <h2 class="card-title text-2xl font-black text-base-content mb-2">Servicios</h2>
+            <p class="text-base-content/60 font-medium">
+                Gestionar catálogo de servicios, mantenimientos, análisis y gestoría.
+            </p>
+            <div class="card-actions mt-6">
+                <span class="btn btn-secondary btn-wide group-hover:gap-3 transition-all">
+                    Acceder a Servicios
+                    <span class="icon-[tabler--arrow-right] size-5"></span>
+                </span>
+            </div>
+        </div>
+    </a>
+</div>
+{% endblock %}

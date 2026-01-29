@@ -1,0 +1,115 @@
+{% extends 'base_flyonui.html' %}
+
+{% block title %}{{ 'Nuevo' if is_new else 'Editar' }} {{ 'Producto' if tipo == 'productos' else 'Servicio' }} - Sistema
+Cophi{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div>
+        <div class="flex items-center gap-2 mb-1">
+            <a href="{{ url_for('ver_catalogo', tipo=tipo) }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
+                <span class="icon-[tabler--arrow-left] size-5"></span>
+            </a>
+            <h1 class="text-3xl font-bold text-base-content">{{ 'Nuevo' if is_new else 'Detalle de' }} {{ 'Producto' if
+                tipo == 'productos' else 'Servicio' }}</h1>
+        </div>
+        <p class="text-base-content/60 font-medium ml-10">
+            {% if is_new %}Ingrese los datos para registrar un nuevo ítem.{% else %}Edite los detalles del ítem
+            seleccionado.{% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="max-w-4xl mx-auto">
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2">
+            <span class="icon-[tabler--box] size-5 text-primary"></span>
+            <h3 class="font-black uppercase tracking-wider text-sm">Información del Item</h3>
+        </div>
+
+        <form action="{{ url_for('guardar_catalogo_item', tipo=tipo) }}" method="POST">
+            {% if not is_new %}
+            <!-- Keep original ID hidden to track edits -->
+            <input type="hidden" name="original_ID" value="{{ item.get('ID', '') }}">
+            {% endif %}
+
+            <div class="card-body p-6 space-y-6">
+                <!-- ID & Nombre -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="form-control md:col-span-1">
+                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">ID</label>
+                        <input type="text" name="ID" value="{{ item.get('ID', suggested_id) }}" required
+                            class="input input-bordered w-full font-mono text-primary font-bold"
+                            placeholder="Ej. P-001">
+                    </div>
+                    <div class="form-control md:col-span-3">
+                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Nombre del
+                            {{ 'Producto' if tipo == 'productos' else 'Servicio' }}</label>
+                        <input type="text" name="Nombre" value="{{ item.get('Nombre', '') }}" required
+                            class="input input-bordered w-full" placeholder="Ej. Cloro Líquido, Mantenimiento...">
+                    </div>
+                </div>
+
+                <!-- Categoría, Unidad, Precio -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="form-control">
+                        <label
+                            class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Categoría</label>
+                        <!-- Datalist for existing categories? Or simple input with suggestions -->
+                        <input type="text" name="Categoría" value="{{ item.get('Categoría', '') }}"
+                            list="categorias-list" class="input input-bordered w-full" placeholder="Ej. Químicos">
+                        <datalist id="categorias-list">
+                            <option value="Químicos">
+                            <option value="Equipos">
+                            <option value="Refacciones">
+                            <option value="Consumibles">
+                            <option value="Limpieza">
+                            <option value="Laboratorio">
+                            <option value="Mantenimiento">
+                            <option value="Consultoría">
+                            <option value="Gestoría">
+                            <option value="Capacitación">
+                            <option value="Instalación">
+                        </datalist>
+                    </div>
+                    <div class="form-control">
+                        <label
+                            class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Unidad</label>
+                        <input type="text" name="Unidad" value="{{ item.get('Unidad', '') }}" list="unidades-list"
+                            class="input input-bordered w-full" placeholder="Ej. Pieza, Litro, Servicio">
+                        <datalist id="unidades-list">
+                            <option value="Pieza">
+                            <option value="Litro">
+                            <option value="Galón">
+                            <option value="Bote">
+                            <option value="Saco">
+                            <option value="Servicio">
+                            <option value="Hora">
+                            <option value="Evento">
+                            <option value="Muestra">
+                            <option value="Trámite">
+                            <option value="Sesión">
+                        </datalist>
+                    </div>
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Precio
+                            ($)</label>
+                        <div class="input-group">
+                            <input type="number" step="0.01" name="Precio" value="{{ item.get('Precio', '') }}"
+                                class="input input-bordered w-full font-mono" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer bg-base-200/50 border-t border-base-content/10 p-6 flex justify-end gap-3">
+                <a href="{{ url_for('ver_catalogo', tipo=tipo) }}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary btn-wide shadow-lg">
+                    <span class="icon-[tabler--device-floppy] size-5"></span>
+                    {{ 'Guardar' if is_new else 'Actualizar' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

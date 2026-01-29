@@ -839,6 +839,25 @@ def ver_tarificador(folio):
 @app.route('/ver_cotizacion/<folio>')
 def ver_cotizacion(folio):
     filename = f"cotizacion_{folio}.html"
+    filepath = os.path.join(COTIZACIONES_GEN_DIR, filename)
+    
+    # Si el archivo no existe, intentar generarlo al vuelo
+    if not os.path.exists(filepath):
+        print(f"Archivo {filename} no encontrado. Intentando generar desde CSV...")
+        success = generate_quotation_html(folio)
+        if not success:
+            # Fallback: buscar si existe con otro nombre (código existente)
+            print(f"Generación fallida o folio no encontrado. Buscando archivos coincidentes...")
+            try:
+                if os.path.exists(COTIZACIONES_GEN_DIR):
+                    files = os.listdir(COTIZACIONES_GEN_DIR)
+                    for f in files:
+                        if folio in f and f.endswith('.html'):
+                            return make_response(send_from_directory(COTIZACIONES_GEN_DIR, f))
+            except:
+                pass
+            return "Archivo no encontrado y no se pudo generar (verifique que el folio exista en el CSV)", 404
+            
     try:
         response = make_response(send_from_directory(COTIZACIONES_GEN_DIR, filename))
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
@@ -846,16 +865,6 @@ def ver_cotizacion(folio):
         response.headers['Expires'] = '0'
         return response
     except FileNotFoundError:
-        # Fallback: try finding a file that contains the folio if exact match fails
-        try:
-            files = os.listdir(COTIZACIONES_GEN_DIR)
-            for f in files:
-                if folio in f and f.endswith('.html'):
-                    response = make_response(send_from_directory(COTIZACIONES_GEN_DIR, f))
-                    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-                    return response
-        except:
-            pass
         return "Archivo no encontrado", 404
 
 def get_orden_data(tipo, folio):
@@ -1629,6 +1638,169 @@ def server_css():
 @app.route('/directorio')
 def directorio():
     return render_template('directorio.html')
+
+@app.route('/catalogo')
+def catalogo():
+    return render_template('Catalogo.html')
+
+PRODUCTOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'productos.csv'))
+SERVICIOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'servicios.csv'))
+
+@app.route('/ver_catalogo/<tipo>')
+def ver_catalogo(tipo):
+    if tipo not in ['productos', 'servicios']:
+        return redirect(url_for('catalogo'))
+    
+    csv_file = PRODUCTOS_CSV if tipo == 'productos' else SERVICIOS_CSV
+    data = read_csv(csv_file)
+    
+    # Extract search parameters
+    q_search = request.args.get('c_search', '').lower()
+    q_cat = request.args.get('c_categoria', '').lower()
+    
+    # Get available categories for filter
+    categorias = sorted(list(set(row.get('Categoría') for row in data if row.get('Categoría'))))
+
+    # Filter data
+    filtered_data = []
+    for item in data:
+        match = True
+        
+        # General search (ID, Nombre, Categoría)
+        if q_search:
+            search_fields = ['ID', 'Nombre', 'Categoría', 'Unidad']
+            row_match = False
+            for field in search_fields:
+                if q_search in str(item.get(field, '')).lower():
+                    row_match = True
+                    break
+            if not row_match: match = False
+            
+        # Category filter
+        if q_cat and q_cat != str(item.get('Categoría', '')).lower():
+            match = False
+            
+        if match:
+            filtered_data.append(item)
+            
+    # Pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    total_items = len(filtered_data)
+    total_pages = math.ceil(total_items / per_page)
+    
+    if page < 1: page = 1
+    if page > total_pages and total_pages > 0: page = total_pages
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_data = filtered_data[start:end]
+    
+    # Headers
+    headers = ['ID', 'Nombre', 'Categoría', 'Unidad', 'Precio']
+    
+    return render_template('tabla_catalogo.html',
+                         tipo=tipo,
+                         data=paginated_data,
+                         headers=headers,
+                         page=page,
+                         total_pages=total_pages,
+                         categorias=categorias)
+
+@app.route('/catalogo/nuevo/<tipo>', methods=['GET'])
+def nuevo_catalogo_item(tipo):
+    is_prod = (tipo == 'productos')
+    csv_file = PRODUCTOS_CSV if is_prod else SERVICIOS_CSV
+    existing = read_csv(csv_file)
+    
+    # Suggest ID
+    prefix = 'P-' if is_prod else 'S-'
+    max_num = 0
+    for r in existing:
+        try:
+            txt = r.get('ID', '')
+            import re
+            nums = re.findall(r'\d+', txt)
+            if nums:
+                 val = int(nums[-1])
+                 if val > max_num: max_num = val
+        except: pass
+    suggested_id = f"{prefix}{max_num+1:03d}"
+    
+    return render_template('crear_catalogo.html', tipo=tipo, is_new=True, item={}, suggested_id=suggested_id)
+
+@app.route('/catalogo/detalle/<tipo>/<id_val>')
+def detalle_catalogo(tipo, id_val):
+    if tipo not in ['productos', 'servicios']: return redirect(url_for('catalogo'))
+    
+    csv_file = PRODUCTOS_CSV if tipo == 'productos' else SERVICIOS_CSV
+    data = read_csv(csv_file)
+    
+    item = next((r for r in data if str(r.get('ID', '')).strip() == str(id_val).strip()), None)
+    
+    if not item:
+        flash('Item no encontrado.', 'error')
+        return redirect(url_for('ver_catalogo', tipo=tipo))
+        
+    return render_template('crear_catalogo.html', tipo=tipo, is_new=False, item=item)
+
+@app.route('/catalogo/guardar/<tipo>', methods=['POST'])
+def guardar_catalogo_item(tipo):
+    csv_file = PRODUCTOS_CSV if tipo == 'productos' else SERVICIOS_CSV
+    existing = read_csv(csv_file)
+    headers = ['ID', 'Nombre', 'Categoría', 'Unidad', 'Precio']
+    
+    item_id = request.form.get('ID')
+    original_id = request.form.get('original_ID')
+    
+    new_row = {
+        'ID': item_id,
+        'Nombre': request.form.get('Nombre'),
+        'Categoría': request.form.get('Categoría'),
+        'Unidad': request.form.get('Unidad'),
+        'Precio': request.form.get('Precio')
+    }
+    
+    if original_id:
+        # Update
+        updated_rows = [r for r in existing if str(r.get('ID', '')).strip() != str(original_id).strip()]
+        updated_rows.append(new_row)
+        # Sort? Maybe by ID
+        try:
+            updated_rows.sort(key=lambda x: x.get('ID', ''))
+        except: pass
+        
+        overwrite_csv(csv_file, headers, updated_rows)
+        flash('Item actualizado correctamente.', 'success')
+        
+    else:
+        # New
+        # DUPLICATE CHECK
+        if any(r.get('ID') == item_id for r in existing):
+             flash(f'El ID {item_id} ya existe. Se sugiere usar otro o editar el existente.', 'error')
+             return redirect(url_for('nuevo_catalogo_item', tipo=tipo))
+             
+        existing.append(new_row)
+        overwrite_csv(csv_file, headers, existing)
+        flash('Item creado exitosamente.', 'success')
+        
+    return redirect(url_for('ver_catalogo', tipo=tipo))
+
+@app.route('/catalogo/eliminar/<tipo>/<id_val>', methods=['POST'])
+def eliminar_catalogo_item(tipo, id_val):
+    csv_file = PRODUCTOS_CSV if tipo == 'productos' else SERVICIOS_CSV
+    existing = read_csv(csv_file)
+    headers = ['ID', 'Nombre', 'Categoría', 'Unidad', 'Precio']
+    
+    updated_rows = [r for r in existing if str(r.get('ID', '')).strip() != str(id_val).strip()]
+    
+    if len(updated_rows) < len(existing):
+        overwrite_csv(csv_file, headers, updated_rows)
+        flash('Item eliminado correctamente.', 'success')
+    else:
+         flash('No se encontró el ítem para eliminar.', 'error')
+         
+    return redirect(url_for('ver_catalogo', tipo=tipo))
 
 PROSPECTOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'prospectos.csv'))
 
