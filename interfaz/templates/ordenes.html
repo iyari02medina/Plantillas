@@ -3,42 +3,37 @@
 {% block title %}Órdenes de Trabajo - Sistema Cophi{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-    <div>
-        <div class="flex items-center gap-3 mb-1">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-tool size-10 text-primary">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
-            </svg>
-            <h1 class="text-3xl font-bold text-base-content m-0">Órdenes de Trabajo</h1>
+<div class="flex items-center justify-between gap-4 mb-8">
+    <div class="flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-tool size-10 text-primary">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
+        </svg>
+        <div>
+            <h1 class="text-3xl font-bold text-base-content m-0 text-balance">Órdenes de Trabajo</h1>
+            <p class="text-base-content/60 font-medium hidden md:block">Gestión de servicios y visitas técnicas.</p>
         </div>
-        <p class="text-base-content/60 font-medium">Gestión de servicios y visitas técnicas.</p>
     </div>
 </div>
 
 <!-- Barra de Control Compacta -->
 <div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
-    <div class="card-body p-4">
-        <div class="flex items-center gap-3">
-            <!-- Etiqueta -->
-            <span class="text-sm font-semibold text-base-content/70 whitespace-nowrap">Tipo de orden:</span>
-
-            <!-- Selector -->
-            <div class="input input-sm items-center pe-0 w-64">
-                <select id="tab-selector" class="select select-sm w-full" aria-label="Seleccionar tipo de orden"
-                    onchange="showTab(this.value)">
+    <div class="card-body p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-base-content/70 font-semibold whitespace-nowrap">Tipo de orden:</span>
+                <select id="tab-selector" class="select select-bordered select-sm w-full sm:w-64"
+                    aria-label="Seleccionar tipo de orden" onchange="showTab(this.value)">
                     <option value="desazolve" selected>Desazolves</option>
                     <option value="trampas">Trampas de Grasa</option>
                     <option value="visitas">Visitas Técnicas</option>
                 </select>
             </div>
-
-            <!-- Botón de Acción -->
             <a href="{{ url_for('nueva_orden', tipo='desazolve') }}" id="btn-nueva-orden"
-                class="btn btn-primary btn-sm gap-2 shadow-sm whitespace-nowrap">
-                <span class="icon-[tabler--plus] size-4"></span>
+                class="btn btn-primary shadow-sm">
+                <span class="icon-[tabler--plus] size-5"></span>
                 <span id="btn-text">Nuevo Desazolve</span>
             </a>
         </div>
@@ -55,37 +50,32 @@
     </div>
 
     <!-- Search Filters -->
-    <div class="p-4 border-b border-base-content/10 bg-base-100">
-        <form method="GET" action="{{ url_for('ordenes') }}" class="flex flex-col gap-4 w-full">
+    <div class="p-6 border-b border-base-content/10 bg-base-100">
+        <form method="GET" action="{{ url_for('ordenes') }}" class="space-y-6 w-full">
             <input type="hidden" name="tab" value="desazolve">
 
-            <!-- Row 1: Folio, Cliente, Servicio -->
-            <div class="flex flex-row items-end gap-3 w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <!-- Folio -->
-                <div class="form-control w-40 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Folio</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio</label>
                     <input type="text" name="folio" class="input input-bordered w-full h-10" placeholder="OT-DES-..."
                         value="{{ request.args.get('folio', '') }}">
                 </div>
 
                 <!-- Cliente -->
-                <div class="form-control flex-grow min-w-0">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Cliente</span>
-                    </label>
+                <div class="form-control lg:col-span-2">
+                    <label
+                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
                     <input type="text" name="cliente" class="input input-bordered w-full h-10"
                         placeholder="Filtrar por cliente..." value="{{ request.args.get('cliente', '') }}">
                 </div>
 
                 <!-- Servicio -->
-                <div class="form-control w-48 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Servicio</span>
-                    </label>
+                <div class="form-control">
+                    <label
+                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Servicio</label>
                     <select name="servicio" class="select select-bordered w-full h-10 min-h-0 px-3">
-                        <option value="" selected>Todos los servicios</option>
+                        <option value="" selected>Todos</option>
                         <option value="vactor" {{ 'selected' if request.args.get('servicio')=='vactor' else '' }}>Vactor
                         </option>
                         <option value="hidro" {{ 'selected' if request.args.get('servicio')=='hidro' else '' }}>Hidro
@@ -94,37 +84,25 @@
                         </option>
                     </select>
                 </div>
-            </div>
 
-            <!-- Row 2: Mes, Año y Botones -->
-            <div class="flex flex-row items-end gap-3 w-full">
                 <!-- Mes -->
-                <div class="form-control w-40 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Mes</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
                     <select name="mes" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Todos los meses</option>
-                        <option value="01" {{ 'selected' if request.args.get('mes')=='01' else '' }}>Enero</option>
-                        <option value="02" {{ 'selected' if request.args.get('mes')=='02' else '' }}>Febrero</option>
-                        <option value="03" {{ 'selected' if request.args.get('mes')=='03' else '' }}>Marzo</option>
-                        <option value="04" {{ 'selected' if request.args.get('mes')=='04' else '' }}>Abril</option>
-                        <option value="05" {{ 'selected' if request.args.get('mes')=='05' else '' }}>Mayo</option>
-                        <option value="06" {{ 'selected' if request.args.get('mes')=='06' else '' }}>Junio</option>
-                        <option value="07" {{ 'selected' if request.args.get('mes')=='07' else '' }}>Julio</option>
-                        <option value="08" {{ 'selected' if request.args.get('mes')=='08' else '' }}>Agosto</option>
-                        <option value="09" {{ 'selected' if request.args.get('mes')=='09' else '' }}>Septiembre</option>
-                        <option value="10" {{ 'selected' if request.args.get('mes')=='10' else '' }}>Octubre</option>
-                        <option value="11" {{ 'selected' if request.args.get('mes')=='11' else '' }}>Noviembre</option>
-                        <option value="12" {{ 'selected' if request.args.get('mes')=='12' else '' }}>Diciembre</option>
+                        {% set meses = [('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05',
+                        'Mayo'), ('06', 'Junio'), ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10',
+                        'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')] %}
+                        {% for m_val, m_name in meses %}
+                        <option value="{{ m_val }}" {{ 'selected' if request.args.get('mes')==m_val else '' }}>{{ m_name
+                            }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
                 <!-- Año -->
-                <div class="form-control w-32 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Año</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
                     <select name="anio" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Año</option>
                         {% for y in range(2023, 2031) %}
@@ -133,31 +111,26 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
 
-                <div class="flex-grow"></div>
-
-                <!-- Botones -->
-                <div class="flex-none">
-                    <div class="flex gap-2">
-                        <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
-                            <span class="icon-[tabler--search] size-5"></span>
-                            <span>Buscar</span>
-                        </button>
-                        <a href="{{ url_for('ordenes') }}" class="btn btn-soft btn-secondary h-10 min-h-0 btn-square"
-                            title="Limpiar">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path
-                                    d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
-                                <path d="M22 22l-5 -5" />
-                                <path d="M17 22l5 -5" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+            <!-- Botones row -->
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                    <span class="icon-[tabler--search] size-5"></span>
+                    <span>Buscar</span>
+                </button>
+                <a href="{{ url_for('ordenes', tab='desazolve') }}"
+                    class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path
+                            d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                        <path d="M22 22l-5 -5" />
+                        <path d="M17 22l5 -5" />
+                    </svg>
+                </a>
             </div>
         </form>
     </div>
@@ -262,81 +235,59 @@
     </div>
 
     <!-- Search Filters -->
-    <div class="p-4 border-b border-base-content/10 bg-base-100">
-        <form method="GET" action="{{ url_for('ordenes') }}" class="flex flex-col gap-4 w-full">
+    <div class="p-6 border-b border-base-content/10 bg-base-100">
+        <form method="GET" action="{{ url_for('ordenes') }}" class="space-y-6 w-full">
             <input type="hidden" name="tab" value="trampas">
 
-            <!-- Row 1: Folio, Cliente, Tipo -->
-            <div class="flex flex-row items-end gap-3 w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Folio -->
-                <div class="form-control w-40 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Folio</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio</label>
                     <input type="text" name="t_folio" class="input input-bordered w-full h-10" placeholder="OT-TRA-..."
                         value="{{ request.args.get('t_folio', '') }}">
                 </div>
 
                 <!-- Cliente -->
-                <div class="form-control flex-grow min-w-0">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Cliente</span>
-                    </label>
+                <div class="form-control">
+                    <label
+                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
                     <input type="text" name="t_cliente" class="input input-bordered w-full h-10"
                         placeholder="Filtrar por cliente..." value="{{ request.args.get('t_cliente', '') }}">
                 </div>
 
                 <!-- Tipo -->
-                <div class="form-control w-48 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Tipo</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Tipo</label>
                     <input type="text" name="t_tipo" class="input input-bordered w-full h-10"
                         placeholder="Tipo de trampa..." value="{{ request.args.get('t_tipo', '') }}">
                 </div>
-            </div>
 
-            <!-- Row 2: Capacidad, Mes, Año y Botones -->
-            <div class="flex flex-row items-end gap-3 w-full">
                 <!-- Capacidad -->
-                <div class="form-control w-48 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Capacidad</span>
-                    </label>
+                <div class="form-control">
+                    <label
+                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Capacidad</label>
                     <input type="text" name="t_capacidad" class="input input-bordered w-full h-10"
                         placeholder="Capacidad..." value="{{ request.args.get('t_capacidad', '') }}">
                 </div>
 
                 <!-- Mes -->
-                <div class="form-control w-40 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Mes</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
                     <select name="t_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Todos los meses</option>
-                        <option value="01" {{ 'selected' if request.args.get('t_mes')=='01' else '' }}>Enero</option>
-                        <option value="02" {{ 'selected' if request.args.get('t_mes')=='02' else '' }}>Febrero</option>
-                        <option value="03" {{ 'selected' if request.args.get('t_mes')=='03' else '' }}>Marzo</option>
-                        <option value="04" {{ 'selected' if request.args.get('t_mes')=='04' else '' }}>Abril</option>
-                        <option value="05" {{ 'selected' if request.args.get('t_mes')=='05' else '' }}>Mayo</option>
-                        <option value="06" {{ 'selected' if request.args.get('t_mes')=='06' else '' }}>Junio</option>
-                        <option value="07" {{ 'selected' if request.args.get('t_mes')=='07' else '' }}>Julio</option>
-                        <option value="08" {{ 'selected' if request.args.get('t_mes')=='08' else '' }}>Agosto</option>
-                        <option value="09" {{ 'selected' if request.args.get('t_mes')=='09' else '' }}>Septiembre
-                        </option>
-                        <option value="10" {{ 'selected' if request.args.get('t_mes')=='10' else '' }}>Octubre</option>
-                        <option value="11" {{ 'selected' if request.args.get('t_mes')=='11' else '' }}>Noviembre
-                        </option>
-                        <option value="12" {{ 'selected' if request.args.get('t_mes')=='12' else '' }}>Diciembre
-                        </option>
+                        {% set meses = [('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05',
+                        'Mayo'), ('06', 'Junio'), ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10',
+                        'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')] %}
+                        {% for m_val, m_name in meses %}
+                        <option value="{{ m_val }}" {{ 'selected' if request.args.get('t_mes')==m_val else '' }}>{{
+                            m_name }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
                 <!-- Año -->
-                <div class="form-control w-32 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Año</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
                     <select name="t_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Año</option>
                         {% for y in range(2023, 2031) %}
@@ -345,31 +296,26 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
 
-                <div class="flex-grow"></div>
-
-                <!-- Botones -->
-                <div class="flex-none">
-                    <div class="flex gap-2">
-                        <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
-                            <span class="icon-[tabler--search] size-5"></span>
-                            <span>Buscar</span>
-                        </button>
-                        <a href="{{ url_for('ordenes', tab='trampas') }}"
-                            class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path
-                                    d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
-                                <path d="M22 22l-5 -5" />
-                                <path d="M17 22l5 -5" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+            <!-- Botones row -->
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                    <span class="icon-[tabler--search] size-5"></span>
+                    <span>Buscar</span>
+                </button>
+                <a href="{{ url_for('ordenes', tab='trampas') }}"
+                    class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path
+                            d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                        <path d="M22 22l-5 -5" />
+                        <path d="M17 22l5 -5" />
+                    </svg>
+                </a>
             </div>
         </form>
     </div>
@@ -465,81 +411,61 @@
     </div>
 
     <!-- Search Filters -->
-    <div class="p-4 border-b border-base-content/10 bg-base-100">
-        <form method="GET" action="{{ url_for('ordenes') }}" class="flex flex-col gap-4 w-full">
+    <div class="p-6 border-b border-base-content/10 bg-base-100">
+        <form method="GET" action="{{ url_for('ordenes') }}" class="space-y-6 w-full">
             <input type="hidden" name="tab" value="visitas">
 
-            <!-- Row 1: Folio, Cliente, Dirección -->
-            <div class="flex flex-row items-end gap-3 w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Folio -->
-                <div class="form-control w-40 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Folio VT</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio
+                        VT</label>
                     <input type="text" name="v_folio" class="input input-bordered w-full h-10" placeholder="VT-..."
                         value="{{ request.args.get('v_folio', '') }}">
                 </div>
 
                 <!-- Cliente -->
-                <div class="form-control flex-grow min-w-0">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Cliente</span>
-                    </label>
+                <div class="form-control">
+                    <label
+                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
                     <input type="text" name="v_cliente" class="input input-bordered w-full h-10"
                         placeholder="Filtrar por cliente..." value="{{ request.args.get('v_cliente', '') }}">
                 </div>
 
                 <!-- Dirección -->
-                <div class="form-control flex-grow min-w-0">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Dirección</span>
-                    </label>
+                <div class="form-control">
+                    <label
+                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Dirección</label>
                     <input type="text" name="v_direccion" class="input input-bordered w-full h-10"
                         placeholder="Filtrar por dirección..." value="{{ request.args.get('v_direccion', '') }}">
                 </div>
-            </div>
 
-            <!-- Row 2: No. Cliente, Mes, Año y Botones -->
-            <div class="flex flex-row items-end gap-3 w-full">
                 <!-- No. Cliente -->
-                <div class="form-control w-48 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">No. Cliente</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">No.
+                        Cliente</label>
                     <input type="text" name="v_no_cliente" class="input input-bordered w-full h-10"
                         placeholder="ID Cliente..." value="{{ request.args.get('v_no_cliente', '') }}">
                 </div>
 
                 <!-- Mes -->
-                <div class="form-control w-40 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Mes</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
                     <select name="v_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Todos los meses</option>
-                        <option value="01" {{ 'selected' if request.args.get('v_mes')=='01' else '' }}>Enero</option>
-                        <option value="02" {{ 'selected' if request.args.get('v_mes')=='02' else '' }}>Febrero</option>
-                        <option value="03" {{ 'selected' if request.args.get('v_mes')=='03' else '' }}>Marzo</option>
-                        <option value="04" {{ 'selected' if request.args.get('v_mes')=='04' else '' }}>Abril</option>
-                        <option value="05" {{ 'selected' if request.args.get('v_mes')=='05' else '' }}>Mayo</option>
-                        <option value="06" {{ 'selected' if request.args.get('v_mes')=='06' else '' }}>Junio</option>
-                        <option value="07" {{ 'selected' if request.args.get('v_mes')=='07' else '' }}>Julio</option>
-                        <option value="08" {{ 'selected' if request.args.get('v_mes')=='08' else '' }}>Agosto</option>
-                        <option value="09" {{ 'selected' if request.args.get('v_mes')=='09' else '' }}>Septiembre
-                        </option>
-                        <option value="10" {{ 'selected' if request.args.get('v_mes')=='10' else '' }}>Octubre</option>
-                        <option value="11" {{ 'selected' if request.args.get('v_mes')=='11' else '' }}>Noviembre
-                        </option>
-                        <option value="12" {{ 'selected' if request.args.get('v_mes')=='12' else '' }}>Diciembre
-                        </option>
+                        {% set meses = [('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05',
+                        'Mayo'), ('06', 'Junio'), ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10',
+                        'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')] %}
+                        {% for m_val, m_name in meses %}
+                        <option value="{{ m_val }}" {{ 'selected' if request.args.get('v_mes')==m_val else '' }}>{{
+                            m_name }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
                 <!-- Año -->
-                <div class="form-control w-32 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Año</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
                     <select name="v_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Año</option>
                         {% for y in range(2023, 2031) %}
@@ -548,31 +474,26 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
 
-                <div class="flex-grow"></div>
-
-                <!-- Botones -->
-                <div class="flex-none">
-                    <div class="flex gap-2">
-                        <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
-                            <span class="icon-[tabler--search] size-5"></span>
-                            <span>Buscar</span>
-                        </button>
-                        <a href="{{ url_for('ordenes', tab='visitas') }}"
-                            class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path
-                                    d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
-                                <path d="M22 22l-5 -5" />
-                                <path d="M17 22l5 -5" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+            <!-- Botones row -->
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                    <span class="icon-[tabler--search] size-5"></span>
+                    <span>Buscar</span>
+                </button>
+                <a href="{{ url_for('ordenes', tab='visitas') }}"
+                    class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path
+                            d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                        <path d="M22 22l-5 -5" />
+                        <path d="M17 22l5 -5" />
+                    </svg>
+                </a>
             </div>
         </form>
     </div>

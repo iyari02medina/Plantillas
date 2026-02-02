@@ -3,40 +3,38 @@
 {% block title %}Cotizaciones - Sistema Cophi{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-    <div>
-        <div class="flex items-center gap-3 mb-1">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-pencil-dollar size-10 text-primary">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-                <path d="M13.5 6.5l4 4" />
-                <path d="M21 15h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5" />
-                <path d="M19 21v1m0 -8v1" />
-            </svg>
-            <h1 class="text-3xl font-bold text-base-content m-0">Cotizaciones</h1>
+<div class="flex items-center justify-between gap-4 mb-8">
+    <div class="flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-pencil-dollar size-10 text-primary">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+            <path d="M13.5 6.5l4 4" />
+            <path d="M21 15h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5" />
+            <path d="M19 21v1m0 -8v1" />
+        </svg>
+        <div>
+            <h1 class="text-3xl font-bold text-base-content m-0 text-balance">Cotizaciones</h1>
+            <p class="text-base-content/60 font-medium hidden md:block">Historial completo de cotizaciones realizadas.
+            </p>
         </div>
-        <p class="text-base-content/60 font-medium">Historial completo de cotizaciones realizadas.</p>
     </div>
     <a href="{{ url_for('nueva_cotizacion') }}" class="btn btn-primary shadow-sm">
         <span class="icon-[tabler--plus] size-5"></span>
-        Nueva Cotización
+        <span class="hidden sm:inline">Nueva Cotización</span>
     </a>
 </div>
 
 <!-- Search Filters -->
 <div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
-    <div class="card-body p-4">
-        <form method="GET" action="{{ url_for('cotizaciones') }}" class="flex flex-col gap-4 w-full">
-
-            <!-- Fila 1: Cliente y Nombre -->
-            <div class="flex flex-row items-end gap-3 w-full">
+    <div class="card-body p-6">
+        <form method="GET" action="{{ url_for('cotizaciones') }}" class="space-y-6 w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Cliente -->
-                <div class="form-control flex-1 min-w-0">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Cliente</span>
-                    </label>
+                <div class="form-control">
+                    <label
+                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
                     <input list="lista-clientes" name="cliente" class="input input-bordered w-full h-10"
                         placeholder="Filtrar por cliente..." value="{{ request.args.get('cliente', '') }}">
                     <datalist id="lista-clientes">
@@ -47,22 +45,15 @@
                 </div>
 
                 <!-- Nombre -->
-                <div class="form-control flex-1 min-w-0">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Nombre</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Nombre</label>
                     <input type="text" name="nombre_cot" class="input input-bordered w-full h-10"
                         placeholder="Filtrar por nombre..." value="{{ request.args.get('nombre_cot', '') }}">
                 </div>
-            </div>
 
-            <!-- Fila 2: Mes, Año y Botones -->
-            <div class="flex flex-row items-end gap-3 w-full">
                 <!-- Mes -->
-                <div class="form-control w-40 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Mes</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
                     <select name="mes" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Todos los meses</option>
                         <option value="01" {{ 'selected' if request.args.get('mes')=='01' else '' }}>Enero</option>
@@ -81,10 +72,8 @@
                 </div>
 
                 <!-- Año -->
-                <div class="form-control w-32 flex-none">
-                    <label class="label py-0 mb-1">
-                        <span class="label-text-alt uppercase font-bold text-base-content/50">Año</span>
-                    </label>
+                <div class="form-control">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
                     <select name="anio" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Año</option>
                         {% for y in range(2023, 2031) %}
@@ -93,32 +82,26 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
 
-                <!-- Espaciador para empujar botones a la derecha si es necesario o simplemente pegados -->
-                <div class="flex-grow"></div>
-
-                <!-- Botones -->
-                <div class="flex-none">
-                    <div class="flex gap-2">
-                        <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
-                            <span class="icon-[tabler--search] size-5"></span>
-                            <span>Buscar</span>
-                        </button>
-                        <a href="{{ url_for('cotizaciones') }}"
-                            class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path
-                                    d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
-                                <path d="M22 22l-5 -5" />
-                                <path d="M17 22l5 -5" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+            <!-- Botones row -->
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                    <span class="icon-[tabler--search] size-5"></span>
+                    <span>Buscar</span>
+                </button>
+                <a href="{{ url_for('cotizaciones') }}" class="btn btn-soft btn-secondary h-10 min-h-0 btn-square"
+                    title="Limpiar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path
+                            d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                        <path d="M22 22l-5 -5" />
+                        <path d="M17 22l5 -5" />
+                    </svg>
+                </a>
             </div>
         </form>
     </div>
