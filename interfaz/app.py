@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, make_response
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import check_password_hash
 import csv
 import os
 import datetime
@@ -6,7 +8,37 @@ import math
 from jinja2 import Template
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Needed for flash messages
+app.secret_key = 'cophi-secret-key-2026' # Cambiar por algo más seguro
+
+# Configuración de Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = "Por favor inicia sesión para acceder."
+login_manager.login_message_category = "info"
+
+class User(UserMixin):
+    def __init__(self, id, username):
+        self.id = id
+        self.username = username
+
+@login_manager.user_loader
+def load_user(user_id):
+    users = read_users()
+    if user_id in users:
+        return User(user_id, users[user_id]['username'])
+    return None
+
+def read_users():
+    users = {}
+    users_file = os.path.join(BASE_DIR, 'usuarios.csv')
+    if os.path.exists(users_file):
+        with open(users_file, mode='r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                uid = row['username'] # Usamos el username como ID para simplicidad
+                users[uid] = row
+    return users
 
 # Paths configuration
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -171,7 +203,34 @@ def overwrite_csv(filepath, fieldnames, rows):
         writer.writeheader()
         writer.writerows(rows)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+        
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        users = read_users()
+        if username in users and check_password_hash(users[username]['password'], password):
+            user = User(username, username)
+            login_user(user)
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('index'))
+        else:
+            flash('Usuario o contraseña incorrectos', 'error')
+            
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 @app.route('/')
+@login_required
 def index():
     cotizaciones = read_csv(COTIZACIONES_CSV)
     ordenes = read_csv(ORDENES_CSV)
@@ -183,6 +242,7 @@ def index():
     return render_template('index.html', total_cotizaciones=total_cotizaciones, total_ordenes=total_ordenes)
 
 @app.route('/cotizaciones')
+@login_required
 def cotizaciones():
     raw_data = read_csv(COTIZACIONES_CSV)
     
@@ -261,6 +321,7 @@ def cotizaciones():
                          total_pages=total_pages)
 
 @app.route('/nueva_cotizacion', methods=['GET', 'POST'])
+@login_required
 def nueva_cotizacion():
     if request.method == 'POST':
         # Extract form data
@@ -420,6 +481,7 @@ def nueva_cotizacion():
     return render_template('crear_cotizacion.html', inventario=inventario, clientes=clientes, suggested_folio=suggested_folio)
 
 @app.route('/eliminar_cotizacion/<folio>', methods=['POST'])
+@login_required
 def eliminar_cotizacion(folio):
     try:
         existing = read_csv(COTIZACIONES_CSV)
@@ -443,6 +505,7 @@ def eliminar_cotizacion(folio):
     return redirect(url_for('cotizaciones'))
 
 @app.route('/ordenes')
+@login_required
 def ordenes():
     desazolves = read_csv(ORDENES_CSV)
     trampas = read_csv(TRAMPAS_CSV)
@@ -543,6 +606,7 @@ def ordenes():
     return render_template('ordenes.html', desazolves=desazolves, trampas=trampas, visitas=visitas)
 
 @app.route('/tarificador')
+@login_required
 def tarificador():
     raw_data = read_csv(TARIFICADOR_CSV)
     
@@ -709,6 +773,7 @@ def generate_single_tarificador_html(data):
         return False
 
 @app.route('/nuevo_tarificador', methods=['GET', 'POST'])
+@login_required
 def nuevo_tarificador():
     if request.method == 'POST':
         folio = request.form.get('folio_tar')
@@ -781,6 +846,7 @@ def nuevo_tarificador():
     return render_template('crear_tarificador.html', clientes=clientes, suggested_folio=suggested_folio, todays_date=datetime.date.today().strftime('%d/%m/%Y'), rangos=load_rangos(), default_lmps=get_default_lmps())
 
 @app.route('/tarificador/<folio>')
+@login_required
 def detalle_tarificador(folio):
     print(f"Buscando detalle para folio: {folio}")
     rows = read_csv(TARIFICADOR_CSV)
@@ -795,6 +861,7 @@ def detalle_tarificador(folio):
     return render_template('crear_tarificador.html', tarificador=target, clientes=clientes, rangos=load_rangos(), default_lmps=get_default_lmps())
 
 @app.route('/eliminar_tarificador/<folio>', methods=['POST'])
+@login_required
 def eliminar_tarificador(folio):
     try:
         all_rows = read_csv(TARIFICADOR_CSV)
@@ -819,6 +886,7 @@ def eliminar_tarificador(folio):
 TARIFICADORES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Documentos_generados', 'tarificadores'))
 
 @app.route('/ver_tarificador/<folio>')
+@login_required
 def ver_tarificador(folio):
     safe_folio = folio.replace('/', '-')
     filename = f"TARIFICADOR_{safe_folio}.html"
@@ -855,6 +923,7 @@ def ver_tarificador(folio):
         return f"Error leyendo el archivo: {e}", 500
 
 @app.route('/ver_cotizacion/<folio>')
+@login_required
 def ver_cotizacion(folio):
     filename = f"cotizacion_{folio}.html"
     filepath = os.path.join(COTIZACIONES_GEN_DIR, filename)
@@ -906,6 +975,7 @@ def get_orden_data(tipo, folio):
     return target, filepath
 
 @app.route('/nueva_orden/<tipo>', methods=['GET', 'POST'])
+@login_required
 def nueva_orden(tipo):
     if request.method == 'POST':
         # Create logic
@@ -1049,6 +1119,7 @@ def nueva_orden(tipo):
     return render_template('crear_orden.html', orden=data, tipo=tipo, folio=data.get(id_key), clientes=clientes, is_new=True)
 
 @app.route('/eliminar_orden/<tipo>/<folio>', methods=['POST'])
+@login_required
 def eliminar_orden(tipo, folio):
     try:
         data, filepath = get_orden_data(tipo, folio)
@@ -1078,6 +1149,7 @@ def eliminar_orden(tipo, folio):
     return redirect(url_for('ordenes', tab=tipo if tipo != 'desazolve' else 'desazolve'))
 
 @app.route('/orden/<tipo>/<folio>', methods=['GET', 'POST'])
+@login_required
 def detalle_orden(tipo, folio):
     data, filepath = get_orden_data(tipo, folio)
     
@@ -1337,6 +1409,7 @@ def generate_order_html(tipo, data):
         return False
 
 @app.route('/ver_orden_pdf/<tipo>/<folio>')
+@login_required
 def ver_orden_pdf(tipo, folio):
     # Define correct subdirectories based on user input
     # Paths are relative to: C:\Users\DELL\Desktop\Cophi\Recursos\Programa_cophi\Documentos_generados
@@ -1380,6 +1453,7 @@ def ver_orden_pdf(tipo, folio):
 
 
 @app.route('/permiso_descarga/<nis>')
+@login_required
 def detalle_permiso_descarga(nis):
     raw_data = read_csv(PERMISOS_CSV)
     target = next((r for r in raw_data if str(r.get('nis', '')).strip() == str(nis).strip()), None)
@@ -1393,6 +1467,7 @@ def detalle_permiso_descarga(nis):
 
 
 @app.route('/permisos_descarga')
+@login_required
 def permisos_descarga():
     raw_data = read_csv(PERMISOS_CSV)
     
@@ -1454,6 +1529,7 @@ def permisos_descarga():
 
 
 @app.route('/nuevo_permiso_descarga', methods=['GET', 'POST'])
+@login_required
 def nuevo_permiso_descarga():
     if request.method == 'POST':
         nis = request.form.get('nis')
@@ -1547,6 +1623,7 @@ def nuevo_permiso_descarga():
 
 
 @app.route('/eliminar_permiso_descarga/<nis>', methods=['POST'])
+@login_required
 def eliminar_permiso_descarga(nis):
     try:
         existing = read_csv(PERMISOS_CSV)
@@ -1570,6 +1647,7 @@ def eliminar_permiso_descarga(nis):
     return redirect(url_for('permisos_descarga'))
 
 @app.route('/ver_permiso_pdf/<nis>/<tipo>')
+@login_required
 def ver_permiso_pdf(nis, tipo):
     """
     Muestra el HTML generado para un permiso. 
@@ -1629,6 +1707,7 @@ def ver_permiso_pdf(nis, tipo):
 
 
 @app.route('/cotizacion/<folio>')
+@login_required
 def detalle_cotizacion(folio):
     data = get_cotizacion_data(folio)
     if not data:
@@ -1654,10 +1733,12 @@ def server_css():
     return send_from_directory('static', 'estilos.css')
 
 @app.route('/directorio')
+@login_required
 def directorio():
     return render_template('directorio.html')
 
 @app.route('/catalogo')
+@login_required
 def catalogo():
     return render_template('Catalogo.html')
 
@@ -1665,6 +1746,7 @@ PRODUCTOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'prod
 SERVICIOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'servicios.csv'))
 
 @app.route('/ver_catalogo/<tipo>')
+@login_required
 def ver_catalogo(tipo):
     if tipo not in ['productos', 'servicios']:
         return redirect(url_for('catalogo'))
@@ -1726,6 +1808,7 @@ def ver_catalogo(tipo):
                          categorias=categorias)
 
 @app.route('/catalogo/nuevo/<tipo>', methods=['GET'])
+@login_required
 def nuevo_catalogo_item(tipo):
     is_prod = (tipo == 'productos')
     csv_file = PRODUCTOS_CSV if is_prod else SERVICIOS_CSV
@@ -1748,6 +1831,7 @@ def nuevo_catalogo_item(tipo):
     return render_template('crear_catalogo.html', tipo=tipo, is_new=True, item={}, suggested_id=suggested_id)
 
 @app.route('/catalogo/detalle/<tipo>/<id_val>')
+@login_required
 def detalle_catalogo(tipo, id_val):
     if tipo not in ['productos', 'servicios']: return redirect(url_for('catalogo'))
     
@@ -1763,6 +1847,7 @@ def detalle_catalogo(tipo, id_val):
     return render_template('crear_catalogo.html', tipo=tipo, is_new=False, item=item)
 
 @app.route('/catalogo/guardar/<tipo>', methods=['POST'])
+@login_required
 def guardar_catalogo_item(tipo):
     csv_file = PRODUCTOS_CSV if tipo == 'productos' else SERVICIOS_CSV
     existing = read_csv(csv_file)
@@ -1805,6 +1890,7 @@ def guardar_catalogo_item(tipo):
     return redirect(url_for('ver_catalogo', tipo=tipo))
 
 @app.route('/catalogo/eliminar/<tipo>/<id_val>', methods=['POST'])
+@login_required
 def eliminar_catalogo_item(tipo, id_val):
     csv_file = PRODUCTOS_CSV if tipo == 'productos' else SERVICIOS_CSV
     existing = read_csv(csv_file)
@@ -1823,6 +1909,7 @@ def eliminar_catalogo_item(tipo, id_val):
 PROSPECTOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'prospectos.csv'))
 
 @app.route('/directorio/<tipo>')
+@login_required
 def ver_directorio(tipo):
     if tipo not in ['clientes', 'prospectos']:
         return redirect(url_for('directorio'))
@@ -1891,6 +1978,7 @@ def ver_directorio(tipo):
                          total_pages=total_pages)
 
 @app.route('/directorio/eliminar/<tipo>/<id_val>', methods=['POST'])
+@login_required
 def eliminar_directorio_item(tipo, id_val):
     if tipo not in ['clientes', 'prospectos']:
         return redirect(url_for('directorio'))
@@ -1924,10 +2012,12 @@ def eliminar_directorio_item(tipo, id_val):
     return redirect(url_for('ver_directorio', tipo=tipo))
 
 @app.route('/directorio/nuevo/<tipo>')
+@login_required
 def nuevo_directorio_item(tipo):
     return render_template('crear_directorio.html', tipo=tipo, is_new=True, item={})
 
 @app.route('/directorio/detalle/<tipo>/<id_val>')
+@login_required
 def detalle_directorio(tipo, id_val):
     if tipo not in ['clientes', 'prospectos']:
         return redirect(url_for('directorio'))
@@ -2048,6 +2138,7 @@ def detalle_directorio(tipo, id_val):
     return render_template('crear_directorio.html', tipo=tipo, is_new=False, item=item, **related_data)
 
 @app.route('/directorio/guardar/<tipo>', methods=['POST'])
+@login_required
 def guardar_directorio(tipo):
     csv_file = CLIENTES_CSV if tipo == 'clientes' else PROSPECTOS_CSV
     
@@ -2154,6 +2245,7 @@ def guardar_nuevo_directorio_logic(tipo, existing, headers, csv_file):
 
 
 @app.route('/consumos')
+@login_required
 def consumos():
     raw_data = read_csv(CONSUMOS_CSV)
     
@@ -2209,6 +2301,7 @@ def consumos():
                          total_pages=total_pages)
 
 @app.route('/crear_consumo', methods=['GET'])
+@login_required
 def crear_consumo():
     # Load clients for the search
     clientes = read_csv(CLIENTES_CSV)
@@ -2232,6 +2325,7 @@ def crear_consumo():
     return render_template('crea_consumo.html', clientes=clientes, suggested_folio=suggested_folio)
 
 @app.route('/guardar_consumo', methods=['POST'])
+@login_required
 def guardar_consumo():
     folio = request.form.get('folio')
     original_folio = request.form.get('original_folio')
@@ -2318,6 +2412,7 @@ def guardar_consumo():
     return redirect(url_for('consumos'))
 
 @app.route('/eliminar_consumo/<folio>', methods=['POST'])
+@login_required
 def eliminar_consumo(folio):
     try:
         all_rows = read_csv(CONSUMOS_CSV)

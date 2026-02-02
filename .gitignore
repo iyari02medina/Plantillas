@@ -11,10 +11,15 @@ __pycache__/
 *.pyc
 .env
 
+# Datos sensibles (NO SUBIR A GITHUB)
+interfaz/usuarios.csv
+interfaz/init_users.py
+*.env
+.DS_Store
+
 # Archivos de sistema/logs
 *.log
 *.sock
-.DS_Store
 
 # --- DATOS SENSIBLES ---
 

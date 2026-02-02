@@ -3,36 +3,35 @@
 {% block title %}Órdenes de Trabajo - Sistema Cophi{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between gap-4 mb-8">
-    <div class="flex items-center gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-            stroke-linecap="round" stroke-linejoin="round"
-            class="icon icon-tabler icons-tabler-outline icon-tabler-tool size-10 text-primary">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
-        </svg>
-        <div>
-            <h1 class="text-3xl font-bold text-base-content m-0 text-balance">Órdenes de Trabajo</h1>
-            <p class="text-base-content/60 font-medium hidden md:block">Gestión de servicios y visitas técnicas.</p>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <div>
+        <div class="flex items-center gap-3 mb-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-tool size-10 text-primary">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
+            </svg>
+            <h1 class="text-3xl font-bold text-base-content m-0">Órdenes de Trabajo</h1>
         </div>
+        <p class="text-base-content/60 font-medium">Gestión de servicios y visitas técnicas.</p>
     </div>
 </div>
 
 <!-- Barra de Control Compacta -->
 <div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
-    <div class="card-body p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <span class="text-base-content/70 font-semibold whitespace-nowrap">Tipo de orden:</span>
-                <select id="tab-selector" class="select select-bordered select-sm w-full sm:w-64"
-                    aria-label="Seleccionar tipo de orden" onchange="showTab(this.value)">
-                    <option value="desazolve" selected>Desazolves</option>
-                    <option value="trampas">Trampas de Grasa</option>
-                    <option value="visitas">Visitas Técnicas</option>
-                </select>
-            </div>
-            <a href="{{ url_for('nueva_orden', tipo='desazolve') }}" id="btn-nueva-orden"
-                class="btn btn-primary shadow-sm">
+    <div class="card-body gap-6">
+        <h6 class="text-base-content/70 font-semibold mb-0">Tipo de orden:</h6>
+        <div class="input max-w-xl items-center pe-0">
+            <select id="tab-selector" class="select select-sm" aria-label="Seleccionar tipo de orden"
+                onchange="showTab(this.value)">
+                <option value="desazolve" selected>Desazolves</option>
+                <option value="trampas">Trampas de Grasa</option>
+                <option value="visitas">Visitas Técnicas</option>
+            </select>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('nueva_orden', tipo='desazolve') }}" id="btn-nueva-orden" class="btn btn-primary">
                 <span class="icon-[tabler--plus] size-5"></span>
                 <span id="btn-text">Nuevo Desazolve</span>
             </a>

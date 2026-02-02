@@ -3,29 +3,29 @@
 {% block title %}{{ 'Nueva Orden de Trabajo' if is_new else 'Detalle Orden' }} - Sistema Cophi{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between gap-4 mb-8">
-    <div class="flex items-center gap-3">
-        <a href="{{ url_for('ordenes') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
-            <span class="icon-[tabler--arrow-left] size-5"></span>
-        </a>
-        <div>
-            <h1 class="text-3xl font-bold text-base-content m-0">{{ 'Nueva' if is_new else 'Detalle' }} Orden de Trabajo
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div>
+        <div class="flex items-center gap-2 mb-1">
+            <a href="{{ url_for('ordenes') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
+                <span class="icon-[tabler--arrow-left] size-5"></span>
+            </a>
+            <h1 class="text-3xl font-bold text-base-content">{{ 'Nueva' if is_new else 'Detalle' }} Orden de Trabajo
             </h1>
-            <p class="text-base-content/60 font-medium uppercase tracking-widest text-xs font-black hidden md:block">
-                Módulo de {{ tipo|upper if tipo else 'ORDEN' }}
-            </p>
         </div>
+        <p class="text-base-content/60 font-medium ml-10 uppercase tracking-widest text-xs font-black">
+            Módulo de {{ tipo|upper if tipo else 'ORDEN' }}
+        </p>
     </div>
     {% if not is_new %}
     <div class="flex gap-2">
         <a href="{{ url_for('ver_orden_pdf', tipo=tipo, folio=folio) }}" target="_blank"
             class="btn btn-soft btn-secondary">
             <span class="icon-[tabler--file-type-pdf] size-5"></span>
-            <span class="hidden sm:inline">Ver PDF</span>
+            Ver PDF
         </a>
         <button type="button" class="btn btn-primary shadow-sm" onclick="enableEdit()" id="btn-editar">
             <span class="icon-[tabler--edit] size-5"></span>
-            <span class="hidden sm:inline">Editar</span>
+            Editar
         </button>
     </div>
     {% endif %}
