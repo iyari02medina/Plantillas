@@ -822,10 +822,28 @@ TARIFICADORES_GEN_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'Docu
 def ver_tarificador(folio):
     safe_folio = folio.replace('/', '-')
     filename = f"TARIFICADOR_{safe_folio}.html"
+    filepath = os.path.join(TARIFICADORES_GEN_DIR, filename)
+    
+    # Asegurar que el directorio exista
+    if not os.path.exists(TARIFICADORES_GEN_DIR):
+        os.makedirs(TARIFICADORES_GEN_DIR, exist_ok=True)
+        
+    # Si el archivo no existe, intentar generarlo al vuelo desde el CSV
+    if not os.path.exists(filepath):
+        print(f"Archivo {filename} no encontrado en {TARIFICADORES_GEN_DIR}. Intentando generar desde CSV...")
+        rows = read_csv(TARIFICADOR_CSV)
+        target = next((r for r in rows if r.get('folio_tar') == folio), None)
+        if target:
+            # Re-calcular para asegurar que los precios estén actualizados
+            target = calculate_tarificador_row(target)
+            if generate_single_tarificador_html(target):
+                print(f"Archivo {filename} generado correctamente.")
+            else:
+                return "Error al intentar generar el documento visual automáticamente.", 500
+        else:
+             return f"Archivo no encontrado y el folio '{folio}' no existe en el registro del tarificador.", 404
+
     try:
-        if not os.path.exists(TARIFICADORES_GEN_DIR):
-             return "Directorio de documentos no encontrado", 404
-             
         response = make_response(send_from_directory(TARIFICADORES_GEN_DIR, filename))
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'

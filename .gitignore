@@ -1,0 +1,26 @@
+# --- SEGURIDAD Y PRIVACIDAD ---
+
+# Archivos de despliegue (No subir, son pesados y redundantes)
+deploy_*.zip
+*.zip
+configurar_ssh.ps1
+
+# Entorno Virtual y Caché (Nunca subir)
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Archivos de sistema/logs
+*.log
+*.sock
+.DS_Store
+
+# --- DATOS SENSIBLES ---
+
+# Facturas y Reportes Generados (Tienen datos reales de clientes)
+Documentos_generados/
+
+# Bases de datos CSV
+# DESCOMENTAR la siguiente línea si tu repo es PÚBLICO y quieres proteger los datos de tus clientes:
+# *.csv

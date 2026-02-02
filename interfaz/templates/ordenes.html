@@ -1,9 +1,9 @@
-{% extends 'base_flyonui.html' %}
+﻿{% extends 'base_flyonui.html' %}
 
 {% block title %}Órdenes de Trabajo - Sistema Cophi{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
     <div>
         <div class="flex items-center gap-3 mb-1">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -16,39 +16,33 @@
         </div>
         <p class="text-base-content/60 font-medium">Gestión de servicios y visitas técnicas.</p>
     </div>
-    <div class="flex flex-wrap gap-2">
-        <a href="{{ url_for('nueva_orden', tipo='desazolve') }}" class="btn btn-primary btn-sm shadow-sm">
-            <span class="icon-[tabler--plus] size-4"></span>
-            Nuevo Desazolve
-        </a>
-        <a href="{{ url_for('nueva_orden', tipo='trampa') }}" class="btn btn-primary btn-sm shadow-sm">
-            <span class="icon-[tabler--plus] size-4"></span>
-            Nueva Trampa
-        </a>
-        <a href="{{ url_for('nueva_orden', tipo='visita') }}" class="btn btn-primary btn-sm shadow-sm">
-            <span class="icon-[tabler--plus] size-4"></span>
-            Nueva Visita
-        </a>
-    </div>
 </div>
 
-<!-- Tabs Navigation -->
-<div class="tabs tabs-box bg-base-100 p-1 rounded-lg border border-base-content/10 shadow-sm mb-6 max-w-2xl">
-    <button onclick="showTab('desazolve')" id="btn-desazolve"
-        class="tab tab-active flex items-center gap-2 h-10 px-6 font-bold transition-all">
-        <span class="icon-[tabler--truck] size-4"></span>
-        Desazolves
-    </button>
-    <button onclick="showTab('trampas')" id="btn-trampas"
-        class="tab flex items-center gap-2 h-10 px-6 font-medium transition-all">
-        <span class="icon-[tabler--droplet-half-2] size-4"></span>
-        Trampas de Grasa
-    </button>
-    <button onclick="showTab('visitas')" id="btn-visitas"
-        class="tab flex items-center gap-2 h-10 px-6 font-medium transition-all">
-        <span class="icon-[tabler--report-search] size-4"></span>
-        Visitas Técnicas
-    </button>
+<!-- Barra de Control Compacta -->
+<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
+    <div class="card-body p-4">
+        <div class="flex items-center gap-3">
+            <!-- Etiqueta -->
+            <span class="text-sm font-semibold text-base-content/70 whitespace-nowrap">Tipo de orden:</span>
+
+            <!-- Selector -->
+            <div class="input input-sm items-center pe-0 w-64">
+                <select id="tab-selector" class="select select-sm w-full" aria-label="Seleccionar tipo de orden"
+                    onchange="showTab(this.value)">
+                    <option value="desazolve" selected>Desazolves</option>
+                    <option value="trampas">Trampas de Grasa</option>
+                    <option value="visitas">Visitas Técnicas</option>
+                </select>
+            </div>
+
+            <!-- Botón de Acción -->
+            <a href="{{ url_for('nueva_orden', tipo='desazolve') }}" id="btn-nueva-orden"
+                class="btn btn-primary btn-sm gap-2 shadow-sm whitespace-nowrap">
+                <span class="icon-[tabler--plus] size-4"></span>
+                <span id="btn-text">Nuevo Desazolve</span>
+            </a>
+        </div>
+    </div>
 </div>
 
 <!-- DESAZOLVES -->
@@ -151,7 +145,16 @@
                         </button>
                         <a href="{{ url_for('ordenes') }}" class="btn btn-soft btn-secondary h-10 min-h-0 btn-square"
                             title="Limpiar">
-                            <span class="icon-[tabler--eraser] size-5"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                                <path d="M22 22l-5 -5" />
+                                <path d="M17 22l5 -5" />
+                            </svg>
                         </a>
                     </div>
                 </div>
@@ -354,7 +357,16 @@
                         </button>
                         <a href="{{ url_for('ordenes', tab='trampas') }}"
                             class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
-                            <span class="icon-[tabler--eraser] size-5"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                                <path d="M22 22l-5 -5" />
+                                <path d="M17 22l5 -5" />
+                            </svg>
                         </a>
                     </div>
                 </div>
@@ -548,7 +560,16 @@
                         </button>
                         <a href="{{ url_for('ordenes', tab='visitas') }}"
                             class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
-                            <span class="icon-[tabler--eraser] size-5"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                                <path d="M22 22l-5 -5" />
+                                <path d="M17 22l5 -5" />
+                            </svg>
                         </a>
                     </div>
                 </div>
@@ -640,25 +661,39 @@
 {% block scripts %}
 <script>
     function showTab(tabName) {
-        // Hide all
+        // Hide all tabs
         document.getElementById('tab-desazolve').classList.add('hidden');
         document.getElementById('tab-trampas').classList.add('hidden');
         document.getElementById('tab-visitas').classList.add('hidden');
 
-        // Show selected
+        // Show selected tab
         document.getElementById('tab-' + tabName).classList.remove('hidden');
 
-        // Update tabs
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('tab-active', 'font-bold');
-            tab.classList.add('font-medium');
-        });
+        // Update selector value
+        const selector = document.getElementById('tab-selector');
+        if (selector) {
+            selector.value = tabName;
+        }
 
-        // Highlight active tab
-        const activeTab = document.getElementById('btn-' + tabName);
-        if (activeTab) {
-            activeTab.classList.add('tab-active', 'font-bold');
-            activeTab.classList.remove('font-medium');
+        // Update action button
+        const btnNuevaOrden = document.getElementById('btn-nueva-orden');
+        const btnText = document.getElementById('btn-text');
+
+        if (btnNuevaOrden && btnText) {
+            switch (tabName) {
+                case 'desazolve':
+                    btnNuevaOrden.href = "{{ url_for('nueva_orden', tipo='desazolve') }}";
+                    btnText.textContent = 'Nuevo Desazolve';
+                    break;
+                case 'trampas':
+                    btnNuevaOrden.href = "{{ url_for('nueva_orden', tipo='trampa') }}";
+                    btnText.textContent = 'Nueva Trampa';
+                    break;
+                case 'visitas':
+                    btnNuevaOrden.href = "{{ url_for('nueva_orden', tipo='visita') }}";
+                    btnText.textContent = 'Nueva Visita';
+                    break;
+            }
         }
     }
 
