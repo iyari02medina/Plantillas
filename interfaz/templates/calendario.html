@@ -1,0 +1,349 @@
+{% extends 'base_flyonui.html' %}
+
+{% block title %}Calendario - Sistema Cophi{% endblock %}
+
+{% block content %}
+<div class="w-full p-6 md:p-10 space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-base-content m-0">Calendario</h1>
+            <p class="text-base-content/60 font-medium ml-1">Planificación y seguimiento de actividades.</p>
+        </div>
+        <!-- Acciones del calendario (opcional) -->
+        <div class="flex gap-2">
+            <button class="btn btn-primary shadow-sm" onclick="toggleModal('modal_nuevo_evento', true)">
+                <span class="icon-[tabler--plus] size-5"></span>
+                Nuevo Evento
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal: Nuevo Evento -->
+    <div id="modal_nuevo_evento" class="modal">
+        <div class="modal-box w-11/12 max-w-3xl">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                onclick="toggleModal('modal_nuevo_evento', false)">✕</button>
+            <h3 class="font-bold text-lg mb-4">Crear Nuevo Evento</h3>
+
+            <!-- Selector de Tipo -->
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text font-bold">Tipo de Actividad</span>
+                </label>
+                <select id="tipo_evento" class="select select-bordered w-full"
+                    onchange="cambiarFormularioEvento(this.value)">
+                    <option value="">-- Seleccione --</option>
+                    <option value="desazolve">Orden de Desazolve</option>
+                    <option value="trampa">Limpieza de Trampa de Grasa</option>
+                    <option value="visita">Visita Técnica</option>
+                    <option value="tarificador">Análisis de Laboratorio</option>
+                </select>
+            </div>
+
+            <!-- Formulario Desazolve -->
+            <form id="form_desazolve" class="hidden evento-form" action="{{ url_for('nueva_orden', tipo='desazolve') }}"
+                method="POST">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Folio</span></label>
+                        <input type="text" name="folio_des" class="input input-bordered" placeholder="OT-DES-..."
+                            required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Cliente</span></label>
+                        <input type="text" name="nombre_cliente" class="input input-bordered" required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Fecha</span></label>
+                        <input type="date" name="fecha_des" class="input input-bordered" value="{{ now_formatted }}"
+                            required>
+                    </div>
+                    <div class="form-control md:col-span-2">
+                        <label class="label"><span class="label-text">Ubicación del Área</span></label>
+                        <input type="text" name="ubicacion_area" class="input input-bordered">
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Tipo de Tubería</span></label>
+                        <select name="tipo_tuberia" class="select select-bordered">
+                            <option>PVC</option>
+                            <option>Concreto</option>
+                            <option>Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Diámetro (pulg)</span></label>
+                        <input type="text" name="diametro_tuberia" class="input input-bordered">
+                    </div>
+                </div>
+                <div class="modal-action">
+                    <button type="button" class="btn"
+                        onclick="toggleModal('modal_nuevo_evento', false)">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Orden</button>
+                </div>
+            </form>
+
+            <!-- Formulario Trampa -->
+            <form id="form_trampa" class="hidden evento-form" action="{{ url_for('nueva_orden', tipo='trampa') }}"
+                method="POST">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Folio</span></label>
+                        <input type="text" name="folio_lt" class="input input-bordered" placeholder="OT-TRA-..."
+                            required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Cliente</span></label>
+                        <input type="text" name="nombre_cliente" class="input input-bordered" required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Fecha</span></label>
+                        <input type="date" name="fecha_lt" class="input input-bordered" value="{{ now_formatted }}"
+                            required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Ubicación del Equipo</span></label>
+                        <input type="text" name="ubicacion_equipo" class="input input-bordered">
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Tipo de Trampa</span></label>
+                        <select name="tipo_trampa" class="select select-bordered">
+                            <option>Estándar</option>
+                            <option>Prefabricada</option>
+                            <option>Otra</option>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Capacidad (L)</span></label>
+                        <input type="text" name="capacidad_trampa" class="input input-bordered">
+                    </div>
+                </div>
+                <div class="modal-action">
+                    <button type="button" class="btn"
+                        onclick="toggleModal('modal_nuevo_evento', false)">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Orden</button>
+                </div>
+            </form>
+
+            <!-- Formulario Visita -->
+            <form id="form_visita" class="hidden evento-form" action="{{ url_for('nueva_orden', tipo='visita') }}"
+                method="POST">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Folio</span></label>
+                        <input type="text" name="folio_vt" class="input input-bordered" placeholder="VT-..." required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Cliente</span></label>
+                        <input type="text" name="nombre_cliente" class="input input-bordered" required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Fecha</span></label>
+                        <input type="date" name="fecha_vt" class="input input-bordered" value="{{ now_formatted }}"
+                            required>
+                    </div>
+                    <div class="form-control md:col-span-2">
+                        <label class="label"><span class="label-text">Dirección</span></label>
+                        <input type="text" name="direccion_cliente" class="input input-bordered">
+                    </div>
+                </div>
+                <div class="modal-action">
+                    <button type="button" class="btn"
+                        onclick="toggleModal('modal_nuevo_evento', false)">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Visita</button>
+                </div>
+            </form>
+
+            <!-- Formulario Tarificador -->
+            <form id="form_tarificador" class="hidden evento-form" action="{{ url_for('nuevo_tarificador') }}"
+                method="POST">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Folio</span></label>
+                        <input type="text" name="folio_tar" class="input input-bordered" placeholder="AUTO" required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Fecha de Muestreo</span></label>
+                        <input type="date" name="fecha_tar" class="input input-bordered" value="{{ now_formatted }}"
+                            required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Cliente</span></label>
+                        <input type="text" name="nombre_cliente" class="input input-bordered" required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label"><span class="label-text">Tipo de Análisis</span></label>
+                        <select name="tipo_analisis" class="select select-bordered">
+                            <option>Agua Potable</option>
+                            <option>Agua Residual</option>
+                            <option>Aguas Jabonosas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-action">
+                    <button type="button" class="btn"
+                        onclick="toggleModal('modal_nuevo_evento', false)">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Análisis</button>
+                </div>
+            </form>
+
+            <!-- Mensaje inicial -->
+            <div id="msg_inicial" class="text-center py-8 text-base-content/60">
+                <span class="icon-[tabler--calendar-event] size-16 mx-auto block mb-2 opacity-30"></span>
+                <p>Selecciona un tipo de actividad para comenzar</p>
+            </div>
+        </div>
+        <div class="modal-backdrop" onclick="toggleModal('modal_nuevo_evento', false)"></div>
+    </div>
+
+    <!-- Contenedor del Calendario -->
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+        <div class="card-body p-6">
+            <div id="calendar" class="min-h-[600px]"></div>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar Scripts -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día',
+                list: 'Lista'
+            },
+            events: [
+                // Ejemplo de eventos
+                {
+                    title: 'Cobro de Estimación',
+                    start: '{{ now_formatted }}', // Hoy
+                    color: '#0099cf' // Primary Cophi
+                },
+                {
+                    title: 'Entrega de Reporte',
+                    start: '{{ tomorrow_formatted }}',
+                    color: '#6ebe43' // Secondary Cophi
+                }
+            ]
+        });
+        calendar.render();
+    });
+
+    // Función para mostrar/ocultar modal
+    function toggleModal(modalId, show) {
+        const modal = document.getElementById(modalId);
+        if (show) {
+            modal.classList.add('modal-open');
+        } else {
+            modal.classList.remove('modal-open');
+            // Reset form selector
+            document.getElementById('tipo_evento').value = '';
+            cambiarFormularioEvento('');
+        }
+    }
+
+    // Función para cambiar formularios
+    function cambiarFormularioEvento(tipo) {
+        // Ocultar todos los formularios
+        document.querySelectorAll('.evento-form').forEach(form => {
+            form.classList.add('hidden');
+        });
+
+        // Ocultar mensaje inicial
+        document.getElementById('msg_inicial').classList.add('hidden');
+
+        // Mostrar el formulario seleccionado
+        if (tipo) {
+            const formId = 'form_' + tipo;
+            const targetForm = document.getElementById(formId);
+            if (targetForm) {
+                targetForm.classList.remove('hidden');
+            }
+        } else {
+            // Mostrar mensaje inicial si no hay selección
+            document.getElementById('msg_inicial').classList.remove('hidden');
+        }
+    }
+
+</script>
+
+<style>
+    /* Personalización simple para que coincida con FlyonUI */
+    :root {
+        --fc-border-color: rgba(var(--bc) / 0.1);
+        --fc-button-text-color: #fff;
+        --fc-button-bg-color: #0099cf;
+        --fc-button-border-color: #0099cf;
+        --fc-button-hover-bg-color: #007bb5;
+        --fc-button-hover-border-color: #007bb5;
+        --fc-button-active-bg-color: #006da1;
+        --fc-button-active-border-color: #006da1;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: rgba(var(--bc));
+    }
+
+    .fc .fc-col-header-cell-cushion {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: rgba(var(--bc) / 0.6);
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .fc-theme-standard td,
+    .fc-theme-standard th {
+        border-color: rgba(var(--bc) / 0.1);
+    }
+
+    /* Modal styles */
+    .modal {
+        pointer-events: none;
+        visibility: hidden;
+        opacity: 0;
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.2s ease-out, visibility 0.2s ease-out;
+    }
+
+    .modal-open {
+        pointer-events: auto;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+    }
+
+    .modal-box {
+        position: relative;
+        z-index: 1000;
+        max-height: calc(100vh - 5rem);
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}

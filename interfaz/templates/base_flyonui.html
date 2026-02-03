@@ -448,6 +448,13 @@
                                     <span class="font-medium">Directorio</span>
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{ url_for('calendario') }}"
+                                    class="{% if request.endpoint == 'calendario' %}menu-active{% else %}text-white/80 hover:text-white hover:bg-white/10{% endif %} flex items-center gap-3 px-4 py-3 rounded-lg transition-all">
+                                    <span class="icon-[tabler--calendar] size-5"></span>
+                                    <span class="font-medium">Calendario</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

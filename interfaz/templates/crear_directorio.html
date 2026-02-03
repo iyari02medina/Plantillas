@@ -11,12 +11,20 @@ Cophi{% endblock %}
                 class="btn btn-sm btn-ghost btn-circle text-base-content/60" title="Volver">
                 <span class="icon-[tabler--arrow-left] size-5"></span>
             </a>
-            <h1 class="text-3xl font-bold text-base-content m-0">{{ 'Registro de' if is_new else 'Detalle de' }} {{
-                'Cliente' if tipo == 'clientes' else 'Prospecto' }}</h1>
+            <h1 class="text-3xl font-bold text-base-content m-0">
+                {{ 'Registro de' if is_new else 'Detalle de' }} {{ 'Cliente' if tipo == 'clientes' else 'Prospecto' }}
+                {% if item.get('nombre_empresa') %}
+                <span class="text-primary">: {{ item.get('nombre_empresa') }}</span>
+                {% endif %}
+            </h1>
         </div>
         <p class="text-base-content/60 font-medium ml-10">
-            {{ 'Complete el formulario para registrar una nueva entrada.' if is_new else 'Gestión integral del perfil y
-            documentos relacionados.' }}
+            {% if item.get('nombre_empresa') %}
+            Expediente de <span class="text-base-content font-bold">{{ item.get('nombre_empresa') }}</span> — {{
+            'Gestión integral del perfil y documentos relacionados.' }}
+            {% else %}
+            {{ 'Complete el formulario para registrar una nueva entrada.' }}
+            {% endif %}
         </p>
     </div>
     {% if not is_new %}

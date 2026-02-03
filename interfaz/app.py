@@ -2447,5 +2447,14 @@ def detalle_consumo(folio):
     clientes = read_csv(CLIENTES_CSV)
     return render_template('crea_consumo.html', consumo=target, clientes=clientes)
 
+@app.route('/calendario')
+@login_required
+def calendario():
+    today = datetime.date.today()
+    tomorrow = today + datetime.timedelta(days=1)
+    return render_template('calendario.html', 
+                          now_formatted=today.isoformat(),
+                          tomorrow_formatted=tomorrow.isoformat())
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
