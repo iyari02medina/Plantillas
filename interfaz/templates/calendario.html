@@ -255,6 +255,13 @@
             window.location.href = info.event.url;
             info.jsEvent.preventDefault();
         }
+    },
+    eventDidMount: function(info) {
+        // Agregar tooltip nativo con el título completo
+        info.el.setAttribute('title', info.event.title);
+
+        // Efecto visual al pasar el mouse (opcional, ya que usaremos CSS)
+        info.el.style.cursor = 'pointer';
     }
         });
     calendar.render();
