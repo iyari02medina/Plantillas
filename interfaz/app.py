@@ -2452,9 +2452,86 @@ def detalle_consumo(folio):
 def calendario():
     today = datetime.date.today()
     tomorrow = today + datetime.timedelta(days=1)
+    
+    # Función helper para convertir fechas a formato ISO
+    def parse_fecha(fecha_str):
+        """Convierte fecha de DD/MM/YYYY o YYYY-MM-DD a YYYY-MM-DD"""
+        if not fecha_str:
+            return None
+        
+        fecha_str = str(fecha_str).strip()
+        
+        try:
+            # Intentar formato YYYY-MM-DD primero (ya está en formato ISO)
+            if '-' in fecha_str and len(fecha_str.split('-')[0]) == 4:
+                return fecha_str
+            
+            # Intentar formato DD/MM/YYYY
+            if '/' in fecha_str:
+                partes = fecha_str.split('/')
+                if len(partes) == 3:
+                    dia, mes, anio = partes
+                    return f"{anio}-{mes.zfill(2)}-{dia.zfill(2)}"
+        except:
+            pass
+        
+        return None
+    
+    # Leer todos los eventos de los CSVs
+    eventos = []
+    
+    # Órdenes de Desazolve
+    desazolves = read_csv(ORDENES_CSV)
+    for d in desazolves:
+        fecha_iso = parse_fecha(d.get('fecha_des', ''))
+        if fecha_iso:
+            eventos.append({
+                'title': f"Desazolve - {d.get('nombre_cliente', 'Sin cliente')}",
+                'start': fecha_iso,
+                'color': '#0099cf',  # Primary
+                'url': f"/orden/desazolve/{d.get('folio_des', '')}"
+            })
+    
+    # Órdenes de Trampa
+    trampas = read_csv(TRAMPAS_CSV)
+    for t in trampas:
+        fecha_iso = parse_fecha(t.get('fecha_lt', ''))
+        if fecha_iso:
+            eventos.append({
+                'title': f"Trampa - {t.get('nombre_cliente', 'Sin cliente')}",
+                'start': fecha_iso,
+                'color': '#6ebe43',  # Secondary
+                'url': f"/orden/trampa/{t.get('folio_lt', '')}"
+            })
+    
+    # Visitas Técnicas
+    visitas = read_csv(VISITAS_CSV)
+    for v in visitas:
+        fecha_iso = parse_fecha(v.get('fecha_vt', ''))
+        if fecha_iso:
+            eventos.append({
+                'title': f"Visita - {v.get('nombre_cliente', 'Sin cliente')}",
+                'start': fecha_iso,
+                'color': '#ff9800',  # Orange
+                'url': f"/orden/visita/{v.get('folio_vt', '')}"
+            })
+    
+    # Análisis de Laboratorio
+    tarificador = read_csv(TARIFICADOR_CSV)
+    for tar in tarificador:
+        fecha_iso = parse_fecha(tar.get('fecha_tar', ''))
+        if fecha_iso:
+            eventos.append({
+                'title': f"Análisis - {tar.get('nombre_cliente', 'Sin cliente')}",
+                'start': fecha_iso,
+                'color': '#9c27b0',  # Purple
+                'url': f"/tarificador/{tar.get('folio_tar', '')}"
+            })
+    
     return render_template('calendario.html', 
                           now_formatted=today.isoformat(),
-                          tomorrow_formatted=tomorrow.isoformat())
+                          tomorrow_formatted=tomorrow.isoformat(),
+                          eventos=eventos)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

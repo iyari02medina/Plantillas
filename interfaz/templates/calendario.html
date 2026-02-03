@@ -10,8 +10,27 @@
             <h1 class="text-3xl font-bold text-base-content m-0">Calendario</h1>
             <p class="text-base-content/60 font-medium ml-1">Planificación y seguimiento de actividades.</p>
         </div>
-        <!-- Acciones del calendario (opcional) -->
-        <div class="flex gap-2">
+        <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center w-full sm:w-auto">
+            <!-- Leyenda de colores -->
+            <div class="flex flex-wrap gap-2 text-sm">
+                <span class="badge badge-lg gap-1" style="background-color: #0099cf; color: white;">
+                    <span class="size-2 rounded-full bg-white"></span>
+                    Desazolve
+                </span>
+                <span class="badge badge-lg gap-1" style="background-color: #6ebe43; color: white;">
+                    <span class="size-2 rounded-full bg-white"></span>
+                    Trampa
+                </span>
+                <span class="badge badge-lg gap-1" style="background-color: #ff9800; color: white;">
+                    <span class="size-2 rounded-full bg-white"></span>
+                    Visita
+                </span>
+                <span class="badge badge-lg gap-1" style="background-color: #9c27b0; color: white;">
+                    <span class="size-2 rounded-full bg-white"></span>
+                    Análisis
+                </span>
+            </div>
+            <!-- Botón Nuevo Evento -->
             <button class="btn btn-primary shadow-sm" onclick="toggleModal('modal_nuevo_evento', true)">
                 <span class="icon-[tabler--plus] size-5"></span>
                 Nuevo Evento
@@ -209,36 +228,36 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'es',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            buttonText: {
-                today: 'Hoy',
-                month: 'Mes',
-                week: 'Semana',
-                day: 'Día',
-                list: 'Lista'
-            },
-            events: [
-                // Ejemplo de eventos
-                {
-                    title: 'Cobro de Estimación',
-                    start: '{{ now_formatted }}', // Hoy
-                    color: '#0099cf' // Primary Cophi
-                },
-                {
-                    title: 'Entrega de Reporte',
-                    start: '{{ tomorrow_formatted }}',
-                    color: '#6ebe43' // Secondary Cophi
-                }
-            ]
+
+        // Debug: ver eventos cargados
+        var eventos = {{ eventos | tojson | safe
+    }};
+    console.log('Eventos cargados:', eventos);
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'es',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        buttonText: {
+            today: 'Hoy',
+            month: 'Mes',
+            week: 'Semana',
+            day: 'Día',
+            list: 'Lista'
+        },
+        events: {{ eventos | tojson | safe }},
+    eventClick: function (info) {
+        if (info.event.url) {
+            window.location.href = info.event.url;
+            info.jsEvent.preventDefault();
+        }
+    }
         });
-        calendar.render();
+    calendar.render();
     });
 
     // Función para mostrar/ocultar modal
