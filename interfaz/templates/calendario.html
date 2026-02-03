@@ -237,6 +237,7 @@
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'es',
+        editable: true,  // Habilitar drag and drop
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
@@ -250,7 +251,7 @@
             list: 'Lista'
         },
         events: {{ eventos | tojson | safe }},
-    eventClick: function (info) {
+    eventClick: function(info) {
         if (info.event.url) {
             window.location.href = info.event.url;
             info.jsEvent.preventDefault();
@@ -259,11 +260,54 @@
     eventDidMount: function(info) {
         // Agregar tooltip nativo con el título completo
         info.el.setAttribute('title', info.event.title);
-
-        // Efecto visual al pasar el mouse (opcional, ya que usaremos CSS)
         info.el.style.cursor = 'pointer';
+    },
+    eventDrop: function(info) {
+        // Obtener la nueva fecha en formato YYYY-MM-DD
+        var nuevaFecha = info.event.startStr;
+        var urlEvento = info.event.url;
+
+        // Determinar el tipo de evento y folio desde la URL
+        var partes = urlEvento.split('/');
+        var tipo = '';
+        var folio = '';
+
+        if (urlEvento.includes('/orden/')) {
+            tipo = partes[partes.length - 2]; // desazolve, trampa, visita
+            folio = partes[partes.length - 1];
+        } else if (urlEvento.includes('/tarificador/')) {
+            tipo = 'tarificador';
+            folio = partes[partes.length - 1];
+        }
+
+        // Enviar la actualización al servidor
+        fetch('/api/actualizar_fecha_evento', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tipo: tipo,
+                folio: folio,
+                nueva_fecha: nuevaFecha
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Fecha actualizada correctamente');
+                } else {
+                    alert('Error al actualizar la fecha: ' + data.error);
+                    info.revert(); // Revertir el cambio visual
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error de conexión al actualizar la fecha');
+                info.revert();
+            });
     }
-        });
+    });
     calendar.render();
     });
 

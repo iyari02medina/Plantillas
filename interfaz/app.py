@@ -2533,5 +2533,60 @@ def calendario():
                           tomorrow_formatted=tomorrow.isoformat(),
                           eventos=eventos)
 
+@app.route('/api/actualizar_fecha_evento', methods=['POST'])
+@login_required
+def actualizar_fecha_evento():
+    """API para actualizar la fecha de un evento (drag and drop del calendario)"""
+    from flask import jsonify
+    
+    try:
+        data = request.get_json()
+        tipo = data.get('tipo', '')
+        folio = data.get('folio', '')
+        nueva_fecha = data.get('nueva_fecha', '')  # Formato YYYY-MM-DD
+        
+        if not tipo or not folio or not nueva_fecha:
+            return jsonify({'success': False, 'error': 'Datos incompletos'})
+        
+        # Determinar qué CSV modificar y qué campo de fecha usar
+        csv_info = {
+            'desazolve': {'csv': ORDENES_CSV, 'campo_folio': 'folio_des', 'campo_fecha': 'fecha_des'},
+            'trampa': {'csv': TRAMPAS_CSV, 'campo_folio': 'folio_lt', 'campo_fecha': 'fecha_lt'},
+            'visita': {'csv': VISITAS_CSV, 'campo_folio': 'folio_vt', 'campo_fecha': 'fecha_vt'},
+            'tarificador': {'csv': TARIFICADOR_CSV, 'campo_folio': 'folio_tar', 'campo_fecha': 'fecha_tar'}
+        }
+        
+        if tipo not in csv_info:
+            return jsonify({'success': False, 'error': f'Tipo de evento no válido: {tipo}'})
+        
+        info = csv_info[tipo]
+        csv_path = info['csv']
+        campo_folio = info['campo_folio']
+        campo_fecha = info['campo_fecha']
+        
+        # Leer el CSV
+        rows = read_csv(csv_path)
+        
+        # Buscar y actualizar el registro
+        encontrado = False
+        for row in rows:
+            if row.get(campo_folio) == folio:
+                row[campo_fecha] = nueva_fecha
+                encontrado = True
+                break
+        
+        if not encontrado:
+            return jsonify({'success': False, 'error': f'No se encontró el evento con folio {folio}'})
+        
+        # Guardar el CSV actualizado
+        if rows:
+            fieldnames = list(rows[0].keys())
+            overwrite_csv(csv_path, fieldnames, rows)
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
