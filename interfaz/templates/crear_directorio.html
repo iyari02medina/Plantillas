@@ -4,18 +4,19 @@
 Cophi{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
     <div>
-        <div class="flex items-center gap-2 mb-1">
-            <a href="{{ url_for('ver_directorio', tipo=tipo) }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
+        <div class="flex items-center gap-3 mb-1">
+            <a href="{{ url_for('ver_directorio', tipo=tipo) }}"
+                class="btn btn-sm btn-ghost btn-circle text-base-content/60" title="Volver">
                 <span class="icon-[tabler--arrow-left] size-5"></span>
             </a>
-            <h1 class="text-3xl font-bold text-base-content">{{ 'Registro de' if is_new else 'Detalle de' }} {{
+            <h1 class="text-3xl font-bold text-base-content m-0">{{ 'Registro de' if is_new else 'Detalle de' }} {{
                 'Cliente' if tipo == 'clientes' else 'Prospecto' }}</h1>
         </div>
         <p class="text-base-content/60 font-medium ml-10">
-            {% if is_new %}Ingrese los datos para registrar un nuevo registro en el directorio.{% else %}Gestión
-            integral del perfil del cliente y documentos relacionados.{% endif %}
+            {{ 'Complete el formulario para registrar una nueva entrada.' if is_new else 'Gestión integral del perfil y
+            documentos relacionados.' }}
         </p>
     </div>
     {% if not is_new %}
@@ -28,39 +29,29 @@ Cophi{% endblock %}
     {% endif %}
 </div>
 
-<!-- Navegación de Pestañas (Sticky) -->
+<!-- Menú de Navegación y Acciones (Solo visible en modo edición/detalle) -->
 {% if not is_new %}
-<div class="sticky top-0 z-20 bg-base-100/80 backdrop-blur-md pb-4 mb-8 border-b border-base-content/10">
-    <div class="flex flex-nowrap overflow-x-auto gap-2 py-2 no-scrollbar">
-        <button onclick="showTab('general')" id="btn-general" class="btn btn-primary btn-sm md:btn-md rounded-full">
-            <span class="icon-[tabler--info-circle] size-4"></span>
-            General
-        </button>
-        <button onclick="showTab('cotizaciones')" id="btn-cotizaciones"
-            class="btn btn-ghost btn-sm md:btn-md rounded-full border border-transparent hover:border-base-content/10">
-            <span class="icon-[tabler--file-description] size-4"></span>
-            Cotizaciones
-        </button>
-        <button onclick="showTab('ordenes')" id="btn-ordenes"
-            class="btn btn-ghost btn-sm md:btn-md rounded-full border border-transparent hover:border-base-content/10">
-            <span class="icon-[tabler--clipboard-list] size-4"></span>
-            Órdenes
-        </button>
-        <button onclick="showTab('tarificador')" id="btn-tarificador"
-            class="btn btn-ghost btn-sm md:btn-md rounded-full border border-transparent hover:border-base-content/10">
-            <span class="icon-[tabler--calculator] size-4"></span>
-            Tarificador
-        </button>
-        <button onclick="showTab('permisos')" id="btn-permisos"
-            class="btn btn-ghost btn-sm md:btn-md rounded-full border border-transparent hover:border-base-content/10">
-            <span class="icon-[tabler--file-check] size-4"></span>
-            Permisos
-        </button>
-        <button onclick="showTab('consumos')" id="btn-consumos"
-            class="btn btn-ghost btn-sm md:btn-md rounded-full border border-transparent hover:border-base-content/10">
-            <span class="icon-[tabler--droplet] size-4"></span>
-            Consumos
-        </button>
+<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
+    <div class="card-body gap-6">
+        <h6 class="text-base-content/70 font-semibold mb-0">Sección:</h6>
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+            <div class="input max-w-xl items-center pe-0">
+                <select id="tab-selector" class="select select-sm w-full md:w-auto min-w-[200px]"
+                    aria-label="Seleccionar sección" onchange="showTab(this.value)">
+                    <option value="general" selected>Información General</option>
+                    <option value="cotizaciones">Cotizaciones</option>
+                    <option value="ordenes">Órdenes de Trabajo</option>
+                    <option value="tarificador">Tarificador</option>
+                    <option value="permisos">Permisos de Descarga</option>
+                    <option value="consumos">Consumos de Agua</option>
+                </select>
+            </div>
+            <!-- Acciones Dinámicas según Tab -->
+            <div id="tab-actions" class="flex gap-3">
+                <!-- Se llenará con JS -->
+            </div>
+        </div>
+
     </div>
 </div>
 {% endif %}
@@ -88,32 +79,29 @@ Cophi{% endblock %}
                     </div>
                     <div class="card-body p-6 space-y-4">
                         <div class="form-control">
-                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Nombre
-                                Empresa / Negocio</label>
+                            <label class="label font-bold text-xs uppercase text-base-content/60">Nombre Empresa /
+                                Negocio</label>
                             <input type="text" name="nombre_empresa" value="{{ item.get('nombre_empresa', '') }}"
-                                required class="input input-bordered w-full font-bold" {% if not is_new %}disabled{%
-                                endif %} placeholder="Ej. Abarrotes Don Pepe">
+                                required class="input input-bordered w-full font-black text-primary" {% if not is_new
+                                %}disabled{% endif %} placeholder="Ej. Abarrotes Don Pepe">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="form-control">
-                                <label
-                                    class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Tipo /
+                                <label class="label font-bold text-xs uppercase text-base-content/60">Tipo /
                                     Giro</label>
                                 <input type="text" name="tipo_empresa" value="{{ item.get('tipo_empresa', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
                                     placeholder="Ej. Restaurante, Taller...">
                             </div>
                             <div class="form-control">
-                                <label
-                                    class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Teléfono</label>
+                                <label class="label font-bold text-xs uppercase text-base-content/60">Teléfono</label>
                                 <input type="text" name="telefono_empresa"
                                     value="{{ item.get('telefono_empresa', '') }}" class="input input-bordered w-full"
                                     {% if not is_new %}disabled{% endif %} placeholder="Ej. 55 1234 5678">
                             </div>
                         </div>
                         <div class="form-control">
-                            <label
-                                class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Dirección
+                            <label class="label font-bold text-xs uppercase text-base-content/60">Dirección
                                 Completa</label>
                             <textarea name="direccion_empresa" class="textarea textarea-bordered w-full" rows="3" {% if
                                 not is_new %}disabled{% endif %}
@@ -131,36 +119,34 @@ Cophi{% endblock %}
                     </div>
                     <div class="card-body p-6 space-y-4">
                         <div class="form-control">
-                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Razón
-                                Social</label>
+                            <label class="label font-bold text-xs uppercase text-base-content/60">Razón Social</label>
                             <input type="text" name="razon_social" value="{{ item.get('razon_social', '') }}"
-                                class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
+                                class="input input-bordered w-full font-bold text-secondary" {% if not is_new
+                                %}disabled{% endif %} placeholder="Razón Social Completa">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="form-control">
-                                <label
-                                    class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Giro
+                                <label class="label font-bold text-xs uppercase text-base-content/60">Giro
                                     Licencia</label>
                                 <input type="text" name="giro_licencia" value="{{ item.get('giro_licencia', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                             </div>
                             <div class="form-control">
-                                <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">NIS
+                                <label class="label font-bold text-xs uppercase text-base-content/60">NIS
                                     (Contrato Agua)</label>
                                 <input type="text" name="nis" value="{{ item.get('nis', '') }}"
                                     class="input input-bordered w-full font-mono text-secondary" {% if not is_new
                                     %}disabled{% endif %}>
                             </div>
                             <div class="form-control">
-                                <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">No.
-                                    Permiso Descargas</label>
+                                <label class="label font-bold text-xs uppercase text-base-content/60">No. Permiso
+                                    Descargas</label>
                                 <input type="text" name="no_permiso_descargas"
                                     value="{{ item.get('no_permiso_descargas', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                             </div>
                             <div class="form-control">
-                                <label
-                                    class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Vigencia
+                                <label class="label font-bold text-xs uppercase text-base-content/60">Vigencia
                                     Permiso</label>
                                 <input type="text" name="vegencia_permiso_descargas"
                                     value="{{ item.get('vegencia_permiso_descargas', '') }}"
@@ -186,30 +172,30 @@ Cophi{% endblock %}
                                     class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
                                     Almacenamiento</h4>
                                 <div class="form-control">
-                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Cisternas
+                                    <label class="label text-xs uppercase font-bold text-base-content/60">Cisternas
                                         (No. / Cap.)</label>
-                                    <div class="join w-full">
+                                    <div class="flex gap-2">
                                         <input type="text" name="total_cisternas"
                                             value="{{ item.get('total_cisternas', '') }}"
-                                            class="input input-bordered join-item w-1/3" placeholder="No." {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-1/3" placeholder="No." {% if not is_new
+                                            %}disabled{% endif %}>
                                         <input type="text" name="cap_cisternas"
                                             value="{{ item.get('cap_cisternas', '') }}"
-                                            class="input input-bordered join-item w-2/3" placeholder="Liters" {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-2/3" placeholder="Liters" {% if not is_new
+                                            %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <div class="form-control">
-                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Tinacos
+                                    <label class="label text-xs uppercase font-bold text-base-content/60">Tinacos
                                         (No. / Cap.)</label>
-                                    <div class="join w-full">
+                                    <div class="flex gap-2">
                                         <input type="text" name="total_tinacos"
                                             value="{{ item.get('total_tinacos', '') }}"
-                                            class="input input-bordered join-item w-1/3" placeholder="No." {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-1/3" placeholder="No." {% if not is_new
+                                            %}disabled{% endif %}>
                                         <input type="text" name="cap_tinacos" value="{{ item.get('cap_tinacos', '') }}"
-                                            class="input input-bordered join-item w-2/3" placeholder="Liters" {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-2/3" placeholder="Liters" {% if not is_new
+                                            %}disabled{% endif %}>
                                     </div>
                                 </div>
                             </div>
@@ -220,28 +206,28 @@ Cophi{% endblock %}
                                     class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
                                     Abastecimiento</h4>
                                 <div class="form-control">
-                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Pozo
+                                    <label class="label text-xs uppercase font-bold text-base-content/60">Pozo
                                         (Si-No / No. Conc)</label>
-                                    <div class="join w-full">
+                                    <div class="flex gap-2">
                                         <input type="text" name="pozo" value="{{ item.get('pozo', '') }}"
-                                            class="input input-bordered join-item w-1/3" placeholder="S/N" {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-1/3" placeholder="S/N" {% if not is_new
+                                            %}disabled{% endif %}>
                                         <input type="text" name="num_concesion_pozo"
                                             value="{{ item.get('num_concesion_pozo', '') }}"
-                                            class="input input-bordered join-item w-2/3" placeholder="Concesión" {% if
-                                            not is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-2/3" placeholder="Concesión" {% if not is_new
+                                            %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <div class="form-control">
-                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Tomas /
+                                    <label class="label text-xs uppercase font-bold text-base-content/60">Tomas /
                                         Red (No. / Red)</label>
-                                    <div class="join w-full">
+                                    <div class="flex gap-2">
                                         <input type="text" name="num_tomas" value="{{ item.get('num_tomas', '') }}"
-                                            class="input input-bordered join-item w-1/3" placeholder="No." {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-1/3" placeholder="No." {% if not is_new
+                                            %}disabled{% endif %}>
                                         <input type="text" name="red" value="{{ item.get('red', '') }}"
-                                            class="input input-bordered join-item w-2/3" placeholder="Municipal?" {% if
-                                            not is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-2/3" placeholder="Municipal?" {% if not is_new
+                                            %}disabled{% endif %}>
                                     </div>
                                 </div>
                             </div>
@@ -252,31 +238,31 @@ Cophi{% endblock %}
                                     class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
                                     Pipas y Medidor</h4>
                                 <div class="form-control">
-                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Pipas
+                                    <label class="label text-xs uppercase font-bold text-base-content/60">Pipas
                                         (Prom. / Cap.)</label>
-                                    <div class="join w-full">
+                                    <div class="flex gap-2">
                                         <input type="text" name="prom_pipas_mes"
                                             value="{{ item.get('prom_pipas_mes', '') }}"
-                                            class="input input-bordered join-item w-1/2" placeholder="Mes" {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-1/2" placeholder="Mes" {% if not is_new
+                                            %}disabled{% endif %}>
                                         <input type="text" name="capacidad_pipas"
                                             value="{{ item.get('capacidad_pipas', '') }}"
-                                            class="input input-bordered join-item w-1/2" placeholder="Cap." {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-1/2" placeholder="Cap." {% if not is_new
+                                            %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <div class="form-control">
-                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Medidor
+                                    <label class="label text-xs uppercase font-bold text-base-content/60">Medidor
                                         (S-N / Serie)</label>
-                                    <div class="join w-full">
+                                    <div class="flex gap-2">
                                         <input type="text" name="medidor_agua "
                                             value="{{ item.get('medidor_agua ', '') }}"
-                                            class="input input-bordered join-item w-1/3" placeholder="S/N" {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-1/3" placeholder="S/N" {% if not is_new
+                                            %}disabled{% endif %}>
                                         <input type="text" name="no_serie_medidor"
                                             value="{{ item.get('no_serie_medidor', '') }}"
-                                            class="input input-bordered join-item w-2/3" placeholder="Serie" {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-2/3" placeholder="Serie" {% if not is_new
+                                            %}disabled{% endif %}>
                                     </div>
                                 </div>
                             </div>
@@ -287,30 +273,30 @@ Cophi{% endblock %}
                                     class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
                                     Descargas</h4>
                                 <div class="form-control">
-                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Registro
+                                    <label class="label text-xs uppercase font-bold text-base-content/60">Registro
                                         (S-N / Loc.)</label>
-                                    <div class="join w-full">
+                                    <div class="flex gap-2">
                                         <input type="text" name="tiene_registro"
                                             value="{{ item.get('tiene_registro', '') }}"
-                                            class="input input-bordered join-item w-1/3" placeholder="S/N" {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-1/3" placeholder="S/N" {% if not is_new
+                                            %}disabled{% endif %}>
                                         <input type="text" name="localización_registro"
                                             value="{{ item.get('localización_registro', '') }}"
-                                            class="input input-bordered join-item w-2/3" placeholder="Ubicación" {% if
-                                            not is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-2/3" placeholder="Ubicación" {% if not is_new
+                                            %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <div class="form-control">
-                                    <label class="label text-[10px] uppercase font-bold text-base-content/60">Trampas
+                                    <label class="label text-xs uppercase font-bold text-base-content/60">Trampas
                                         (No. / Cap.)</label>
-                                    <div class="join w-full">
+                                    <div class="flex gap-2">
                                         <input type="text" name="no_trampas_grasa"
                                             value="{{ item.get('no_trampas_grasa', '') }}"
-                                            class="input input-bordered join-item w-1/3" placeholder="No." {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-1/3" placeholder="No." {% if not is_new
+                                            %}disabled{% endif %}>
                                         <input type="text" name="cap_trampas" value="{{ item.get('cap_trampas', '') }}"
-                                            class="input input-bordered join-item w-2/3" placeholder="Cap." {% if not
-                                            is_new %}disabled{% endif %}>
+                                            class="input input-bordered w-2/3" placeholder="Cap." {% if not is_new
+                                            %}disabled{% endif %}>
                                     </div>
                                 </div>
                             </div>
@@ -338,7 +324,6 @@ Cophi{% endblock %}
             <div
                 class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center">
                 <span>Historial de Cotizaciones</span>
-                <a href="{{ url_for('nueva_cotizacion') }}" class="btn btn-xs btn-primary">+ Nueva</a>
             </div>
             <div class="card-body p-0">
                 <div class="overflow-x-auto">
@@ -544,7 +529,8 @@ Cophi{% endblock %}
                                 current_tariff.tarifa_saneamiento }}</span></div>
                         <div
                             class="pt-2 border-t border-base-content/5 flex justify-between text-lg font-black text-primary">
-                            <span>Total:</span><span>${{ current_tariff.total_tarifa }}</span></div>
+                            <span>Total:</span><span>${{ current_tariff.total_tarifa }}</span>
+                        </div>
                     </div>
                     {% else %}
                     <div class="text-center py-4 opacity-30 italic text-sm">Sin datos de tarifa.</div>
@@ -619,6 +605,7 @@ Cophi{% endblock %}
 
 </div>
 
+{% block scripts %}
 <script>
     function enableEdit() {
         document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
@@ -629,24 +616,34 @@ Cophi{% endblock %}
     }
 
     function showTab(tabName) {
+        // Ocultar todos los contenidos
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById('tab-' + tabName).classList.remove('hidden');
+        // Mostrar contenido seleccionado
+        const targetTab = document.getElementById('tab-' + tabName);
+        if (targetTab) targetTab.classList.remove('hidden');
 
-        document.querySelectorAll('button[id^="btn-"]').forEach(btn => {
-            if (btn.id !== 'btn-submit' && btn.id !== 'btn-editar') {
-                btn.classList.remove('btn-primary', 'shadow-md');
-                btn.classList.add('btn-ghost');
-            }
-        });
+        // Actualizar el valor del selector si el cambio vino de otro lado (opcional)
+        const selector = document.getElementById('tab-selector');
+        if (selector) selector.value = tabName;
 
-        const activeBtn = document.getElementById('btn-' + tabName);
-        if (activeBtn) {
-            activeBtn.classList.remove('btn-ghost');
-            activeBtn.classList.add('btn-primary', 'shadow-md');
+        // Actualizar botones de acción (ejemplo: si estamos en Cotizaciones, mostrar botón de Nueva Cotización)
+        updateActionButtons(tabName);
+    }
+
+    function updateActionButtons(tabName) {
+        const container = document.getElementById('tab-actions');
+        if (!container) return;
+
+        container.innerHTML = ''; // Limpiar
+
+        if (tabName === 'cotizaciones') {
+            const btn = document.createElement('a');
+            btn.href = "{{ url_for('nueva_cotizacion') }}";
+            btn.className = "btn btn-primary";
+            btn.innerHTML = '<span class="icon-[tabler--plus] size-5"></span><span class="hidden sm:inline">Nueva Cotización</span>';
+            container.appendChild(btn);
         }
-
-        // Horizontal scroll to button on mobile
-        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
 </script>
+{% endblock %}
 {% endblock %}
