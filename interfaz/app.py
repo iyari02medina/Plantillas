@@ -2034,10 +2034,12 @@ def eliminar_directorio_item(tipo, id_val):
         
         key = 'id_cliente' if tipo == 'clientes' else 'folio'
         
-        # Primary deletion filter
+        # Deletion logic: try primary key, then ID (for clients), then name
         updated_rows = [r for r in existing if str(r.get(key, '')).strip() != str(id_val).strip()]
         
-        # Fallback filter mapping the logic in detalle_directorio
+        if len(updated_rows) == len(existing) and tipo == 'clientes':
+            updated_rows = [r for r in existing if str(r.get('ID', '')).strip() != str(id_val).strip()]
+
         if len(updated_rows) == len(existing):
             normalized_id_val = str(id_val).strip().lower()
             updated_rows = [r for r in existing if str(r.get('nombre_empresa', '')).strip().lower() != normalized_id_val]
@@ -2072,7 +2074,11 @@ def detalle_directorio(tipo, id_val):
     key = 'id_cliente' if tipo == 'clientes' else 'folio'
     item = next((r for r in data if str(r.get(key, '')).strip() == str(id_val).strip()), None)
     
-    # Fallback to name if not found by ID (for records with missing IDs like KHEIRO)
+    # Fallback to 'ID' for clients if primary key didn't match
+    if not item and tipo == 'clientes':
+        item = next((r for r in data if str(r.get('ID', '')).strip() == str(id_val).strip()), None)
+
+    # Fallback to name if not found by ID
     if not item:
         normalized_id_val = str(id_val).strip().lower()
         item = next((r for r in data if str(r.get('nombre_empresa', '')).strip().lower() == normalized_id_val), None)
@@ -2207,6 +2213,11 @@ def guardar_directorio(tipo):
     if id_val:
         # Update
         target = next((r for r in existing if str(r.get(key, '')).strip() == str(id_val).strip()), None)
+        
+        # Fallback to 'ID' for clients
+        if not target and tipo == 'clientes':
+            target = next((r for r in existing if str(r.get('ID', '')).strip() == str(id_val).strip()), None)
+
         # Fallback to name if ID search fails (for KHEIRO-like cases)
         if not target:
             target = next((r for r in existing if str(r.get('nombre_empresa', '')).strip().lower() == str(id_val).strip().lower()), None)
