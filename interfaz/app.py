@@ -46,7 +46,8 @@ COTIZACIONES_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cotizacion', 'c
 ORDENES_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Orden de trabajo', 'ordenes_desazolve.csv'))
 TRAMPAS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Orden de trabajo', 'ordenes_trampas.csv'))
 VISITAS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Visita_tecnica', 'datos_visita_tecnica.csv'))
-INVENTARIO_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'productos_servicios.csv'))
+PRODUCTOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'productos.csv'))
+SERVICIOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'servicios.csv'))
 CLIENTES_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'inventario', 'empresas.csv'))
 TARIFICADOR_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'tarificador', 'datos_tarificador.csv'))
 PERMISOS_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cuestionario_permiso_descargas', 'cuestionario_variables.csv'))
@@ -451,7 +452,31 @@ def nueva_cotizacion():
         return redirect(url_for('cotizaciones'))
 
     # Load inventory and clients for the form
-    inventario = read_csv(INVENTARIO_CSV)
+    # Load inventory from both files
+    productos = read_csv(PRODUCTOS_CSV)
+    servicios = read_csv(SERVICIOS_CSV)
+    
+    # Add 'categoria' or type if missing and harmonize keys
+    inventario = []
+    
+    # Normalize keys function
+    def normalize_item(item, tipo):
+        # Ensure we have common keys: nombre, descripcion, precio, unidad, categoria
+        # Note: CSV headers might be capitalized. We'll map them.
+        return {
+            'nombre': item.get('Nombre', item.get('nombre', '')),
+            'descripcion': item.get('Nombre', item.get('nombre', '')), # Use name as description if separate desc not available
+            'precio': item.get('Precio', item.get('precio', '0')),
+            'unidad': item.get('Unidad', item.get('unidad', 'pza')),
+            'categoria': item.get('Categoría', item.get('categoria', tipo))
+        }
+
+    for p in productos:
+        inventario.append(normalize_item(p, 'Producto'))
+        
+    for s in servicios:
+        inventario.append(normalize_item(s, 'Servicio'))
+
     clientes = read_csv(CLIENTES_CSV)
     
     # Get next folio suggestion

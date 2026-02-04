@@ -1,2 +1,3 @@
 ID,Nombre,Categoría,Unidad,Precio
-
+SERV-001,Mano de Obra General,Servicios,Hora,150.00
+SERV-002,Flete Local,Logística,Viaje,500.00

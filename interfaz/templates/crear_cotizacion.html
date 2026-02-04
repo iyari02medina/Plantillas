@@ -35,7 +35,7 @@
 
         <!-- Columna Izquierda: Datos Cliente -->
         <div class="lg:col-span-1 space-y-6">
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
                 <div
                     class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                     <span class="icon-[tabler--file-info] size-5 text-primary"></span>
@@ -107,14 +107,14 @@
 
         <!-- Columna Derecha: Conceptos -->
         <div class="lg:col-span-2 space-y-6">
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm" style="min-height: 350px;">
                 <div
                     class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center">
                     <h3 class="text-sm font-black uppercase tracking-widest text-base-content/40">Conceptos de la
                         Cotización</h3>
                 </div>
-                <div class="card-body p-0">
-                    <div class="overflow-x-auto">
+                <div class="card-body p-0 overflow-visible">
+                    <div class="">
                         <table class="table table-lg">
                             <thead class="bg-base-200/30">
                                 <tr>
@@ -212,17 +212,13 @@
     </div>
 </form>
 
-<datalist id="inventory_list">
-    {% for item in items_inventario %}
-    <option value="{{ item.nombre }}" data-desc="{{ item.descripcion }}" data-unit="{{ item.unidad }}"
-        data-price="{{ item.precio }}">
-        ${{ item.precio }} - {{ item.descripcion }}
-    </option>
-    {% endfor %}
-</datalist>
-
 <script id="clients-data" type="application/json">{{ clientes|tojson|safe }}</script>
-<script src="{{ url_for('static', filename='crear_cotizacion.js') }}"></script>
+<script id="inventory-data" type="application/json">{{ inventario|tojson|safe }}</script>
+<script>
+    // Make it global BEFORE the external script runs logic that might need it (although logic is in functions)
+    window.inventoryData = JSON.parse(document.getElementById('inventory-data').textContent);
+</script>
+<script src="{{ url_for('static', filename='crear_cotizacion.js') }}?v={{ range(1, 10000) | random }}"></script>
 
 <script>
     const clientsData = JSON.parse(document.getElementById('clients-data').textContent);
