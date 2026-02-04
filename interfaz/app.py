@@ -1615,14 +1615,26 @@ def nuevo_permiso_descarga():
                 if not os.path.exists(upload_folder):
                     os.makedirs(upload_folder)
                 
-                # Nombre seguro: NIS_Timestamp_Filename
-                import time
+                # 1. Borrar imagen anterior si existe para no llenar la memoria
+                old_img = new_row.get('croquis_imagen')
+                if old_img:
+                    old_path = os.path.join(upload_folder, old_img)
+                    if os.path.exists(old_path):
+                        try:
+                            os.remove(old_path)
+                        except:
+                            pass # Ignorar si no se puede borrar en ese momento
+                
+                # 2. Guardar la nueva imagen
                 from werkzeug.utils import secure_filename
                 
                 fname = secure_filename(croquis_file.filename)
-                safe_nis = str(nis).strip().replace('/', '').replace('\\', '')
-                timestamp = int(time.time())
-                final_name = f"{safe_nis}_{timestamp}_{fname}"
+                safe_nis = str(nis).strip().replace('/', '').replace('\\', '').replace(' ', '_')
+                
+                # Usar un nombre predecible basado en NIS para evitar duplicados
+                # Agregamos la extensión original
+                ext = fname.rsplit('.', 1)[1].lower() if '.' in fname else 'jpg'
+                final_name = f"croquis_{safe_nis}.{ext}"
                 
                 save_path = os.path.join(upload_folder, final_name)
                 croquis_file.save(save_path)
@@ -1630,7 +1642,6 @@ def nuevo_permiso_descarga():
                 new_row['croquis_imagen'] = final_name
             except Exception as e:
                 print(f"Error saving croquis: {e}")
-                # No interrumpe el flujo principal, solo no guarda la imagen
             
         # Normalización de Si/No y NIS
         new_row['nis'] = str(nis).strip()
