@@ -637,7 +637,15 @@ def ordenes():
             if match: filtered_v.append(o)
         visitas = filtered_v
 
-    return render_template('ordenes.html', desazolves=desazolves, trampas=trampas, visitas=visitas)
+    # Prepare data for client autocomplete
+    empresas = read_csv(CLIENTES_CSV)
+    clientes_all = sorted(list(set(row.get('nombre_empresa', row.get('nombre_cliente', '')).strip() for row in empresas if row.get('nombre_empresa') or row.get('nombre_cliente'))))
+
+    return render_template('ordenes.html', 
+                         desazolves=desazolves, 
+                         trampas=trampas, 
+                         visitas=visitas,
+                         clientes_all=clientes_all)
 
 @app.route('/tarificador')
 @login_required

@@ -40,7 +40,7 @@
 </div>
 
 <!-- DESAZOLVES -->
-<div id="tab-desazolve" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+<div id="tab-desazolve" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-visible">
     <div class="card-header bg-base-200/30 p-4 border-b border-base-content/10">
         <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
             <span class="icon-[tabler--list-details] size-5"></span>
@@ -65,8 +65,16 @@
                 <div class="form-control lg:col-span-2">
                     <label
                         class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
-                    <input type="text" name="cliente" class="input input-bordered w-full h-10"
-                        placeholder="Filtrar por cliente..." value="{{ request.args.get('cliente', '') }}">
+                    <div class="relative w-full">
+                        <input type="text" name="cliente" class="input input-bordered w-full h-10"
+                            placeholder="Buscar cliente..." value="{{ request.args.get('cliente', '') }}"
+                            autocomplete="off" oninput="filterGeneric(this, 'clientes')"
+                            onfocus="filterGeneric(this, 'clientes')">
+
+                        <div
+                            class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Servicio -->
@@ -134,7 +142,7 @@
         </form>
     </div>
 
-    <div class="card-body p-0">
+    <div class="card-body p-0 overflow-visible">
         <div class="overflow-x-auto">
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
@@ -225,7 +233,7 @@
 </div>
 
 <!-- TRAMPAS -->
-<div id="tab-trampas" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden hidden">
+<div id="tab-trampas" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-visible hidden">
     <div class="card-header bg-base-200/30 p-4 border-b border-base-content/10">
         <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
             <span class="icon-[tabler--list-details] size-5"></span>
@@ -250,8 +258,16 @@
                 <div class="form-control">
                     <label
                         class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
-                    <input type="text" name="t_cliente" class="input input-bordered w-full h-10"
-                        placeholder="Filtrar por cliente..." value="{{ request.args.get('t_cliente', '') }}">
+                    <div class="relative w-full">
+                        <input type="text" name="t_cliente" class="input input-bordered w-full h-10"
+                            placeholder="Buscar cliente..." value="{{ request.args.get('t_cliente', '') }}"
+                            autocomplete="off" oninput="filterGeneric(this, 'clientes')"
+                            onfocus="filterGeneric(this, 'clientes')">
+
+                        <div
+                            class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Tipo -->
@@ -319,7 +335,7 @@
         </form>
     </div>
 
-    <div class="card-body p-0">
+    <div class="card-body p-0 overflow-visible">
         <div class="overflow-x-auto">
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
@@ -401,7 +417,7 @@
 </div>
 
 <!-- VISITAS -->
-<div id="tab-visitas" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden hidden">
+<div id="tab-visitas" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-visible hidden">
     <div class="card-header bg-base-200/30 p-4 border-b border-base-content/10">
         <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
             <span class="icon-[tabler--list-details] size-5"></span>
@@ -427,8 +443,16 @@
                 <div class="form-control">
                     <label
                         class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
-                    <input type="text" name="v_cliente" class="input input-bordered w-full h-10"
-                        placeholder="Filtrar por cliente..." value="{{ request.args.get('v_cliente', '') }}">
+                    <div class="relative w-full">
+                        <input type="text" name="v_cliente" class="input input-bordered w-full h-10"
+                            placeholder="Buscar cliente..." value="{{ request.args.get('v_cliente', '') }}"
+                            autocomplete="off" oninput="filterGeneric(this, 'clientes')"
+                            onfocus="filterGeneric(this, 'clientes')">
+
+                        <div
+                            class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Dirección -->
@@ -497,7 +521,7 @@
         </form>
     </div>
 
-    <div class="card-body p-0">
+    <div class="card-body p-0 overflow-visible">
         <div class="overflow-x-auto">
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
@@ -579,21 +603,86 @@
 </div>
 
 {% block scripts %}
+<!-- Datos de Autocomplete -->
+<script id="autocomplete-json" type="application/json">
+{
+    "clientes": {{ clientes_all|tojson|safe }}
+}
+</script>
+
 <script>
+    // Cargar datos
+    const rawData = JSON.parse(document.getElementById('autocomplete-json').textContent);
+    window.autocompleteData = {
+        clientes: rawData.clientes || []
+    };
+
+    function normalizeStr(str) {
+        return (str || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    }
+
+    function filterGeneric(input, type) {
+        const wrapper = input.closest('.relative');
+        if (!wrapper) return;
+
+        const list = wrapper.querySelector('.generic-suggestions');
+        if (!list) return;
+
+        const val = normalizeStr(input.value);
+
+        list.innerHTML = '';
+        list.classList.add('hidden');
+        wrapper.style.zIndex = "";
+
+        if (!val) return;
+
+        const source = window.autocompleteData[type] || [];
+        const matches = source.filter(str => normalizeStr(str).includes(val));
+
+        if (matches.length > 0) {
+            list.classList.remove('hidden');
+            wrapper.style.zIndex = "100";
+            matches.slice(0, 15).forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'p-2 hover:bg-primary/10 cursor-pointer border-b border-base-content/5 text-sm font-bold text-base-content bg-base-100';
+                div.textContent = match;
+                div.onmousedown = (e) => {
+                    e.preventDefault();
+                    input.value = match;
+                    list.classList.add('hidden');
+                    wrapper.style.zIndex = "";
+                };
+                list.appendChild(div);
+            });
+        }
+    }
+
+    // Cerrar sugerencias al hacer click fuera
+    document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('.relative')) {
+            document.querySelectorAll('.generic-suggestions').forEach(el => {
+                el.classList.add('hidden');
+                const rel = el.closest('.relative');
+                if (rel) rel.style.zIndex = "";
+            });
+        }
+    });
+
     function showTab(tabName) {
         // Hide all tabs
-        document.getElementById('tab-desazolve').classList.add('hidden');
-        document.getElementById('tab-trampas').classList.add('hidden');
-        document.getElementById('tab-visitas').classList.add('hidden');
+        const tabs = ['tab-desazolve', 'tab-trampas', 'tab-visitas'];
+        tabs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        });
 
         // Show selected tab
-        document.getElementById('tab-' + tabName).classList.remove('hidden');
+        const activeTab = document.getElementById('tab-' + tabName);
+        if (activeTab) activeTab.classList.remove('hidden');
 
         // Update selector value
         const selector = document.getElementById('tab-selector');
-        if (selector) {
-            selector.value = tabName;
-        }
+        if (selector) selector.value = tabName;
 
         // Update action button
         const btnNuevaOrden = document.getElementById('btn-nueva-orden');
