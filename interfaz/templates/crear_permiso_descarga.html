@@ -46,7 +46,8 @@
     {% endif %}
 </div>
 
-<form action="{{ url_for('nuevo_permiso_descarga') }}" method="POST" class="space-y-8 pb-20">
+<form action="{{ url_for('nuevo_permiso_descarga') }}" method="POST" enctype="multipart/form-data"
+    class="space-y-8 pb-20">
 
     <!-- SECCION 1: IDENTIFICACION -->
     <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
@@ -57,6 +58,27 @@
             <span>Identificación del Negocio</span>
         </div>
         <div class="card-body p-6">
+            <!-- Croquis Upload -->
+            <div class="form-control mb-6 bg-base-200/30 p-4 rounded-lg border border-dashed border-base-content/20">
+                <label class="label font-bold text-xs uppercase text-base-content/60">Imagen de Croquis /
+                    Coordenadas</label>
+                <div class="flex items-center gap-4">
+                    <input type="file" name="croquis_file" accept="image/*"
+                        class="file-input file-input-bordered file-input-primary w-full max-w-xs" {{ 'disabled' if
+                        permiso else '' }}>
+                    {% if permiso and permiso.croquis_imagen %}
+                    <div class="badge badge-success gap-2">
+                        <span class="icon-[tabler--photo-check] size-4"></span>
+                        Imagen Cargada
+                    </div>
+                    {% endif %}
+                </div>
+                <label class="label">
+                    <span class="label-text-alt opacity-60">Sube una imagen (JPG/PNG) del plano o ubicación. Se mostrará
+                        en el documento generado.</span>
+                </label>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="form-control">
                     <label class="label font-bold text-xs uppercase text-base-content/60">NIS (Folio)</label>

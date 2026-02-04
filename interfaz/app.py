@@ -1588,7 +1588,7 @@ def nuevo_permiso_descarga():
         new_row = target_existing.copy() if target_existing else {}
 
         # Asegurar que los nuevos campos estén en los encabezados
-        expected_fields = ['nombre_empresa', 'num_concesion_pozo', 'prom_pipas_mes', 'capacidad_pipas', 'prom_descarga_muni']
+        expected_fields = ['nombre_empresa', 'num_concesion_pozo', 'prom_pipas_mes', 'capacidad_pipas', 'prom_descarga_muni', 'croquis_imagen']
         for f in expected_fields:
             if f not in headers:
                 headers.append(f)
@@ -1602,12 +1602,35 @@ def nuevo_permiso_descarga():
             if val is not None:
                 new_row[h] = val
             elif h in checkbox_fields:
-                # Si es checkbox y no está en el form, marcar como No
-                # Solo si ya tenemos el row o si es nuevo, pero evitar sobreescribir si el campo no existe en form
-                # Checkboxes siempre envian valor si checkeados, nada si no.
                 new_row[h] = 'No'
             elif h not in new_row:
                  new_row[h] = ''
+
+        # Manejo de Archivo Croquis
+        croquis_file = request.files.get('croquis_file')
+        if croquis_file and croquis_file.filename:
+            try:
+                # Definir carpeta de destino
+                upload_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'img', 'croquis')
+                if not os.path.exists(upload_folder):
+                    os.makedirs(upload_folder)
+                
+                # Nombre seguro: NIS_Timestamp_Filename
+                import time
+                from werkzeug.utils import secure_filename
+                
+                fname = secure_filename(croquis_file.filename)
+                safe_nis = str(nis).strip().replace('/', '').replace('\\', '')
+                timestamp = int(time.time())
+                final_name = f"{safe_nis}_{timestamp}_{fname}"
+                
+                save_path = os.path.join(upload_folder, final_name)
+                croquis_file.save(save_path)
+                
+                new_row['croquis_imagen'] = final_name
+            except Exception as e:
+                print(f"Error saving croquis: {e}")
+                # No interrumpe el flujo principal, solo no guarda la imagen
             
         # Normalización de Si/No y NIS
         new_row['nis'] = str(nis).strip()

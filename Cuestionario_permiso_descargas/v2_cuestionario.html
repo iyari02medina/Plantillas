@@ -560,8 +560,14 @@
         </p>
 
         <!-- Placeholder para la imagen de ejemplo -->
+        <!-- Placeholder para la imagen de ejemplo -->
         <div class="croquis-box">
+            {% if croquis_imagen %}
+            <img src="../../../Plantillas/interfaz/static/img/croquis/{{ croquis_imagen }}" alt="Croquis del Predio"
+                style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            {% else %}
             [ Espacio para Croquis / Ejemplo de Coordenadas ]
+            {% endif %}
         </div>
 
         <div class="section-header">3.0.- Datos del Giro o Actividad</div>
