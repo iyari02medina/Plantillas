@@ -170,6 +170,94 @@ Todos los labels de formularios deben ser consistentes:
 *   **Clase:** `text-xs uppercase font-bold text-base-content/60` (o `text-base-content/50` si es muy secundario).
 *   **Evita:** Tamaños arbitrarios como `text-[10px]` o `text-lg`. Consistencia es clave.
 
+### E. Componente de Búsqueda Autocomplete (Filtros y Formularios)
+Este componente permite realizar búsquedas en tiempo real sobre listas de datos locales (CSV), siendo totalmente insensible a acentos y mayúsculas.
+
+#### 1. Análisis de Fuentes de Datos (CSV)
+Antes de implementar, identifica qué datos necesitas mostrar. El componente debe configurarse según el origen:
+*   **Inventario:** Usa `productos.csv` y `servicios.csv`. Ideal para formularios de creación.
+*   **Catálogo de Empresas:** Usa `empresas.csv`. Ideal para filtros de búsqueda por cliente.
+*   **Registros Históricos:** Usa `cotizaciones.csv` o `ordenes_desazolve.csv`. Ideal para autocompletar nombres de proyectos o folios ya existentes.
+
+#### 2. Implementación en Backend (Flask/Jinja2)
+Para evitar errores de sintaxis en JavaScript con las llaves de Jinja2, usa el patrón de **Inyección Segura por JSON**:
+
+```html
+<!-- En el template .html -->
+<script id="autocomplete-data" type="application/json">
+{
+    "lista1": {{ datos_backend_1|tojson|safe }},
+    "lista2": {{ datos_backend_2|tojson|safe }}
+}
+</script>
+```
+
+#### 3. Estructura HTML (Floating UI)
+Para que las sugerencias floten **por encima** de otros elementos de la grilla, es vital manejar el `z-index` dinámicamente.
+
+```html
+<div class="form-control">
+    <label class="label text-xs uppercase font-bold text-base-content/60">Etiqueta</label>
+    <div class="relative w-full">
+        <!-- Input con limpieza de autocompletado nativo -->
+        <input type="text" autocomplete="off" 
+               class="input input-bordered w-full"
+               oninput="filterGeneric(this, 'lista1')" 
+               onfocus="filterGeneric(this, 'lista1')">
+        
+        <!-- Contenedor de Sugerencias (z-9999 y shadow-2xl) -->
+        <div class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0">
+        </div>
+    </div>
+</div>
+```
+
+#### 4. Lógica JavaScript Pro (Normalización y Z-Index)
+La función debe elevar el contenedor padre mientras se muestran los resultados.
+
+```javascript
+// 1. Cargar datos de forma segura
+const sourceData = JSON.parse(document.getElementById('autocomplete-data').textContent);
+
+// 2. Normalización (Ignora acentos y mayúsculas)
+function normalizeStr(str) {
+    return (str || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+// 3. Función de filtrado genérica
+function filterGeneric(input, type) {
+    const wrapper = input.closest('.relative');
+    const list = wrapper.querySelector('.generic-suggestions');
+    const val = normalizeStr(input.value);
+    
+    list.innerHTML = '';
+    list.classList.add('hidden');
+    wrapper.style.zIndex = ""; // Reset z-index
+
+    if (!val) return;
+
+    const matches = (sourceData[type] || []).filter(str => normalizeStr(str).includes(val));
+
+    if (matches.length > 0) {
+        list.classList.remove('hidden');
+        wrapper.style.zIndex = "100"; // ELEVAR CAPA PARA FLOTAR
+        
+        matches.slice(0, 15).forEach(match => {
+            const div = document.createElement('div');
+            div.className = 'p-2 hover:bg-primary/10 cursor-pointer border-b border-base-content/5 text-sm font-bold bg-base-100 text-base-content';
+            div.textContent = match;
+            div.onmousedown = (e) => {
+                e.preventDefault();
+                input.value = match;
+                list.classList.add('hidden');
+                wrapper.style.zIndex = "";
+            };
+            list.appendChild(div);
+        });
+    }
+}
+```
+
 ## 📱 Guía de Responsividad (Mobile First)
 
 La aplicación está diseñada para ser 100% funcional en móviles. Sigue estas reglas estrictas para mantener este comportamiento:

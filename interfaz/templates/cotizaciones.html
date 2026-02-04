@@ -27,28 +27,39 @@
 </div>
 
 <!-- Search Filters -->
-<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
-    <div class="card-body p-6">
+<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-12"> <!-- Aumentado mb para espacio dropdown -->
+    <div class="card-body p-6 overflow-visible">
         <form method="GET" action="{{ url_for('cotizaciones') }}" class="space-y-6 w-full">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Cliente -->
+                <!-- Cliente (Apunta a empresas.csv) -->
                 <div class="form-control">
                     <label
                         class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
-                    <input list="lista-clientes" name="cliente" class="input input-bordered w-full h-10"
-                        placeholder="Filtrar por cliente..." value="{{ request.args.get('cliente', '') }}">
-                    <datalist id="lista-clientes">
-                        {% for cliente in clientes_disponibles %}
-                        <option value="{{ cliente }}">
-                            {% endfor %}
-                    </datalist>
+                    <div class="relative w-full">
+                        <input type="text" name="cliente" class="input input-bordered w-full h-10"
+                            placeholder="Buscar empresa..." value="{{ request.args.get('cliente', '') }}"
+                            autocomplete="off" oninput="filterGeneric(this, 'clientes')"
+                            onfocus="filterGeneric(this, 'clientes')">
+
+                        <div
+                            class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Nombre -->
+                <!-- Nombre (Apunta a cotizaciones.csv) -->
                 <div class="form-control">
                     <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Nombre</label>
-                    <input type="text" name="nombre_cot" class="input input-bordered w-full h-10"
-                        placeholder="Filtrar por nombre..." value="{{ request.args.get('nombre_cot', '') }}">
+                    <div class="relative w-full">
+                        <input type="text" name="nombre_cot" class="input input-bordered w-full h-10"
+                            placeholder="Buscar título..." value="{{ request.args.get('nombre_cot', '') }}"
+                            autocomplete="off" oninput="filterGeneric(this, 'nombres')"
+                            onfocus="filterGeneric(this, 'nombres')">
+
+                        <div
+                            class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Mes -->
@@ -56,18 +67,13 @@
                     <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
                     <select name="mes" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Todos los meses</option>
-                        <option value="01" {{ 'selected' if request.args.get('mes')=='01' else '' }}>Enero</option>
-                        <option value="02" {{ 'selected' if request.args.get('mes')=='02' else '' }}>Febrero</option>
-                        <option value="03" {{ 'selected' if request.args.get('mes')=='03' else '' }}>Marzo</option>
-                        <option value="04" {{ 'selected' if request.args.get('mes')=='04' else '' }}>Abril</option>
-                        <option value="05" {{ 'selected' if request.args.get('mes')=='05' else '' }}>Mayo</option>
-                        <option value="06" {{ 'selected' if request.args.get('mes')=='06' else '' }}>Junio</option>
-                        <option value="07" {{ 'selected' if request.args.get('mes')=='07' else '' }}>Julio</option>
-                        <option value="08" {{ 'selected' if request.args.get('mes')=='08' else '' }}>Agosto</option>
-                        <option value="09" {{ 'selected' if request.args.get('mes')=='09' else '' }}>Septiembre</option>
-                        <option value="10" {{ 'selected' if request.args.get('mes')=='10' else '' }}>Octubre</option>
-                        <option value="11" {{ 'selected' if request.args.get('mes')=='11' else '' }}>Noviembre</option>
-                        <option value="12" {{ 'selected' if request.args.get('mes')=='12' else '' }}>Diciembre</option>
+                        {% set meses =
+                        [('01','Enero'),('02','Febrero'),('03','Marzo'),('04','Abril'),('05','Mayo'),('06','Junio'),('07','Julio'),('08','Agosto'),('09','Septiembre'),('10','Octubre'),('11','Noviembre'),('12','Diciembre')]
+                        %}
+                        {% for val, name in meses %}
+                        <option value="{{ val }}" {{ 'selected' if request.args.get('mes')==val else '' }}>{{ name }}
+                        </option>
+                        {% endfor %}
                     </select>
                 </div>
 
@@ -84,7 +90,6 @@
                 </div>
             </div>
 
-            <!-- Botones row -->
             <div class="flex gap-3 pt-2">
                 <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
                     <span class="icon-[tabler--search] size-5"></span>
@@ -92,23 +97,15 @@
                 </button>
                 <a href="{{ url_for('cotizaciones') }}" class="btn btn-soft btn-secondary h-10 min-h-0 btn-square"
                     title="Limpiar">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path
-                            d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
-                        <path d="M22 22l-5 -5" />
-                        <path d="M17 22l5 -5" />
-                    </svg>
+                    <span class="icon-[tabler--filter-x] size-5"></span>
                 </a>
             </div>
         </form>
     </div>
 </div>
 
-<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-    <div class="card-body p-0">
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-visible">
+    <div class="card-body p-0 overflow-visible">
         <div class="overflow-x-auto">
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
@@ -242,4 +239,73 @@
     </div>
     {% endif %}
 </div>
+
+<!-- Datos en formato JSON seguro -->
+<script id="autocomplete-json" type="application/json">
+{
+    "clientes": {{ clientes_all|tojson|safe }},
+    "nombres": {{ nombres_all|tojson|safe }}
+}
+</script>
+
+<script>
+    // Cargar datos desde el JSON estático
+    const rawData = JSON.parse(document.getElementById('autocomplete-json').textContent);
+    window.autocompleteData = {
+        clientes: rawData.clientes || [],
+        nombres: rawData.nombres || []
+    };
+
+    function normalizeStr(str) {
+        return (str || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function filterGeneric(input, type) {
+        const wrapper = input.closest('.relative');
+        if (!wrapper) return;
+
+        const list = wrapper.querySelector('.generic-suggestions');
+        if (!list) return;
+
+        const val = normalizeStr(input.value);
+
+        list.innerHTML = '';
+        list.classList.add('hidden');
+        wrapper.style.zIndex = "";
+
+        if (!val) return;
+
+        const source = window.autocompleteData[type] || [];
+        const matches = source.filter(str => normalizeStr(str).includes(val));
+
+        if (matches.length > 0) {
+            list.classList.remove('hidden');
+            wrapper.style.zIndex = "100";
+            matches.slice(0, 15).forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'p-2 hover:bg-primary/10 cursor-pointer border-b border-base-content/5 text-sm font-bold text-base-content bg-base-100';
+                div.textContent = match;
+                div.onmousedown = (e) => {
+                    e.preventDefault();
+                    input.value = match;
+                    list.classList.add('hidden');
+                    wrapper.style.zIndex = "";
+                };
+                list.appendChild(div);
+            });
+        }
+    }
+
+    // Cerrar sugerencias al hacer click fuera
+    document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('.relative')) {
+            document.querySelectorAll('.generic-suggestions').forEach(el => {
+                el.classList.add('hidden');
+                const rel = el.closest('.relative');
+                if (rel) rel.style.zIndex = "";
+            });
+        }
+    });
+</script>
+
 {% endblock %}

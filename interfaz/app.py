@@ -314,10 +314,19 @@ def cotizaciones():
     start = (page - 1) * per_page
     end = start + per_page
     paginated_cots = all_cots[start:end]
+    # Prepare data for autocompletes
+    # 1. All available companies from empresas.csv
+    empresas = read_csv(CLIENTES_CSV)
+    clientes_all = sorted(list(set(row.get('nombre_empresa', row.get('nombre_cliente', '')).strip() for row in empresas if row.get('nombre_empresa') or row.get('nombre_cliente'))))
+    
+    # 2. All quotation names from cotizaciones.csv
+    nombres_all = sorted(list(set(row.get('nombre_cot', '').strip() for row in raw_data if row.get('nombre_cot'))))
     
     return render_template('cotizaciones.html', 
                          cotizaciones=paginated_cots,
-                         clientes_disponibles=clientes_disponibles,
+                         clientes_disponibles=clientes_disponibles, # Existing (only filtered)
+                         clientes_all=clientes_all,
+                         nombres_all=nombres_all,
                          page=page,
                          total_pages=total_pages)
 
