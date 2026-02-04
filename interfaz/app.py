@@ -2202,23 +2202,31 @@ def guardar_directorio(tipo):
             
     # Check if update or new
     key = 'id_cliente' if tipo == 'clientes' else 'folio'
-    id_val = request.form.get(key)
+    # For clients, we prioritze the hidden 'ID' field for edits, then 'id_cliente'
+    if tipo == 'clientes':
+        id_val = request.form.get('ID') or request.form.get('id_cliente')
+    else:
+        id_val = request.form.get(key)
     
     # Handle new fields from form not in headers
     # Always ensure basic fields + others from form serve as headers if missing
     for k in request.form.keys():
-        if k not in headers and k != key: # Don't add ID/key if not there, handled separately
+        if k not in headers and k != key: 
              headers.append(k)
     
     if id_val:
         # Update
-        target = next((r for r in existing if str(r.get(key, '')).strip() == str(id_val).strip()), None)
+        target = None
         
-        # Fallback to 'ID' for clients
-        if not target and tipo == 'clientes':
+        # Try finding by numeric ID first (most robust for created items)
+        if tipo == 'clientes':
             target = next((r for r in existing if str(r.get('ID', '')).strip() == str(id_val).strip()), None)
+            
+        # Try finding by primary key (id_cliente/folio)
+        if not target:
+             target = next((r for r in existing if str(r.get(key, '')).strip() == str(id_val).strip()), None)
 
-        # Fallback to name if ID search fails (for KHEIRO-like cases)
+        # Fallback to name if ID search fails
         if not target:
             target = next((r for r in existing if str(r.get('nombre_empresa', '')).strip().lower() == str(id_val).strip().lower()), None)
             
@@ -2230,11 +2238,8 @@ def guardar_directorio(tipo):
             updated_rows = existing
             flash('Registro actualizado correctamente.', 'success')
         else:
-            # Should not happen typically if coming from edit form intended for existing
-            # Treat as new if not found? Or error. Let's treat as new to be safe/robust or error.
-            # Actually, if we passed an ID but it wasn't found, it might be a concurrency issue or bad ID.
-            # Let's create new.
-             flash('ID no encontrado, se creó uno nuevo.', 'warning')
+             # If ID passed but not found, create new
+             flash('Registro no encontrado para edición, se creó uno nuevo.', 'warning')
              return guardar_nuevo_directorio_logic(tipo, existing, headers, csv_file)
     else:
         # New
@@ -2261,8 +2266,12 @@ def guardar_nuevo_directorio_logic(tipo, existing, headers, csv_file):
         try:
             max_id = max([int(r.get('ID', 0)) for r in existing if str(r.get('ID','')).isdigit()], default=0)
             new_row['ID'] = max_id + 1
+            # Auto-generate id_cliente if not provided
+            if not request.form.get('id_cliente'):
+                new_row['id_cliente'] = f"CLI-{new_row['ID']:03d}"
         except:
             new_row['ID'] = 1
+            new_row['id_cliente'] = "CLI-001"
     else:
         try:
             max_folio = max([int(r.get('folio', 0)) for r in existing if str(r.get('folio','')).isdigit()], default=0)
