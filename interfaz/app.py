@@ -140,18 +140,29 @@ def read_csv(filepath):
         try:
             with open(filepath, mode='r', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f)
-                items = list(reader)
+                for row in reader:
+                    # Extra columns in a row end up with None as the key in DictReader
+                    # We skip those and ensure all other keys/values are strings
+                    clean_row = {str(k): (str(v) if v is not None else '') 
+                                for k, v in row.items() if k is not None}
+                    items.append(clean_row)
         except Exception as e:
             print(f"Error reading {filepath}: {e}")
             try:
                 # Fallback
                 with open(filepath, mode='r', encoding='latin-1') as f:
                     reader = csv.DictReader(f)
-                    items = list(reader)
+                    items = []
+                    for row in reader:
+                        clean_row = {str(k): (str(v) if v is not None else '') 
+                                    for k, v in row.items() if k is not None}
+                        items.append(clean_row)
             except Exception as e2:
                 print(f"Error reading fallback {filepath}: {e2}")
 
     print(f"Loaded {len(items)} items from {filepath}")
+    # Filter out empty rows (where all values are None or empty strings)
+    items = [row for row in items if any(val and str(val).strip() for val in row.values())]
     if items:
         print(f"First item keys: {items[0].keys()}")
     return items
@@ -254,7 +265,7 @@ def cotizaciones():
     q_anio = request.args.get('anio', '')
     
     # Get available clients for datalist
-    clientes_disponibles = sorted(list(set(row.get('nombre_cliente') for row in raw_data if row.get('nombre_cliente'))))
+    clientes_disponibles = sorted(list(set(str(row.get('nombre_cliente')) for row in raw_data if row.get('nombre_cliente'))))
 
     # Group by folio and filter
     grouped_cotizaciones = {}
@@ -317,10 +328,10 @@ def cotizaciones():
     # Prepare data for autocompletes
     # 1. All available companies from empresas.csv
     empresas = read_csv(CLIENTES_CSV)
-    clientes_all = sorted(list(set(row.get('nombre_empresa', row.get('nombre_cliente', '')).strip() for row in empresas if row.get('nombre_empresa') or row.get('nombre_cliente'))))
+    clientes_all = sorted(list(set((str(row.get('nombre_empresa')) or str(row.get('nombre_cliente')) or '').strip() for row in empresas if row.get('nombre_empresa') or row.get('nombre_cliente'))))
     
     # 2. All quotation names from cotizaciones.csv
-    nombres_all = sorted(list(set(row.get('nombre_cot', '').strip() for row in raw_data if row.get('nombre_cot'))))
+    nombres_all = sorted(list(set((str(row.get('nombre_cot')) or '').strip() for row in raw_data if row.get('nombre_cot'))))
     
     return render_template('cotizaciones.html', 
                          cotizaciones=paginated_cots,
@@ -473,11 +484,11 @@ def nueva_cotizacion():
         # Ensure we have common keys: nombre, descripcion, precio, unidad, categoria
         # Note: CSV headers might be capitalized. We'll map them.
         return {
-            'nombre': item.get('Nombre', item.get('nombre', '')),
-            'descripcion': item.get('Nombre', item.get('nombre', '')), # Use name as description if separate desc not available
-            'precio': item.get('Precio', item.get('precio', '0')),
-            'unidad': item.get('Unidad', item.get('unidad', 'pza')),
-            'categoria': item.get('Categoría', item.get('categoria', tipo))
+            'nombre': item.get('Nombre') or item.get('nombre') or '',
+            'descripcion': item.get('Nombre') or item.get('nombre') or '', 
+            'precio': item.get('Precio') or item.get('precio') or '0',
+            'unidad': item.get('Unidad') or item.get('unidad') or 'pza',
+            'categoria': item.get('Categoría') or item.get('categoria') or tipo
         }
 
     for p in productos:
@@ -498,8 +509,8 @@ def nueva_cotizacion():
     max_num = 0
     if cotizaciones_existentes:
         for row in cotizaciones_existentes:
-            f = row.get('folio_cot', '')
-            if f.startswith(prefix):
+            f = row.get('folio_cot') or ''
+            if f and f.startswith(prefix):
                 try:
                     num = int(f.split('-')[-1])
                     if num > max_num: max_num = num
@@ -507,11 +518,16 @@ def nueva_cotizacion():
     
     suggested_folio = f"{prefix}{max_num + 1:03d}"
 
-    return render_template('crear_cotizacion.html', 
-                         inventario=inventario, 
-                         clientes=clientes, 
-                         suggested_folio=suggested_folio,
-                         todays_date=now.strftime('%d/%m/%Y'))
+    try:
+        return render_template('crear_cotizacion.html', 
+                             inventario=inventario, 
+                             clientes=clientes, 
+                             suggested_folio=suggested_folio,
+                             todays_date=now.strftime('%d/%m/%Y'))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise e
 
 @app.route('/eliminar_cotizacion/<folio>', methods=['POST'])
 @login_required
@@ -638,7 +654,7 @@ def ordenes():
 
     # Prepare data for client autocomplete
     empresas = read_csv(CLIENTES_CSV)
-    clientes_all = sorted(list(set(row.get('nombre_empresa', row.get('nombre_cliente', '')).strip() for row in empresas if row.get('nombre_empresa') or row.get('nombre_cliente'))))
+    clientes_all = sorted(list(set((str(row.get('nombre_empresa')) or str(row.get('nombre_cliente')) or '').strip() for row in empresas if row.get('nombre_empresa') or row.get('nombre_cliente'))))
 
     return render_template('ordenes.html', 
                          desazolves=desazolves, 
@@ -697,7 +713,7 @@ def tarificador():
     
     # Get all client names for autocomplete search
     clientes_data = read_csv(CLIENTES_CSV)
-    clientes_names = sorted(list(set([r.get('nombre_empresa', '').strip() for r in clientes_data if r.get('nombre_empresa')])))
+    clientes_names = sorted(list(set([(str(r.get('nombre_empresa')) or '').strip() for r in clientes_data if r.get('nombre_empresa')])))
     
     return render_template('tarificador.html', 
                          tarificadores=paginated_tars,
@@ -729,7 +745,7 @@ def load_rangos():
             reader = csv.DictReader(f)
             for row in reader:
                 min_val = clean_float(row.get('Minimo', 0))
-                max_str = row.get('Maximo', '').strip()
+                max_str = (row.get('Maximo') or '').strip()
                 max_val = clean_float(max_str) if max_str else None
                 price = clean_float(row.get('Contaminantes Básicos', 0))
                 rangos.append({'min': min_val, 'max': max_val, 'price': price})
@@ -883,8 +899,8 @@ def nuevo_tarificador():
     max_num = 0
     if existing:
         for r in existing:
-            f = r.get('folio_tar', '')
-            if f.startswith(prefix):
+            f = r.get('folio_tar') or ''
+            if f and f.startswith(prefix):
                 try:
                     # Extract numeric part after prefix
                     parts = f.split('-')
@@ -1576,7 +1592,7 @@ def permisos_descarga():
     
     # Get all client names for autocomplete search
     clientes_data = read_csv(CLIENTES_CSV)
-    clientes_names = sorted(list(set([r.get('nombre_empresa', '').strip() for r in clientes_data if r.get('nombre_empresa')])))
+    clientes_names = sorted(list(set([(str(r.get('nombre_empresa')) or '').strip() for r in clientes_data if r.get('nombre_empresa')])))
 
     return render_template('permiso_descarga.html', 
                          permisos=paginated_permisos,
@@ -1849,7 +1865,25 @@ def detalle_cotizacion(folio):
         flash('Cotización no encontrada.', 'error')
         return redirect(url_for('cotizaciones'))
         
-    inventario = read_csv(INVENTARIO_CSV)
+    # Combine products and services for inventory
+    productos = read_csv(PRODUCTOS_CSV)
+    servicios = read_csv(SERVICIOS_CSV)
+    
+    inventario = []
+    def normalize_item_local(item, tipo):
+        return {
+            'nombre': item.get('Nombre') or item.get('nombre') or '',
+            'descripcion': item.get('Nombre') or item.get('nombre') or '',
+            'precio': item.get('Precio') or item.get('precio') or '0',
+            'unidad': item.get('Unidad') or item.get('unidad') or 'pza',
+            'categoria': item.get('Categoría') or item.get('categoria') or tipo
+        }
+        
+    for p in productos:
+        inventario.append(normalize_item_local(p, 'Producto'))
+    for s in servicios:
+        inventario.append(normalize_item_local(s, 'Servicio'))
+        
     clientes = read_csv(CLIENTES_CSV)
     
     return render_template('crear_cotizacion.html', 
@@ -1894,7 +1928,7 @@ def ver_catalogo(tipo):
     q_cat = request.args.get('c_categoria', '').lower()
     
     # Get available categories for filter
-    categorias = sorted(list(set(row.get('Categoría') for row in data if row.get('Categoría'))))
+    categorias = sorted(list(set(str(row.get('Categoría')) for row in data if row.get('Categoría'))))
 
     # Filter data
     filtered_data = []
@@ -1935,7 +1969,7 @@ def ver_catalogo(tipo):
     headers = ['ID', 'Nombre', 'Categoría', 'Unidad', 'Precio']
     
     # Names for autocomplete
-    autocomplete_names = sorted(list(set(row.get('Nombre', '').strip() for row in data if row.get('Nombre'))))
+    autocomplete_names = sorted(list(set((str(row.get('Nombre')) or '').strip() for row in data if row.get('Nombre'))))
     
     return render_template('tabla_catalogo.html',
                          tipo=tipo,
@@ -2009,7 +2043,7 @@ def guardar_catalogo_item(tipo):
         updated_rows.append(new_row)
         # Sort? Maybe by ID
         try:
-            updated_rows.sort(key=lambda x: x.get('ID', ''))
+            updated_rows.sort(key=lambda x: str(x.get('ID') or ''))
         except: pass
         
         overwrite_csv(csv_file, headers, updated_rows)
@@ -2110,7 +2144,7 @@ def ver_directorio(tipo):
          headers = ['nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa']
 
     # Get all names for autocomplete (from current CSV)
-    names = sorted(list(set(r.get('nombre_empresa', '').strip() for r in data if r.get('nombre_empresa'))))
+    names = sorted(list(set((str(r.get('nombre_empresa')) or '').strip() for r in data if r.get('nombre_empresa'))))
 
     return render_template('tabla_directorio.html', 
                          tipo=tipo, 
@@ -2488,7 +2522,7 @@ def consumos():
     
     # Get all client names for autocomplete search
     clientes_data = read_csv(CLIENTES_CSV)
-    clientes_names = sorted(list(set([r.get('nombre_empresa', '').strip() for r in clientes_data if r.get('nombre_empresa')])))
+    clientes_names = sorted(list(set([(str(r.get('nombre_empresa')) or '').strip() for r in clientes_data if r.get('nombre_empresa')])))
 
     return render_template('consumos_agua.html', 
                          consumos=paginated_consumos,
@@ -2570,7 +2604,7 @@ def guardar_consumo():
         
         if previous_records:
              # Sort by date descending
-             previous_records.sort(key=lambda x: x.get('fecha_lectura', ''), reverse=True)
+             previous_records.sort(key=lambda x: str(x.get('fecha_lectura') or ''), reverse=True)
              last_record = previous_records[0]
              lectura_anterior = float(last_record.get('lectura', 0))
         else:
@@ -2596,7 +2630,7 @@ def guardar_consumo():
         updated_rows.append(row)
         # Re-sort entire CSV by folio or date? Keeping original order mostly, but appended.
         # Maybe better to sort list by folio to keep it clean.
-        updated_rows.sort(key=lambda x: x.get('folio', '')) # Simple sort
+        updated_rows.sort(key=lambda x: str(x.get('folio') or '')) # Simple sort
         
         overwrite_csv(CONSUMOS_CSV, headers, updated_rows)
         flash('Consumo actualizado exitosamente.', 'success')
