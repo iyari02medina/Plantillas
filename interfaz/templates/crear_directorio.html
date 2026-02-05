@@ -79,6 +79,30 @@ Cophi{% endblock %}
             {% endif %}
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Tarjeta: Registro (Folio y Fecha) -->
+                <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden lg:col-span-2">
+                    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2">
+                        <span class="icon-[tabler--tag] size-5 text-primary"></span>
+                        <h3 class="font-black uppercase tracking-wider text-sm">Información del Registro</h3>
+                    </div>
+                    <div class="card-body p-6 flex flex-col md:flex-row gap-6">
+                        <div class="form-control flex-1">
+                            <label class="label font-bold text-xs uppercase text-base-content/60">Folio</label>
+                            <input type="text" name="folio"
+                                value="{{ (item.get('folio') if item else suggested_folio) or suggested_folio or '' }}"
+                                required class="input input-bordered w-full font-black text-primary always-locked"
+                                readonly>
+                        </div>
+                        <div class="form-control flex-1">
+                            <label class="label font-bold text-xs uppercase text-base-content/60">Fecha de
+                                Registro</label>
+                            <input type="text" name="fecha_creacion"
+                                value="{{ (item.get('fecha_creacion') if item else todays_date) or todays_date or '' }}"
+                                class="input input-bordered w-full always-locked" readonly>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Tarjeta Principal: Identificación -->
                 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                     <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2">

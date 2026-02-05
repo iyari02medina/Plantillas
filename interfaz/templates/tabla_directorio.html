@@ -30,7 +30,7 @@
                     <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Búsqueda
                         General</label>
                     <input type="text" name="d_search" class="input input-bordered w-full h-10"
-                        placeholder="Buscar por nombre, ID o dirección..."
+                        placeholder="Buscar por nombre, Folio o dirección..."
                         value="{{ request.args.get('d_search', '') }}" oninput="filterGeneric(this, 'clientes')"
                         autocomplete="off">
                     <div
@@ -118,9 +118,8 @@
                                 <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
                                     aria-orientation="vertical" aria-labelledby="dropdown-dir-{{ loop.index }}">
                                     <li>
-                                        {% set id_val = (row.get('id_cliente') or row.get('ID') or
-                                        row.get('nombre_empresa')) if tipo == 'clientes' else (row.get('folio') or
-                                        row.get('nombre_empresa')) %}
+                                        {% set id_val = (row.get('folio') or row.get('ID') or row.get('nombre_empresa'))
+                                        %}
                                         <a class="dropdown-item flex items-center gap-2"
                                             href="{{ url_for('detalle_directorio', tipo=tipo, id_val=id_val) }}">
                                             <span class="icon-[tabler--eye] size-4"></span>

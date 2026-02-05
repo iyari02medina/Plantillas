@@ -358,7 +358,7 @@ def nueva_cotizacion():
             'folio_cot': folio,
             'nombre_cot': request.form.get('nombre_cot'),
             'fecha_cot': request.form.get('fecha_cot') or datetime.date.today().strftime('%d/%m/%Y'),
-            'id_cliente': 'CLI-GENERICO', # Simplified for now
+            'id_cliente': request.form.get('id_cliente') or 'CLI-GENERICO',
             'nombre_cliente': request.form.get('nombre_cliente'),
             'razon_social_cliente': request.form.get('razon_social_cliente'),
             'direccion_cliente': request.form.get('direccion_cliente'),
@@ -488,31 +488,30 @@ def nueva_cotizacion():
 
     clientes = read_csv(CLIENTES_CSV)
     
-    # Get next folio suggestion
-    cotizaciones_existentes = read_csv(COTIZACIONES_CSV)
-    next_folio_num = 1
-    if cotizaciones_existentes:
-        max_num = 0
-        for row in cotizaciones_existentes:
-            try:
-                folio = row.get('folio_cot', '')
-                # Assuming format COT-COPHI-XXX or similar standard ending in digits
-                # Split by delimiters to be safe
-                parts = folio.replace('-', ' ').split()
-                # Look for the last numeric part
-                for p in reversed(parts):
-                    if p.isdigit():
-                        num = int(p)
-                        if num > max_num:
-                            max_num = num
-                        break
-            except:
-                pass
-        next_folio_num = max_num + 1
-    
-    suggested_folio = f"COT-COPHI-{next_folio_num:03d}"
+    # Get next folio suggestion: Format COT-MMYY-###
+    now = datetime.date.today()
+    month_str = now.strftime('%m')
+    year_str = now.strftime('%y')
+    prefix = f"COT-{month_str}{year_str}-"
 
-    return render_template('crear_cotizacion.html', inventario=inventario, clientes=clientes, suggested_folio=suggested_folio)
+    cotizaciones_existentes = read_csv(COTIZACIONES_CSV)
+    max_num = 0
+    if cotizaciones_existentes:
+        for row in cotizaciones_existentes:
+            f = row.get('folio_cot', '')
+            if f.startswith(prefix):
+                try:
+                    num = int(f.split('-')[-1])
+                    if num > max_num: max_num = num
+                except: pass
+    
+    suggested_folio = f"{prefix}{max_num + 1:03d}"
+
+    return render_template('crear_cotizacion.html', 
+                         inventario=inventario, 
+                         clientes=clientes, 
+                         suggested_folio=suggested_folio,
+                         todays_date=now.strftime('%d/%m/%Y'))
 
 @app.route('/eliminar_cotizacion/<folio>', methods=['POST'])
 @login_required
@@ -1597,14 +1596,14 @@ def nuevo_permiso_descarga():
         if existing:
             headers = list(existing[0].keys())
         else:
-            headers = ['nis','nombre_empresa','prop_nombre','prop_direccion','prop_colonia','prop_municipio','prop_telefono','prop_localidad','prop_cp','prop_rfc','arr_nombre','arr_ine','arr_direccion','arr_colonia','arr_municipio','arr_telefono','arr_localidad','arr_cp','arr_rfc','giro_licencia','giro_descripcion','num_empleados','turnos','horario_atencion','pozo','num_concesion_pozo','pipas','prom_pipas_mes','capacidad_pipas','red','num_tomas','fuente_otro','total_wc','total_mingitorios','total_lavamanos','total_regaderas','total_cisternas','cap_cisternas','total_tinacos','cap_tinacos','tiene_comedor','mecanismos_ahorro','prom_descarga_muni','tiene_registro','localización_registro','profundidad_registro','diametro_registro','material_registro','tiene_medidor_descargas','tiene_pretrat','operación_pretratamiento','disposicion_residuos','desc_pretratamiento','tiene_analisis','fecha_acuse','testigo1_nombre','testigo2_nombre']
+            headers = ['folio', 'fecha_creacion', 'nis','nombre_empresa','prop_nombre','prop_direccion','prop_colonia','prop_municipio','prop_telefono','prop_localidad','prop_cp','prop_rfc','arr_nombre','arr_ine','arr_direccion','arr_colonia','arr_municipio','arr_telefono','arr_localidad','arr_cp','arr_rfc','giro_licencia','giro_descripcion','num_empleados','turnos','horario_atencion','pozo','num_concesion_pozo','pipas','prom_pipas_mes','capacidad_pipas','red','num_tomas','fuente_otro','total_wc','total_mingitorios','total_lavamanos','total_regaderas','total_cisternas','cap_cisternas','total_tinacos','cap_tinacos','tiene_comedor','mecanismos_ahorro','prom_descarga_muni','tiene_registro','localización_registro','profundidad_registro','diametro_registro','material_registro','tiene_medidor_descargas','tiene_pretrat','operación_pretratamiento','disposicion_residuos','desc_pretratamiento','tiene_analisis','fecha_acuse','testigo1_nombre','testigo2_nombre']
             
         # Buscar si ya existe para preservar campos no presentes en el form
         target_existing = next((r for r in existing if str(r.get('nis', '')).strip() == str(nis).strip()), None)
         new_row = target_existing.copy() if target_existing else {}
 
         # Asegurar que los nuevos campos estén en los encabezados
-        expected_fields = ['nombre_empresa', 'num_concesion_pozo', 'prom_pipas_mes', 'capacidad_pipas', 'prom_descarga_muni', 'croquis_imagen']
+        expected_fields = ['folio', 'fecha_creacion', 'nombre_empresa', 'num_concesion_pozo', 'prom_pipas_mes', 'capacidad_pipas', 'prom_descarga_muni', 'croquis_imagen']
         for f in expected_fields:
             if f not in headers:
                 headers.append(f)
@@ -1621,6 +1620,23 @@ def nuevo_permiso_descarga():
                 new_row[h] = 'No'
             elif h not in new_row:
                  new_row[h] = ''
+
+        # Auto-fill folio and fecha_creacion if new
+        if not new_row.get('folio'):
+            now = datetime.date.today()
+            prefix = f"PER-{now.strftime('%m%y')}-"
+            max_num = 0
+            for r in existing:
+                f = r.get('folio', '')
+                if f.startswith(prefix):
+                    try:
+                        num = int(f.split('-')[-1])
+                        if num > max_num: max_num = num
+                    except: pass
+            new_row['folio'] = f"{prefix}{max_num + 1:03d}"
+            
+        if not new_row.get('fecha_creacion'):
+            new_row['fecha_creacion'] = datetime.date.today().strftime('%d/%m/%Y')
 
         # Manejo de Archivo Croquis
         croquis_file = request.files.get('croquis_file')
@@ -1719,7 +1735,25 @@ def nuevo_permiso_descarga():
             except: pass
     suggested_nis = max_num + 1
 
-    return render_template('crear_permiso_descarga.html', clientes=clientes, suggested_nis=suggested_nis, permiso=None)
+    # Suggest Folio: PER-MMYY-###
+    now = datetime.date.today()
+    prefix = f"PER-{now.strftime('%m%y')}-"
+    max_f = 0
+    for r in existing:
+        f = r.get('folio', '')
+        if f.startswith(prefix):
+            try:
+                num = int(f.split('-')[-1])
+                if num > max_f: max_f = num
+            except: pass
+    suggested_folio = f"{prefix}{max_f + 1:03d}"
+
+    return render_template('crear_permiso_descarga.html', 
+                         clientes=clientes, 
+                         suggested_nis=suggested_nis, 
+                         suggested_folio=suggested_folio,
+                         todays_date=now.strftime('%d/%m/%Y'),
+                         permiso=None)
 
 
 
@@ -2066,7 +2100,7 @@ def ver_directorio(tipo):
     if data:
         # Prioritize important headers
         all_keys = list(data[0].keys())
-        priority = ['nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa', 'contacto'] 
+        priority = ['folio', 'nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa'] 
         headers = [k for k in priority if k in all_keys]
         # Add others up to 5 cols
         for k in all_keys:
@@ -2125,7 +2159,29 @@ def eliminar_directorio_item(tipo, id_val):
 @app.route('/directorio/nuevo/<tipo>')
 @login_required
 def nuevo_directorio_item(tipo):
-    return render_template('crear_directorio.html', tipo=tipo, is_new=True, item={})
+    csv_file = CLIENTES_CSV if tipo == 'clientes' else PROSPECTOS_CSV
+    existing = read_csv(csv_file)
+    now = datetime.date.today()
+    todays_date = now.strftime('%d/%m/%Y')
+    
+    # Suggest Folio: CLI-MMYY-### or PRO-MMYY-###
+    prefix = ("CLI-" if tipo == 'clientes' else "PRO-") + now.strftime('%m%y') + "-"
+    max_num = 0
+    for r in existing:
+        f = r.get('folio', '')
+        if f.startswith(prefix):
+            try:
+                num = int(f.split('-')[-1])
+                if num > max_num: max_num = num
+            except: pass
+    suggested_folio = f"{prefix}{max_num + 1:03d}"
+    
+    return render_template('crear_directorio.html', 
+                         tipo=tipo, 
+                         is_new=True, 
+                         item={}, 
+                         suggested_folio=suggested_folio,
+                         todays_date=todays_date)
 
 @app.route('/directorio/detalle/<tipo>/<id_val>')
 @login_required
@@ -2263,17 +2319,17 @@ def guardar_directorio(tipo):
         headers = list(existing[0].keys())
     else:
         if tipo == 'clientes':
-            headers = ['id_cliente', 'nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa', 'razon_social']
+            headers = ['folio', 'fecha_creacion', 'nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa', 'razon_social']
         else:
-            headers = ['folio', 'nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa']
+            headers = ['folio', 'fecha_creacion', 'nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa']
             
-    # Check if update or new
-    key = 'id_cliente' if tipo == 'clientes' else 'folio'
-    # For clients, we prioritze the hidden 'ID' field for edits, then 'id_cliente'
-    if tipo == 'clientes':
-        id_val = request.form.get('ID') or request.form.get('id_cliente')
-    else:
-        id_val = request.form.get(key)
+    # Key is always folio now
+    key = 'folio'
+    id_val = request.form.get('ID') if tipo == 'clientes' else request.form.get('folio')
+    
+    # Fallback to folio in form if ID not present for clients
+    if tipo == 'clientes' and not id_val:
+        id_val = request.form.get('folio')
     
     # Handle new fields from form not in headers
     # Always ensure basic fields + others from form serve as headers if missing
@@ -2328,23 +2384,29 @@ def guardar_directorio(tipo):
 def guardar_nuevo_directorio_logic(tipo, existing, headers, csv_file):
     new_row = {}
     
-    # Generate ID
+    # Generate ID for clients (numeric internal ID)
     if tipo == 'clientes':
         try:
             max_id = max([int(r.get('ID', 0)) for r in existing if str(r.get('ID','')).isdigit()], default=0)
             new_row['ID'] = max_id + 1
-            # Auto-generate id_cliente if not provided
-            if not request.form.get('id_cliente'):
-                new_row['id_cliente'] = f"CLI-{new_row['ID']:03d}"
         except:
             new_row['ID'] = 1
-            new_row['id_cliente'] = "CLI-001"
-    else:
-        try:
-            max_folio = max([int(r.get('folio', 0)) for r in existing if str(r.get('folio','')).isdigit()], default=0)
-            new_row['folio'] = max_folio + 1
-        except:
-             new_row['folio'] = 1
+            
+    # Generate Folio: CLI-MMYY-### or PRO-MMYY-###
+    now = datetime.date.today()
+    prefix = ("CLI-" if tipo == 'clientes' else "PRO-") + now.strftime('%m%y') + "-"
+    max_num = 0
+    for r in existing:
+        f = r.get('folio', '')
+        if f.startswith(prefix):
+            try:
+                num = int(f.split('-')[-1])
+                if num > max_num: max_num = num
+            except: pass
+    new_row['folio'] = f"{prefix}{max_num + 1:03d}"
+    
+    # Set Creation Date
+    new_row['fecha_creacion'] = now.strftime('%d/%m/%Y')
              
     # Fill Data
     for k in request.form:

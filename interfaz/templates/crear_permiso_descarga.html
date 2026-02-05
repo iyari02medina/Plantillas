@@ -49,6 +49,30 @@
 <form action="{{ url_for('nuevo_permiso_descarga') }}" method="POST" enctype="multipart/form-data"
     class="space-y-8 pb-20">
 
+    <!-- INFORMACIÓN DEL FOLIO -->
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div
+            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold uppercase tracking-widest text-sm flex items-center gap-2">
+            <span class="icon-[tabler--tag] size-5 text-primary"></span>
+            <span>Información del Folio</span>
+        </div>
+        <div class="card-body p-6 flex flex-col md:flex-row gap-6">
+            <div class="form-control flex-1">
+                <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Folio</label>
+                <input type="text" id="folio" name="folio" placeholder="PER-MMYY-###"
+                    class="input input-bordered w-full font-bold text-primary always-locked"
+                    value="{{ (permiso.folio if permiso else suggested_folio) or '' }}" required readonly>
+            </div>
+            <div class="form-control flex-1">
+                <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Fecha de
+                    Creación</label>
+                <input type="text" id="fecha_creacion" name="fecha_creacion"
+                    class="input input-bordered w-full always-locked"
+                    value="{{ (permiso.fecha_creacion if permiso else todays_date) or '' }}" readonly>
+            </div>
+        </div>
+    </div>
+
     <!-- CARD DE CARGA DE CROQUIS -->
     <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
         <div
@@ -158,7 +182,7 @@
         <div class="card-body p-6">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="form-control">
-                    <label class="label font-bold text-xs uppercase text-base-content/60">NIS (Folio)</label>
+                    <label class="label font-bold text-xs uppercase text-base-content/60">NIS</label>
                     <input type="text" name="nis" value="{{ permiso.nis if permiso else suggested_nis }}" required
                         class="input input-bordered w-full font-mono font-black text-primary" {{ 'readonly' if permiso
                         else '' }}>

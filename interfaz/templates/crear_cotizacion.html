@@ -44,9 +44,9 @@
                 <div class="card-body p-6 space-y-4">
                     <div class="form-control">
                         <label class="label font-bold text-xs uppercase text-base-content/60">Folio Cotización</label>
-                        <input type="text" name="folio_cot"
+                        <input type="text" name="folio_cot" placeholder="COT-MMYY-###"
                             value="{{ suggested_folio if not cotizacion else cotizacion.folio_cot }}"
-                            class="input input-bordered w-full font-black text-primary" readonly required>
+                            class="input input-bordered w-full font-black text-primary always-locked" readonly required>
                     </div>
                     <div class="form-control">
                         <label class="label font-bold text-xs uppercase text-base-content/60">Nombre de
@@ -56,10 +56,10 @@
                             {{ 'disabled' if cotizacion else '' }} required>
                     </div>
                     <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Fecha</label>
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Fecha de Creación</label>
                         <input type="text" name="fecha_cot"
                             value="{{ cotizacion.fecha_cot if cotizacion else todays_date }}"
-                            class="input input-bordered w-full" readonly>
+                            class="input input-bordered w-full always-locked" readonly>
                     </div>
                 </div>
             </div>
@@ -77,6 +77,8 @@
                             autocomplete="off" class="input input-bordered w-full font-bold" oninput="fillClient(this)"
                             required value="{{ cotizacion.nombre_cliente if cotizacion else '' }}" {{ 'disabled' if
                             cotizacion else '' }}>
+                        <input type="hidden" id="id_cliente" name="id_cliente"
+                            value="{{ cotizacion.id_cliente if cotizacion else '' }}">
                         <div id="suggestions-box"
                             class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
                         </div>
@@ -225,6 +227,8 @@
 
     function enableEdit() {
         document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+        document.querySelectorAll('input.always-locked').forEach(el => el.readOnly = true);
+
         document.querySelectorAll('.btn-ghost.text-error').forEach(el => el.classList.remove('hidden'));
         document.getElementById('btn-add-item').hidden = false;
 
@@ -232,6 +236,17 @@
         if (btnSubmit) btnSubmit.classList.remove('hidden');
         const btnEdit = document.getElementById('btn-editar');
         if (btnEdit) btnEdit.classList.add('hidden');
+    }
+
+    // Overwrite the selectClient from external JS to fill id_cliente
+    const originalSelectClient = window.selectClient;
+    window.selectClient = function (client) {
+        if (typeof originalSelectClient === 'function') {
+            originalSelectClient(client);
+        }
+        if (document.getElementById('id_cliente')) {
+            document.getElementById('id_cliente').value = client.folio || client.id_cliente || '';
+        }
     }
 </script>
 {% endblock %}
