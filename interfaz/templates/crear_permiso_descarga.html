@@ -49,6 +49,104 @@
 <form action="{{ url_for('nuevo_permiso_descarga') }}" method="POST" enctype="multipart/form-data"
     class="space-y-8 pb-20">
 
+    <!-- CARD DE CARGA DE CROQUIS -->
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div
+            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2 font-black uppercase tracking-widest text-sm">
+            <span class="icon-[tabler--map-pin] size-5 text-primary"></span>
+            <span>Croquis y Ubicación</span>
+        </div>
+        <div class="card-body p-6">
+            <div class="form-control">
+                <label class="label font-bold text-xs uppercase text-base-content/60 mb-2">
+                    <span class="flex items-center gap-2">
+                        <span class="icon-[tabler--photo] size-4"></span>
+                        Imagen de Croquis / Coordenadas
+                    </span>
+                </label>
+
+                <!-- Área de carga con diseño atractivo -->
+                <div
+                    class="relative border-2 border-dashed border-primary/30 rounded-xl bg-gradient-to-br from-primary/5 to-transparent hover:border-primary/50 hover:from-primary/10 transition-all duration-300 group">
+                    <!-- Input file oculto -->
+                    <input type="file" id="croquis_file_input" name="croquis_file" accept="image/*"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        onchange="updateFilePreview(this)" {{ 'disabled' if permiso else '' }}>
+
+                    <!-- Contenido visual del área de carga -->
+                    <div id="upload-area" class="p-8 text-center">
+                        <!-- Icono y texto por defecto (cuando no hay archivo) -->
+                        <div id="upload-prompt" class="space-y-3">
+                            <div class="flex justify-center">
+                                <div class="bg-primary/10 rounded-full p-4 group-hover:bg-primary/20 transition-colors">
+                                    <span class="icon-[tabler--photo-up] size-12 text-primary"></span>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-base font-bold text-base-content/80">
+                                    Selecciona o arrastra una imagen
+                                </p>
+                                <p class="text-xs text-base-content/50 mt-1">
+                                    JPG, PNG hasta 10MB
+                                </p>
+                            </div>
+                            <div class="pt-2">
+                                <span class="btn btn-primary btn-sm">
+                                    <span class="icon-[tabler--upload] size-4"></span>
+                                    Elegir Archivo
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Información del archivo cargado (oculto por defecto) -->
+                        <div id="file-preview" class="hidden space-y-3">
+                            <div class="flex justify-center">
+                                <div class="bg-success/10 rounded-full p-4">
+                                    <span class="icon-[tabler--photo-check] size-12 text-success"></span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="badge badge-success gap-2 text-xs font-bold">
+                                    <span class="icon-[tabler--check] size-3"></span>
+                                    Archivo Cargado
+                                </div>
+                                <p id="file-name" class="text-sm font-bold text-base-content truncate px-4"></p>
+                                <p id="file-size" class="text-xs text-base-content/60"></p>
+                            </div>
+                            <div class="pt-2">
+                                <span class="btn btn-outline btn-primary btn-sm">
+                                    <span class="icon-[tabler--refresh] size-4"></span>
+                                    Cambiar Archivo
+                                </span>
+                            </div>
+                        </div>
+
+                        {% if permiso and permiso.croquis_imagen %}
+                        <!-- Estado inicial cuando ya existe una imagen -->
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                document.getElementById('upload-prompt').classList.add('hidden');
+                                document.getElementById('file-preview').classList.remove('hidden');
+                                document.getElementById('file-name').textContent = 'Imagen existente';
+                                document.getElementById('file-size').textContent = 'Archivo previamente cargado';
+                            });
+                        </script>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Ayuda descriptiva -->
+                <label class="label">
+                    <span class="label-text-alt opacity-60 flex items-start gap-2">
+                        <span class="icon-[tabler--info-circle] size-4 mt-0.5 flex-shrink-0"></span>
+                        <span>Sube una imagen (JPG/PNG) del plano o ubicación. Se mostrará en el documento
+                            generado.</span>
+                    </span>
+                </label>
+            </div>
+        </div>
+    </div>
+
     <!-- SECCION 1: IDENTIFICACION -->
     <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
         <div
@@ -58,27 +156,6 @@
             <span>Identificación del Negocio</span>
         </div>
         <div class="card-body p-6">
-            <!-- Croquis Upload -->
-            <div class="form-control mb-6 bg-base-200/30 p-4 rounded-lg border border-dashed border-base-content/20">
-                <label class="label font-bold text-xs uppercase text-base-content/60">Imagen de Croquis /
-                    Coordenadas</label>
-                <div class="flex items-center gap-4">
-                    <input type="file" name="croquis_file" accept="image/*"
-                        class="file-input file-input-bordered file-input-primary w-full max-w-xs" {{ 'disabled' if
-                        permiso else '' }}>
-                    {% if permiso and permiso.croquis_imagen %}
-                    <div class="badge badge-success gap-2">
-                        <span class="icon-[tabler--photo-check] size-4"></span>
-                        Imagen Cargada
-                    </div>
-                    {% endif %}
-                </div>
-                <label class="label">
-                    <span class="label-text-alt opacity-60">Sube una imagen (JPG/PNG) del plano o ubicación. Se mostrará
-                        en el documento generado.</span>
-                </label>
-            </div>
-
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="form-control">
                     <label class="label font-bold text-xs uppercase text-base-content/60">NIS (Folio)</label>
@@ -563,5 +640,42 @@
     document.addEventListener('click', () => {
         document.getElementById('suggestions-box').classList.add('hidden');
     });
+
+    // Función para actualizar el preview del archivo de croquis
+    function updateFilePreview(input) {
+        const uploadPrompt = document.getElementById('upload-prompt');
+        const filePreview = document.getElementById('file-preview');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            // Formatear el tamaño del archivo
+            let size = file.size;
+            let unit = 'bytes';
+
+            if (size >= 1024 * 1024) {
+                size = (size / (1024 * 1024)).toFixed(2);
+                unit = 'MB';
+            } else if (size >= 1024) {
+                size = (size / 1024).toFixed(2);
+                unit = 'KB';
+            }
+
+            // Actualizar UI
+            fileName.textContent = file.name;
+            fileSize.textContent = `${size} ${unit}`;
+
+            // Mostrar preview y ocultar prompt
+            uploadPrompt.classList.add('hidden');
+            filePreview.classList.remove('hidden');
+        } else {
+            // Si se cancela la selección, volver al estado inicial
+            uploadPrompt.classList.remove('hidden');
+            filePreview.classList.add('hidden');
+        }
+    }
+
 </script>
 {% endblock %}
