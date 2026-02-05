@@ -1,1 +1,1 @@
-folio,nombre_empresa,telefono_empresa,direccion_empresa,tipo_empresa
+folio,fecha_creacion,nombre_empresa,propietario_empresa,rfc_propietario,telefono_empresa,calle_num_empresa,colonia_empresa,municipio_empresa,localidad_empresa,cp_empresa,tipo_empresa,rfc_empresa
