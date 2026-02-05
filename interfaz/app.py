@@ -874,23 +874,29 @@ def nuevo_tarificador():
     # GET
     clientes = read_csv(CLIENTES_CSV)
     
-    # Suggest Folio
+    # Suggest Folio: Format TAR-MMYY-### (e.g., TAR-0226-001)
+    now = datetime.date.today()
+    month_str = now.strftime('%m')
+    year_str = now.strftime('%y')
+    prefix = f"TAR-{month_str}{year_str}-"
+    
     existing = read_csv(TARIFICADOR_CSV)
     max_num = 0
     if existing:
         for r in existing:
-            try:
-                # Expecting TAR-XXX
-                txt = r.get('folio_tar', '')
-                import re
-                nums = re.findall(r'\d+', txt)
-                if nums:
-                    val = int(nums[-1])
-                    if val > max_num: max_num = val
-            except: pass
-    suggested_folio = f"TAR-{max_num + 1:03d}"
+            f = r.get('folio_tar', '')
+            if f.startswith(prefix):
+                try:
+                    # Extract numeric part after prefix
+                    parts = f.split('-')
+                    if len(parts) >= 3:
+                        num = int(parts[2])
+                        if num > max_num: max_num = num
+                except: pass
     
-    return render_template('crear_tarificador.html', clientes=clientes, suggested_folio=suggested_folio, todays_date=datetime.date.today().strftime('%d/%m/%Y'), rangos=load_rangos(), default_lmps=get_default_lmps())
+    suggested_folio = f"{prefix}{max_num + 1:03d}"
+    
+    return render_template('crear_tarificador.html', clientes=clientes, suggested_folio=suggested_folio, todays_date=now.strftime('%d/%m/%Y'), rangos=load_rangos(), default_lmps=get_default_lmps())
 
 @app.route('/tarificador/<folio>')
 @login_required

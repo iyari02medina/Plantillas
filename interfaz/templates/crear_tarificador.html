@@ -43,17 +43,18 @@
                     <div class="form-control">
                         <label
                             class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Folio</label>
-                        <input type="text" id="folio_tar" name="folio_tar" placeholder="Ej. TAR-001"
-                            class="input input-bordered w-full font-bold text-primary"
-                            value="{{ suggested_folio if not tarificador else tarificador.folio_tar }}" required {% if
-                            tarificador %}readonly{% endif %}>
+                        <input type="text" id="folio_tar" name="folio_tar" placeholder="TAR-MMYY-###"
+                            class="input input-bordered w-full font-bold text-primary always-locked"
+                            value="{{ suggested_folio if not tarificador else tarificador.folio_tar }}" required
+                            readonly {% if tarificador %}disabled{% endif %}>
                     </div>
                     <div class="form-control">
-                        <label
-                            class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Fecha</label>
-                        <input type="text" id="fecha_tar" name="fecha_tar" class="input input-bordered w-full"
-                            value="{{ tarificador.fecha_tar if tarificador else todays_date }}" {% if tarificador
-                            %}disabled{% endif %}>
+                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Fecha de
+                            Creación</label>
+                        <input type="text" id="fecha_tar" name="fecha_tar"
+                            class="input input-bordered w-full always-locked"
+                            value="{{ tarificador.fecha_tar if tarificador else todays_date }}" readonly {% if
+                            tarificador %}disabled{% endif %}>
                     </div>
                 </div>
             </div>
