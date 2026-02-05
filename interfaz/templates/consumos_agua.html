@@ -36,11 +36,15 @@
                 </div>
 
                 <!-- Cliente -->
-                <div class="form-control">
+                <div class="form-control relative">
                     <label
                         class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
                     <input type="text" name="c_cliente" class="input input-bordered w-full h-10"
-                        placeholder="Filtrar por nombre de cliente..." value="{{ request.args.get('c_cliente', '') }}">
+                        placeholder="Filtrar por nombre de cliente..." value="{{ request.args.get('c_cliente', '') }}"
+                        oninput="filterGeneric(this, 'clientes')" autocomplete="off">
+                    <div
+                        class="generic-suggestions absolute z-[100] w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                    </div>
                 </div>
 
                 <!-- Mes -->
@@ -218,4 +222,64 @@
     </div>
     {% endif %}
 </div>
+<script id="autocomplete-json" type="application/json">{{ clientes_all|tojson|safe }}</script>
+
+<script>
+    // Cargar datos
+    const rawData = JSON.parse(document.getElementById('autocomplete-json').textContent);
+    window.autocompleteData = {
+        clientes: rawData.clientes || []
+    };
+
+    function normalizeStr(str) {
+        return (str || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    }
+
+    function filterGeneric(input, type) {
+        const wrapper = input.closest('.relative');
+        if (!wrapper) return;
+
+        const list = wrapper.querySelector('.generic-suggestions');
+        if (!list) return;
+
+        const val = normalizeStr(input.value);
+
+        list.innerHTML = '';
+        list.classList.add('hidden');
+        wrapper.style.zIndex = "";
+
+        if (!val) return;
+
+        const source = window.autocompleteData[type] || [];
+        const matches = source.filter(str => normalizeStr(str).includes(val));
+
+        if (matches.length > 0) {
+            list.classList.remove('hidden');
+            wrapper.style.zIndex = "100";
+            matches.slice(0, 15).forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'p-2 hover:bg-primary/10 cursor-pointer border-b border-base-content/5 text-sm font-bold text-base-content bg-base-100';
+                div.textContent = match;
+                div.onmousedown = (e) => {
+                    e.preventDefault();
+                    input.value = match;
+                    list.classList.add('hidden');
+                    wrapper.style.zIndex = "";
+                };
+                list.appendChild(div);
+            });
+        }
+    }
+
+    // Cerrar sugerencias al hacer click fuera
+    document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('.relative')) {
+            document.querySelectorAll('.generic-suggestions').forEach(el => {
+                el.classList.add('hidden');
+                const rel = el.closest('.relative');
+                if (rel) rel.style.zIndex = "";
+            });
+        }
+    });
+</script>
 {% endblock %}

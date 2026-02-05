@@ -270,21 +270,6 @@
                     </div>
                 </div>
 
-                <!-- Tipo -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Tipo</label>
-                    <input type="text" name="t_tipo" class="input input-bordered w-full h-10"
-                        placeholder="Tipo de trampa..." value="{{ request.args.get('t_tipo', '') }}">
-                </div>
-
-                <!-- Capacidad -->
-                <div class="form-control">
-                    <label
-                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Capacidad</label>
-                    <input type="text" name="t_capacidad" class="input input-bordered w-full h-10"
-                        placeholder="Capacidad..." value="{{ request.args.get('t_capacidad', '') }}">
-                </div>
-
                 <!-- Mes -->
                 <div class="form-control">
                     <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
@@ -453,22 +438,6 @@
                             class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
                         </div>
                     </div>
-                </div>
-
-                <!-- Dirección -->
-                <div class="form-control">
-                    <label
-                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Dirección</label>
-                    <input type="text" name="v_direccion" class="input input-bordered w-full h-10"
-                        placeholder="Filtrar por dirección..." value="{{ request.args.get('v_direccion', '') }}">
-                </div>
-
-                <!-- No. Cliente -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">No.
-                        Cliente</label>
-                    <input type="text" name="v_no_cliente" class="input input-bordered w-full h-10"
-                        placeholder="ID Cliente..." value="{{ request.args.get('v_no_cliente', '') }}">
                 </div>
 
                 <!-- Mes -->

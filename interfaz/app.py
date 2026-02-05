@@ -696,10 +696,15 @@ def tarificador():
     end = start + per_page
     paginated_tars = all_tars[start:end]
     
+    # Get all client names for autocomplete search
+    clientes_data = read_csv(CLIENTES_CSV)
+    clientes_names = sorted(list(set([r.get('nombre_empresa', '').strip() for r in clientes_data if r.get('nombre_empresa')])))
+    
     return render_template('tarificador.html', 
                          tarificadores=paginated_tars,
                          page=page,
-                         total_pages=total_pages)
+                         total_pages=total_pages,
+                         clientes_all={'clientes': clientes_names})
 
 # --- Tarificador Logic Helpers ---
 # Use functions similar to generar_tarificador.py to ensure consistency
@@ -1564,10 +1569,15 @@ def permisos_descarga():
     end = start + per_page
     paginated_permisos = all_permisos[start:end]
     
+    # Get all client names for autocomplete search
+    clientes_data = read_csv(CLIENTES_CSV)
+    clientes_names = sorted(list(set([r.get('nombre_empresa', '').strip() for r in clientes_data if r.get('nombre_empresa')])))
+
     return render_template('permiso_descarga.html', 
                          permisos=paginated_permisos,
                          page=page,
-                         total_pages=total_pages)
+                         total_pages=total_pages,
+                         clientes_all={'clientes': clientes_names})
 
 
 @app.route('/nuevo_permiso_descarga', methods=['GET', 'POST'])
@@ -1884,13 +1894,17 @@ def ver_catalogo(tipo):
     # Headers
     headers = ['ID', 'Nombre', 'Categoría', 'Unidad', 'Precio']
     
+    # Names for autocomplete
+    autocomplete_names = sorted(list(set(row.get('Nombre', '').strip() for row in data if row.get('Nombre'))))
+    
     return render_template('tabla_catalogo.html',
                          tipo=tipo,
                          data=paginated_data,
                          headers=headers,
                          page=page,
                          total_pages=total_pages,
-                         categorias=categorias)
+                         categorias=categorias,
+                         autocomplete_names={'items': autocomplete_names})
 
 @app.route('/catalogo/nuevo/<tipo>', methods=['GET'])
 @login_required
@@ -2055,12 +2069,16 @@ def ver_directorio(tipo):
     else:
          headers = ['nombre_empresa', 'telefono_empresa', 'direccion_empresa', 'tipo_empresa']
 
+    # Get all names for autocomplete (from current CSV)
+    names = sorted(list(set(r.get('nombre_empresa', '').strip() for r in data if r.get('nombre_empresa'))))
+
     return render_template('tabla_directorio.html', 
                          tipo=tipo, 
                          data=paginated_data, 
                          headers=headers, 
                          page=page, 
-                         total_pages=total_pages)
+                         total_pages=total_pages,
+                         clientes_all={'clientes': names})
 
 @app.route('/directorio/eliminar/<tipo>/<id_val>', methods=['POST'])
 @login_required
@@ -2400,10 +2418,15 @@ def consumos():
     end = start + per_page
     paginated_consumos = all_consumos[start:end]
     
+    # Get all client names for autocomplete search
+    clientes_data = read_csv(CLIENTES_CSV)
+    clientes_names = sorted(list(set([r.get('nombre_empresa', '').strip() for r in clientes_data if r.get('nombre_empresa')])))
+
     return render_template('consumos_agua.html', 
                          consumos=paginated_consumos,
                          page=page,
-                         total_pages=total_pages)
+                         total_pages=total_pages,
+                         clientes_all={'clientes': clientes_names})
 
 @app.route('/crear_consumo', methods=['GET'])
 @login_required
