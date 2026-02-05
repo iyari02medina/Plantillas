@@ -1,5 +1,7 @@
 import csv
 import os
+import datetime
+import re
 from jinja2 import Template
 
 # Configuración de rutas
@@ -7,6 +9,31 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_FILE = os.path.join(BASE_DIR, "desazolve.html")
 CSV_FILE = os.path.join(BASE_DIR, "ordenes_desazolve.csv")
 OUTPUT_DIR = r"C:\Users\DELL\Desktop\Cophi\Recursos\Programa_cophi\Documentos_generados\dezasolves"
+
+def obtener_siguiente_folio():
+    """
+    Genera el folio siguiendo la estructura: DZ-MMYY-NNN
+    DZ = Desazolve, MM = Mes, YY = Año, NNN = Secuencial del mes.
+    Cada primero de mes se reinicia a 001.
+    """
+    now = datetime.datetime.now()
+    prefix = f"DZ-{now.strftime('%m%y')}-"
+    
+    max_num = 0
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                folio = row.get('folio_des', '')
+                if folio.startswith(prefix):
+                    try:
+                        num = int(folio.split('-')[-1])
+                        if num > max_num:
+                            max_num = num
+                    except:
+                        pass
+    
+    return f"{prefix}{max_num + 1:03d}"
 
 def generar_html():
     # Crear directorio de salida si no existe

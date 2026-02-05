@@ -1121,34 +1121,34 @@ def nueva_orden(tipo):
     # GET: Prepare empty form
     else:
         # Determine next folio
-        prefix = ''
+        now = datetime.datetime.now()
+        mm_yy = now.strftime('%m%y')
+
         if tipo == 'desazolve': 
             filepath = ORDENES_CSV
-            prefix = 'OT-DES-'
             id_key = 'folio_des'
+            prefix = f"DZ-{mm_yy}-"
         elif tipo == 'trampa': 
             filepath = TRAMPAS_CSV
-            prefix = 'OT-TRA-'
             id_key = 'folio_lt'
+            prefix = f"TG-{mm_yy}-"
         else: 
             filepath = VISITAS_CSV
-            prefix = 'VT-'
             id_key = 'folio_vt'
+            prefix = f"VT-{mm_yy}-"
             
         rows = read_csv(filepath)
         max_num = 0
         for r in rows:
-            try:
-                # Extract number from format like PREFIX-001
-                # Robust extraction: find last digits
-                txt = r.get(id_key, '')
-                import re
-                nums = re.findall(r'\d+', txt)
-                if nums:
-                    val = int(nums[-1])
-                    if val > max_num: max_num = val
-            except: pass
-            
+            f = r.get(id_key, '')
+            if f and f.startswith(prefix):
+                try:
+                    parts = f.split('-')
+                    if len(parts) >= 3:
+                        num = int(parts[-1])
+                        if num > max_num: max_num = num
+                except: pass
+        
         suggested_folio = f"{prefix}{max_num + 1:03d}"
         
         # Empty data structure with just today's date
@@ -1625,19 +1625,28 @@ def nuevo_permiso_descarga():
                         except:
                             pass # Ignorar si no se puede borrar en ese momento
                 
-                # 2. Guardar la nueva imagen
+                # 2. Procesar y guardar la nueva imagen (PNG optimizado)
                 from werkzeug.utils import secure_filename
+                from PIL import Image
                 
                 fname = secure_filename(croquis_file.filename)
                 safe_nis = str(nis).strip().replace('/', '').replace('\\', '').replace(' ', '_')
                 
-                # Usar un nombre predecible basado en NIS para evitar duplicados
-                # Agregamos la extensión original
-                ext = fname.rsplit('.', 1)[1].lower() if '.' in fname else 'jpg'
-                final_name = f"croquis_{safe_nis}.{ext}"
-                
+                # Forzamos formato .png
+                final_name = f"croquis_{safe_nis}.png"
                 save_path = os.path.join(upload_folder, final_name)
-                croquis_file.save(save_path)
+                
+                # Abrir imagen con Pillow
+                img = Image.open(croquis_file)
+                
+                # Redimensionar si supera los 800px (manteniendo proporción)
+                max_dim = 800
+                if img.width > max_dim or img.height > max_dim:
+                    img.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
+                
+                # Guardar como PNG optimizado
+                # 'optimize=True' intenta reducir el tamaño sin perder calidad (compresión sin pérdida)
+                img.save(save_path, "PNG", optimize=True)
                 
                 new_row['croquis_imagen'] = final_name
             except Exception as e:
