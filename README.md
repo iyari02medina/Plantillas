@@ -38,7 +38,8 @@ Consulta [README_DESPLIEGUE.md](README_DESPLIEGUE.md) para saber cómo subir tus
 ```
 
 ## 🎨 Interfaz y Diseño
-Consulta [README_UI.md](README_UI.md) para detalles sobre los componentes visuales de FlyonUI y TailwindCSS.
+Consulta [README_UI.md](README_UI.md) para detalles sobre los componentes visuales.
+*   **Regla de Oro:** Todos los contenedores de títulos (`div` con `h1`) deben usar la clase `mb-6` (ejemplo en `cotizaciones.html`).
 
 ## 📁 Estructura de Datos
 *   `/Cotizacion`: Datos de cotizaciones genéricas.

@@ -288,7 +288,8 @@ Para ahorrar espacio en pantallas pequeñas, oculta el texto de los botones secu
 
 ### 4. Encabezados de Página
 Usa Flexbox para apilar título y botones verticalmente en móvil, y alinearlos horizontalmente en escritorio.
-*   **Clases:** `flex flex-col md:flex-row justify-between items-start md:items-center`
+*   **Margen Crítico:** Todos los contenedores `div` que contengan un `h1` deben llevar obligatoriamente la clase `mb-6` para dar espacio al contenido inferior (referencia: `cotizaciones.html`).
+*   **Clases:** `flex flex-col md:flex-row justify-between items-start md:items-center mb-6`
 
 ---
 
@@ -354,6 +355,8 @@ Catálogo oficial de las etiquetas `div` y sus clases estándar para reproducir 
 | **6. Split-Flex (Inputs)** | `flex gap-2` (Hijos: `w-1/3`, `w-2/3`) | **CRÍTICO:** Para dividir un solo campo en dos (No./Cap). Reemplaza a grid en este caso específico. |
 | **7. Contenedor Tabs** | `card bg-base-100 border... mb-6` | Barra flotante que contiene el `<select>` de navegación y botones de acción. |
 | **8. Estado Vacío (Tabla)** | `text-center py-20 opacity-40` | `td` único para mostrar mensajes cuando no hay datos en una tabla. |
+| **9. Folio de Consumo** | `CON-MMAA-###` | Formato estricto para registros de agua. El contador se reinicia mensualmente (ej: `CON-0226-001`). **Protegido:** Solo lectura para el usuario. |
+| **10. Div con H1 (Header)** | `div.mb-6` | Todo contenedor `div` que tenga un `h1` (título de página) tendrá un margen `mb-6` (como en `cotizaciones.html`). |
 
 #### Ejemplo de Estructura Completa (Skeleton)
 ```html

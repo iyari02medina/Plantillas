@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="space-y-6">
-    <div class="flex items-center justify-between gap-4 mb-2">
+    <div class="flex items-center justify-between gap-4 mb-6">
         <div class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                 class="icon icon-tabler icons-tabler-filled icon-tabler-droplet-half-2 size-10 text-primary">
@@ -14,9 +14,6 @@
             </svg>
             <div>
                 <h1 class="text-3xl font-bold text-base-content m-0 text-balance">Consumos de Agua</h1>
-                <p class="text-base-content/60 font-medium hidden md:block">Historial de consumos registrados por
-                    cliente y
-                    niveles de lectura.</p>
             </div>
         </div>
         <a href="{{ url_for('crear_consumo') }}" class="btn btn-primary shadow-sm">

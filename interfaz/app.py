@@ -2571,21 +2571,24 @@ def crear_consumo():
     # Load clients for the search
     clientes = read_csv(CLIENTES_CSV)
     
-    # Suggest Folio
+    # Suggest Folio: CON-MMYY-###
+    now = datetime.date.today()
+    prefix = f"CON-{now.strftime('%m%y')}-"
+    
     existing = read_csv(CONSUMOS_CSV)
     max_num = 0
     if existing:
         for r in existing:
             try:
-                # Expecting CON-XXX
+                # Expecting CON-MMYY-###
                 txt = r.get('folio', '')
-                import re
-                nums = re.findall(r'\d+', txt)
-                if nums:
-                    val = int(nums[-1])
-                    if val > max_num: max_num = val
+                if txt.startswith(prefix):
+                    nums = txt.split('-')
+                    if len(nums) == 3:
+                        val = int(nums[2])
+                        if val > max_num: max_num = val
             except: pass
-    suggested_folio = f"CON-{max_num + 1:03d}"
+    suggested_folio = f"{prefix}{max_num + 1:03d}"
     
     return render_template('crea_consumo.html', clientes=clientes, suggested_folio=suggested_folio)
 
@@ -2604,6 +2607,19 @@ def guardar_consumo():
     if not headers:
         headers = ['folio', 'fecha_registro', 'fecha_lectura', 'ID_cliente', 'nombre_cliente', 'lectura', 'consumo']
         
+    # If new, we must not allow the user to override the suggested folio with something invalid
+    # though for consistency with other modules we take it from form but check collisions.
+    # The user said "user cannot modify the folio" - we already have 'readonly' in HTML.
+    
+    # If strictly new, let's re-generate prefix to ensure it's correct for CURRENT month
+    if not original_folio:
+        now = datetime.date.today()
+        prefix = f"CON-{now.strftime('%m%y')}-"
+        # Only override if the provided folio doesn't match the monthly pattern (failsafe)
+        if not folio.startswith(prefix):
+            flash('Error en el formato del folio generado.', 'error')
+            return redirect(url_for('crear_consumo'))
+
     # Check duplicates if new
     if not original_folio and any(r.get('folio') == folio for r in existing):
         flash(f'El Folio {folio} ya existe.', 'error')
