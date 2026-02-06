@@ -164,12 +164,11 @@ Cuando necesites dividir un solo campo en dos datos relacionados (ej: "No. / Cap
     ```
     *   **`div.flex gap-2`**: Contenedor padre. `gap-2` crea la separación visual.
     *   **`w-1/3` y `w-2/3`**: Definen la proporción. Para mitades iguales usa `w-1/2` en ambos.
-    *   **Nota:** NO uses `grid` ni `input-group` para esto. Flexbox es más robusto para anidación.
-
-#### 3. Tipografía de Labels
-Todos los labels de formularios deben ser consistentes:
-*   **Clase:** `text-xs uppercase font-bold text-base-content/60` (o `text-base-content/50` si es muy secundario).
-*   **Evita:** Tamaños arbitrarios como `text-[10px]` o `text-lg`. Consistencia es clave.
+#### 4. Tamaño Estándar de Inputs
+Para mantener la consistencia en el programa, todos los inputs deben tener un tamaño uniforme:
+*   **Clase para campos estándar:** `input input-bordered w-full h-10` (El `h-10` asegura que coincidan con la altura de los botones estándar).
+*   **Clase para campos en tablas:** `input input-bordered input-sm w-full`.
+*   **Evita:** Usar `input-lg`, `input-xs` o paddings arbitrarios como `py-10` a menos que sea una excepción de diseño justificada.
 
 ### E. Componente de Búsqueda Autocomplete (Filtros y Formularios)
 Este componente permite realizar búsquedas en tiempo real sobre listas de datos locales (CSV), siendo totalmente insensible a acentos y mayúsculas.

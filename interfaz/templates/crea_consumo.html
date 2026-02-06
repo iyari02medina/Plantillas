@@ -41,28 +41,27 @@
                     <span>Identificación del Registro</span>
                 </div>
                 <div class="card-body p-6 space-y-4">
-                    <div class="form-control">
+                    <div class="form-control space-y-2">
                         <label
-                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio</label>
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                         <input type="text" id="folio" name="folio" placeholder="Ej. CON-001"
-                            class="input input-bordered w-full font-bold text-primary"
+                            class="input input-bordered w-full h-10 font-bold text-primary"
                             value="{{ suggested_folio if not consumo else consumo.folio }}" required readonly>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="form-control">
-                            <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Fecha
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha
                                 Registro</label>
                             <input type="date" id="fecha_registro" name="fecha_registro"
-                                class="input input-bordered w-full"
+                                class="input input-bordered w-full h-10"
                                 value="{{ consumo.fecha_registro if consumo else '' }}" {% if consumo %}disabled{% endif
                                 %} required>
                         </div>
-                        <div class="form-control">
-                            <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Fecha
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha
                                 Lectura</label>
-                            Lectura</label>
                             <input type="date" id="fecha_lectura" name="fecha_lectura"
-                                class="input input-bordered w-full"
+                                class="input input-bordered w-full h-10"
                                 value="{{ consumo.fecha_lectura if consumo else '' }}" {% if consumo %}disabled{% endif
                                 %} required>
                         </div>
@@ -78,23 +77,22 @@
                     <span>Asignación de Cliente</span>
                 </div>
                 <div class="card-body p-6 space-y-4">
-                    <div class="form-control relative">
-                        <label
-                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs text-base-content/60">Nombre
+                    <div class="form-control relative space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre
                             Cliente</label>
                         <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar cliente..."
-                            class="input input-bordered w-full" autocomplete="off" oninput="fillClient(this)" required
-                            value="{{ consumo.nombre_cliente if consumo else '' }}" {% if consumo %}disabled{% endif %}>
+                            class="input input-bordered w-full h-10" autocomplete="off" oninput="fillClient(this)"
+                            required value="{{ consumo.nombre_cliente if consumo else '' }}" {% if consumo %}disabled{%
+                            endif %}>
                         <div id="suggestions-box"
                             class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
                         </div>
                     </div>
-                    <div class="form-control">
-                        <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">ID Cliente
-                            /
-                            NIS</label>
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">ID Cliente
+                            / NIS</label>
                         <input type="text" id="ID_cliente" name="ID_cliente" placeholder="ID Cliente"
-                            class="input input-bordered w-full font-mono text-secondary"
+                            class="input input-bordered w-full h-10 font-mono text-secondary"
                             value="{{ consumo.ID_cliente if consumo else '' }}" readonly>
                     </div>
                 </div>
@@ -107,37 +105,31 @@
                     <span class="icon-[tabler--gauge] size-5 text-info"></span>
                     <span>Datos de Lectura de Medidor</span>
                 </div>
-                <div class="card-body p-8">
-                    <div class="flex flex-col md:flex-row items-center justify-around gap-10">
-                        <div class="form-control w-full md:w-1/3">
+                <div class="card-body p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                        <div class="form-control space-y-2">
                             <label
-                                class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs text-center">Lectura
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Lectura
                                 Actual (m³)</label>
                             <input type="number" step="0.01" id="lectura" name="lectura" placeholder="0.00"
-                                class="input input-bordered input-lg w-full text-center text-3xl font-black py-10"
+                                class="input input-bordered w-full h-10 font-black text-center text-xl"
                                 value="{{ consumo.lectura if consumo else '' }}" {% if consumo %}disabled{% endif %}
                                 required>
                         </div>
 
-                        <div class="flex flex-col items-center">
-                            <span
-                                class="icon-[tabler--arrow-right] size-10 text-base-content/20 hidden md:block"></span>
-                            <span class="icon-[tabler--arrow-down] size-10 text-base-content/20 md:hidden"></span>
-                        </div>
-
-                        <div class="form-control w-full md:w-1/3">
+                        <div class="form-control space-y-2">
                             <label
-                                class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs text-center">Consumo
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Consumo
                                 Calculado (m³)</label>
                             <div class="relative">
                                 <input type="number" step="0.01" id="consumo" name="consumo" placeholder="---"
-                                    class="input input-bordered input-lg w-full text-center text-3xl font-black py-10 bg-base-200/50 border-dashed"
+                                    class="input input-bordered w-full h-10 font-black text-center text-xl bg-base-200/50 border-dashed"
                                     value="{{ consumo.consumo if consumo else '' }}" readonly>
                             </div>
+                            <p class="text-[10px] opacity-40 font-bold uppercase tracking-widest text-center mt-1">
+                                Diferencia vs lectura anterior
+                            </p>
                         </div>
-                        <label
-                            class="label justify-center text-[10px] opacity-40 font-bold uppercase tracking-widest mt-2">Diferencia
-                            vs lectura anterior</label>
                     </div>
                 </div>
             </div>
@@ -145,8 +137,9 @@
 </div>
 
 <div class="mt-8 flex justify-end gap-3 pb-20">
-    <a href="{{ url_for('consumos') }}" class="btn btn-ghost">Cancelar</a>
-    <button type="submit" class="btn btn-primary btn-wide shadow-lg {% if consumo %}hidden{% endif %}" id="btn-submit">
+    <a href="{{ url_for('consumos') }}" class="btn btn-ghost h-10 min-h-0">Cancelar</a>
+    <button type="submit" class="btn btn-primary btn-wide shadow-lg h-10 min-h-0 {% if consumo %}hidden{% endif %}"
+        id="btn-submit">
         <span class="icon-[tabler--device-floppy] size-5"></span>
         Guardar Consumo
     </button>
