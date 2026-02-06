@@ -2136,7 +2136,7 @@ def ver_directorio(tipo):
         
         # General search (ID, Folio, Name, Address)
         if q_search:
-            search_fields = ['folio', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'rfc_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa']
+            search_fields = ['folio', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'rfc_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'nombre_usuario', 'titular_pago', 'regimen', 'giro', 'uso', 'contrato_con']
             row_match = False
             for field in search_fields:
                 if q_search in str(item.get(field, '')).lower():
@@ -2388,9 +2388,9 @@ def guardar_directorio(tipo):
         headers = list(existing[0].keys())
     else:
         if tipo == 'clientes':
-            headers = ['folio', 'fecha_creacion', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'telefono_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'tipo_empresa', 'razon_social', 'rfc_empresa', 'no_wc', 'no_mingitorios', 'no_lavamanos', 'no_regaderas']
+            headers = ['folio', 'fecha_creacion', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'telefono_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'tipo_empresa', 'razon_social', 'rfc_empresa', 'nombre_usuario', 'periodo_servicios', 'titular_pago', 'tarifa', 'regimen', 'giro', 'uso', 'contrato_con', 'no_wc', 'no_mingitorios', 'no_lavamanos', 'no_regaderas']
         else:
-            headers = ['folio', 'fecha_creacion', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'telefono_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'tipo_empresa', 'rfc_empresa', 'no_wc', 'no_mingitorios', 'no_lavamanos', 'no_regaderas']
+            headers = ['folio', 'fecha_creacion', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'telefono_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'tipo_empresa', 'rfc_empresa', 'nombre_usuario', 'periodo_servicios', 'titular_pago', 'tarifa', 'regimen', 'giro', 'uso', 'contrato_con', 'no_wc', 'no_mingitorios', 'no_lavamanos', 'no_regaderas']
             
     # Key is always folio now
     key = 'folio'

@@ -116,8 +116,7 @@ Cophi{% endblock %}
                     <div class="card-body p-6 space-y-4">
                         <div class="form-control space-y-2">
                             <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre
-                                Empresa /
-                                Negocio</label>
+                                Empresa</label>
                             <input type="text" name="nombre_empresa" value="{{ item.get('nombre_empresa', '') }}"
                                 required class="input input-bordered w-full font-black text-primary" {% if not is_new
                                 %}disabled{% endif %} placeholder="Ej. Abarrotes Don Pepe">
@@ -126,7 +125,7 @@ Cophi{% endblock %}
                             <label
                                 class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Propietario
                                 /
-                                Representante</label>
+                                Representante Legal</label>
                             <input type="text" name="propietario_empresa"
                                 value="{{ item.get('propietario_empresa', '') }}" class="input input-bordered w-full" {%
                                 if not is_new %}disabled{% endif %} placeholder="Nombre del dueño o responsable">
@@ -135,7 +134,7 @@ Cophi{% endblock %}
                             <div class="form-control space-y-2">
                                 <label
                                     class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">RFC
-                                    Propietario</label>
+                                    Propietario / Representante Legal</label>
                                 <input type="text" name="rfc_propietario" value="{{ item.get('rfc_propietario', '') }}"
                                     class="input input-bordered w-full font-mono uppercase" {% if not is_new
                                     %}disabled{% endif %} placeholder="RFC del Propietario">
@@ -209,6 +208,86 @@ Cophi{% endblock %}
                     </div>
                 </div>
 
+                <!-- Tarjeta: Datos de Servicio y Contratación (Ambos) -->
+                <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                    <div
+                        class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                        <span class="icon-[tabler--address-book] size-5 text-primary"></span>
+                        <span>Datos de Servicio y Contrato de Agua</span>
+                    </div>
+                    <div class="card-body p-6 space-y-4">
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre
+                                del Usuario</label>
+                            <input type="text" name="nombre_usuario" value="{{ item.get('nombre_usuario', '') }}"
+                                class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
+                                placeholder="Nombre completo del usuario">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Titular
+                                    de Pago</label>
+                                <input type="text" name="titular_pago" value="{{ item.get('titular_pago', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
+                                    placeholder="Nombre del titular">
+                            </div>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Régimen</label>
+                                <input type="text" name="regimen" value="{{ item.get('regimen', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
+                                    placeholder="Ej. Persona Física, Moral...">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Giro</label>
+                                <input type="text" name="giro" value="{{ item.get('giro', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
+                                    placeholder="Giro específico">
+                            </div>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Uso</label>
+                                <input type="text" name="uso" value="{{ item.get('uso', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
+                                    placeholder="Ej. Comercial, Industrial...">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Periodo
+                                    de Servicios</label>
+                                <input type="text" name="periodo_servicios"
+                                    value="{{ item.get('periodo_servicios', '') }}" class="input input-bordered w-full"
+                                    {% if not is_new %}disabled{% endif %} placeholder="Ej. Mensual, Bimestral...">
+                            </div>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Contrato
+                                    con</label>
+                                <input type="text" name="contrato_con" value="{{ item.get('contrato_con', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
+                                    placeholder="Ej. Agua de Puebla, Municipio...">
+                            </div>
+                        </div>
+
+                        <div class="form-control space-y-2">
+                            <label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tarifa</label>
+                            <input type="text" name="tarifa" value="{{ item.get('tarifa', '') }}"
+                                class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
+                                placeholder="Ej. $1,500.00">
+                        </div>
+                    </div>
+                </div>
+
                 {% if tipo == 'clientes' %}
                 <!-- Tarjeta: Datos Fiscales (Solo Clientes) -->
                 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
@@ -264,210 +343,199 @@ Cophi{% endblock %}
                 </div>
 
                 <!-- Tarjeta: Servicios e Infraestructura (Solo Clientes) -->
-                <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden lg:col-span-2">
+                <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                     <div
                         class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                         <span class="icon-[tabler--tool] size-5 text-info"></span>
                         <span>Infraestructura Hidráulica y Servicios</span>
                     </div>
-                    <div class="card-body p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            <!-- Almacenamiento -->
-                            <div class="space-y-4">
-                                <h4
-                                    class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
-                                    Almacenamiento</h4>
+                    <div class="card-body p-6 space-y-8">
+                        <!-- Almacenamiento -->
+                        <div class="space-y-4">
+                            <h4
+                                class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                                Almacenamiento</h4>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cisternas
+                                    (No. / Cap.)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" name="total_cisternas"
+                                        value="{{ item.get('total_cisternas', '') }}" class="input input-bordered w-1/3"
+                                        placeholder="No." {% if not is_new %}disabled{% endif %}>
+                                    <input type="text" name="cap_cisternas" value="{{ item.get('cap_cisternas', '') }}"
+                                        class="input input-bordered w-2/3" placeholder="Liters" {% if not is_new
+                                        %}disabled{% endif %}>
+                                </div>
+                            </div>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tinacos
+                                    (No. / Cap.)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" name="total_tinacos" value="{{ item.get('total_tinacos', '') }}"
+                                        class="input input-bordered w-1/3" placeholder="No." {% if not is_new
+                                        %}disabled{% endif %}>
+                                    <input type="text" name="cap_tinacos" value="{{ item.get('cap_tinacos', '') }}"
+                                        class="input input-bordered w-2/3" placeholder="Liters" {% if not is_new
+                                        %}disabled{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Muebles Sanitarios -->
+                        <div class="space-y-4">
+                            <h4
+                                class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                                Muebles Sanitarios</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div class="form-control space-y-2">
                                     <label
-                                        class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cisternas
-                                        (No. / Cap.)</label>
-                                    <div class="flex gap-2">
-                                        <input type="text" name="total_cisternas"
-                                            value="{{ item.get('total_cisternas', '') }}"
-                                            class="input input-bordered w-1/3" placeholder="No." {% if not is_new
-                                            %}disabled{% endif %}>
-                                        <input type="text" name="cap_cisternas"
-                                            value="{{ item.get('cap_cisternas', '') }}"
-                                            class="input input-bordered w-2/3" placeholder="Liters" {% if not is_new
-                                            %}disabled{% endif %}>
-                                    </div>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tinacos
-                                            (No. / Cap.)</label>
-                                        <div class="flex gap-2">
-                                            <input type="text" name="total_tinacos"
-                                                value="{{ item.get('total_tinacos', '') }}"
-                                                class="input input-bordered w-1/3" placeholder="No." {% if not is_new
-                                                %}disabled{% endif %}>
-                                            <input type="text" name="cap_tinacos"
-                                                value="{{ item.get('cap_tinacos', '') }}"
-                                                class="input input-bordered w-2/3" placeholder="Liters" {% if not is_new
-                                                %}disabled{% endif %}>
-                                        </div>
-                                    </div>
+                                        class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
+                                        W.C.</label>
+                                    <input type="number" name="no_wc" value="{{ item.get('no_wc', '') }}"
+                                        class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                                 </div>
-
-                                <!-- Muebles Sanitarios -->
-                                <div class="space-y-4">
-                                    <h4
-                                        class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
-                                        Muebles Sanitarios</h4>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
-                                            W.C.</label>
-                                        <input type="number" name="no_wc" value="{{ item.get('no_wc', '') }}"
-                                            class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
-                                    </div>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
-                                            Mingitorios</label>
-                                        <input type="number" name="no_mingitorios"
-                                            value="{{ item.get('no_mingitorios', '') }}"
-                                            class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
-                                    </div>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
-                                            Lavamanos</label>
-                                        <input type="number" name="no_lavamanos"
-                                            value="{{ item.get('no_lavamanos', '') }}"
-                                            class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
-                                    </div>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
-                                            Regaderas</label>
-                                        <input type="number" name="no_regaderas"
-                                            value="{{ item.get('no_regaderas', '') }}"
-                                            class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
-                                    </div>
+                                <div class="form-control space-y-2">
+                                    <label
+                                        class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
+                                        Mingitorios</label>
+                                    <input type="number" name="no_mingitorios"
+                                        value="{{ item.get('no_mingitorios', '') }}" class="input input-bordered w-full"
+                                        {% if not is_new %}disabled{% endif %}>
                                 </div>
-
-                                <!-- Abastecimiento -->
-                                <div class="space-y-4">
-                                    <h4
-                                        class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
-                                        Abastecimiento</h4>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Pozo
-                                            (Si-No / No. Conc)</label>
-                                        <div class="flex gap-2">
-                                            <input type="text" name="pozo" value="{{ item.get('pozo', '') }}"
-                                                class="input input-bordered w-1/3" placeholder="S/N" {% if not is_new
-                                                %}disabled{% endif %}>
-                                            <input type="text" name="num_concesion_pozo"
-                                                value="{{ item.get('num_concesion_pozo', '') }}"
-                                                class="input input-bordered w-2/3" placeholder="Concesión" {% if not
-                                                is_new %}disabled{% endif %}>
-                                        </div>
-                                    </div>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tomas
-                                            /
-                                            Red (No. / Red)</label>
-                                        <div class="flex gap-2">
-                                            <input type="text" name="num_tomas" value="{{ item.get('num_tomas', '') }}"
-                                                class="input input-bordered w-1/3" placeholder="No." {% if not is_new
-                                                %}disabled{% endif %}>
-                                            <input type="text" name="red" value="{{ item.get('red', '') }}"
-                                                class="input input-bordered w-2/3" placeholder="Municipal?" {% if not
-                                                is_new %}disabled{% endif %}>
-                                        </div>
-                                    </div>
+                                <div class="form-control space-y-2">
+                                    <label
+                                        class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
+                                        Lavamanos</label>
+                                    <input type="number" name="no_lavamanos" value="{{ item.get('no_lavamanos', '') }}"
+                                        class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                                 </div>
-
-                                <!-- Pipas y Medidor -->
-                                <div class="space-y-4">
-                                    <h4
-                                        class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
-                                        Pipas y Medidor</h4>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Pipas
-                                            (Prom. / Cap.)</label>
-                                        <div class="flex gap-2">
-                                            <input type="text" name="prom_pipas_mes"
-                                                value="{{ item.get('prom_pipas_mes', '') }}"
-                                                class="input input-bordered w-1/2" placeholder="Mes" {% if not is_new
-                                                %}disabled{% endif %}>
-                                            <input type="text" name="capacidad_pipas"
-                                                value="{{ item.get('capacidad_pipas', '') }}"
-                                                class="input input-bordered w-1/2" placeholder="Cap." {% if not is_new
-                                                %}disabled{% endif %}>
-                                        </div>
-                                    </div>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Medidor
-                                            (S-N / Serie)</label>
-                                        <div class="flex gap-2">
-                                            <input type="text" name="medidor_agua "
-                                                value="{{ item.get('medidor_agua ', '') }}"
-                                                class="input input-bordered w-1/3" placeholder="S/N" {% if not is_new
-                                                %}disabled{% endif %}>
-                                            <input type="text" name="no_serie_medidor"
-                                                value="{{ item.get('no_serie_medidor', '') }}"
-                                                class="input input-bordered w-2/3" placeholder="Serie" {% if not is_new
-                                                %}disabled{% endif %}>
-                                        </div>
-                                    </div>
+                                <div class="form-control space-y-2">
+                                    <label
+                                        class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
+                                        Regaderas</label>
+                                    <input type="number" name="no_regaderas" value="{{ item.get('no_regaderas', '') }}"
+                                        class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                                 </div>
+                            </div>
+                        </div>
+                        <!-- Abastecimiento -->
+                        <div class="space-y-4">
+                            <h4
+                                class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                                Abastecimiento</h4>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Pozo
+                                    (Si-No / No. Conc)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" name="pozo" value="{{ item.get('pozo', '') }}"
+                                        class="input input-bordered w-1/3" placeholder="S/N" {% if not is_new
+                                        %}disabled{% endif %}>
+                                    <input type="text" name="num_concesion_pozo"
+                                        value="{{ item.get('num_concesion_pozo', '') }}"
+                                        class="input input-bordered w-2/3" placeholder="Concesión" {% if not is_new
+                                        %}disabled{% endif %}>
+                                </div>
+                            </div>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tomas
+                                    /
+                                    Red (No. / Red)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" name="num_tomas" value="{{ item.get('num_tomas', '') }}"
+                                        class="input input-bordered w-1/3" placeholder="No." {% if not is_new
+                                        %}disabled{% endif %}>
+                                    <input type="text" name="red" value="{{ item.get('red', '') }}"
+                                        class="input input-bordered w-2/3" placeholder="Municipal?" {% if not is_new
+                                        %}disabled{% endif %}>
+                                </div>
+                            </div>
+                        </div>
 
-                                <!-- Descargas -->
-                                <div class="space-y-4">
-                                    <h4
-                                        class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
-                                        Descargas</h4>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Registro
-                                            (S-N / Loc.)</label>
-                                        <div class="flex gap-2">
-                                            <input type="text" name="tiene_registro"
-                                                value="{{ item.get('tiene_registro', '') }}"
-                                                class="input input-bordered w-1/3" placeholder="S/N" {% if not is_new
-                                                %}disabled{% endif %}>
-                                            <input type="text" name="localización_registro"
-                                                value="{{ item.get('localización_registro', '') }}"
-                                                class="input input-bordered w-2/3" placeholder="Ubicación" {% if not
-                                                is_new %}disabled{% endif %}>
-                                        </div>
-                                    </div>
-                                    <div class="form-control space-y-2">
-                                        <label
-                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Trampas
-                                            (No. / Cap.)</label>
-                                        <div class="flex gap-2">
-                                            <input type="text" name="no_trampas_grasa"
-                                                value="{{ item.get('no_trampas_grasa', '') }}"
-                                                class="input input-bordered w-1/3" placeholder="No." {% if not is_new
-                                                %}disabled{% endif %}>
-                                            <input type="text" name="cap_trampas"
-                                                value="{{ item.get('cap_trampas', '') }}"
-                                                class="input input-bordered w-2/3" placeholder="Cap." {% if not is_new
-                                                %}disabled{% endif %}>
-                                        </div>
-                                    </div>
+                        <!-- Pipas y Medidor -->
+                        <div class="space-y-4">
+                            <h4
+                                class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                                Pipas y Medidor</h4>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Pipas
+                                    (Prom. / Cap.)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" name="prom_pipas_mes"
+                                        value="{{ item.get('prom_pipas_mes', '') }}" class="input input-bordered w-1/2"
+                                        placeholder="Mes" {% if not is_new %}disabled{% endif %}>
+                                    <input type="text" name="capacidad_pipas"
+                                        value="{{ item.get('capacidad_pipas', '') }}" class="input input-bordered w-1/2"
+                                        placeholder="Cap." {% if not is_new %}disabled{% endif %}>
+                                </div>
+                            </div>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Medidor
+                                    (S-N / Serie)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" name="medidor_agua " value="{{ item.get('medidor_agua ', '') }}"
+                                        class="input input-bordered w-1/3" placeholder="S/N" {% if not is_new
+                                        %}disabled{% endif %}>
+                                    <input type="text" name="no_serie_medidor"
+                                        value="{{ item.get('no_serie_medidor', '') }}"
+                                        class="input input-bordered w-2/3" placeholder="Serie" {% if not is_new
+                                        %}disabled{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descargas -->
+                        <div class="space-y-4">
+                            <h4
+                                class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                                Descargas</h4>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Registro
+                                    (S-N / Loc.)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" name="tiene_registro"
+                                        value="{{ item.get('tiene_registro', '') }}" class="input input-bordered w-1/3"
+                                        placeholder="S/N" {% if not is_new %}disabled{% endif %}>
+                                    <input type="text" name="localización_registro"
+                                        value="{{ item.get('localización_registro', '') }}"
+                                        class="input input-bordered w-2/3" placeholder="Ubicación" {% if not is_new
+                                        %}disabled{% endif %}>
+                                </div>
+                            </div>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Trampas
+                                    (No. / Cap.)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" name="no_trampas_grasa"
+                                        value="{{ item.get('no_trampas_grasa', '') }}"
+                                        class="input input-bordered w-1/3" placeholder="No." {% if not is_new
+                                        %}disabled{% endif %}>
+                                    <input type="text" name="cap_trampas" value="{{ item.get('cap_trampas', '') }}"
+                                        class="input input-bordered w-2/3" placeholder="Cap." {% if not is_new
+                                        %}disabled{% endif %}>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {% endif %}
                 </div>
+                {% endif %}
+            </div>
 
-                <div class="mt-8 flex justify-end gap-3 pb-10">
-                    <a href="{{ url_for('ver_directorio', tipo=tipo) }}" class="btn btn-ghost">Cancelar</a>
-                    <button type="submit"
-                        class="btn btn-primary btn-wide shadow-lg {% if not is_new %}hidden{% endif %}" id="btn-submit">
-                        <span class="icon-[tabler--device-floppy] size-5"></span>
-                        {{ 'Guardar Registro' if is_new else 'Guardar Cambios' }}
-                    </button>
-                </div>
+            <div class="mt-8 flex justify-end gap-3 pb-10">
+                <a href="{{ url_for('ver_directorio', tipo=tipo) }}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary btn-wide shadow-lg {% if not is_new %}hidden{% endif %}"
+                    id="btn-submit">
+                    <span class="icon-[tabler--device-floppy] size-5"></span>
+                    {{ 'Guardar Registro' if is_new else 'Guardar Cambios' }}
+                </button>
+            </div>
         </form>
     </div>
 
