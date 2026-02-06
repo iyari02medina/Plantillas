@@ -3,235 +3,259 @@
 {% block title %}Tarificador - Sistema Cophi{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between gap-4 mb-8">
-    <div class="flex items-center gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-            stroke-linecap="round" stroke-linejoin="round"
-            class="icon icon-tabler icons-tabler-outline icon-tabler-microscope size-10 text-primary">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M5 21h14" />
-            <path d="M6 18h2" />
-            <path d="M7 18v3" />
-            <path d="M9 11l3 3l6 -6l-3 -3l-6 6" />
-            <path d="M10.5 12.5l-1.5 1.5" />
-            <path d="M17 3l3 3" />
-            <path d="M12 21a6 6 0 0 0 3.715 -10.712" />
-        </svg>
-        <div>
-            <h1 class="text-3xl font-bold text-base-content m-0 text-balance">Análisis de Laboratorio</h1>
-            <p class="text-base-content/60 font-medium hidden md:block">Historial de informes de tarificación y análisis
-                de contaminantes.</p>
+<div class="space-y-6">
+    <div class="flex items-center justify-between gap-4 mb-2">
+        <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-microscope size-10 text-primary">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 21h14" />
+                <path d="M6 18h2" />
+                <path d="M7 18v3" />
+                <path d="M9 11l3 3l6 -6l-3 -3l-6 6" />
+                <path d="M10.5 12.5l-1.5 1.5" />
+                <path d="M17 3l3 3" />
+                <path d="M12 21a6 6 0 0 0 3.715 -10.712" />
+            </svg>
+            <div>
+                <h1 class="text-3xl font-bold text-base-content m-0 text-balance">Análisis de Laboratorio</h1>
+                <p class="text-base-content/60 font-medium hidden md:block">Historial de informes de tarificación y
+                    análisis
+                    de contaminantes.</p>
+            </div>
         </div>
+        <a href="{{ url_for('nuevo_tarificador') }}" class="btn btn-primary shadow-sm">
+            <span class="icon-[tabler--plus] size-5"></span>
+            <span class="hidden sm:inline">Nuevo Tarificador</span>
+        </a>
     </div>
-    <a href="{{ url_for('nuevo_tarificador') }}" class="btn btn-primary shadow-sm">
-        <span class="icon-[tabler--plus] size-5"></span>
-        <span class="hidden sm:inline">Nuevo Tarificador</span>
-    </a>
-</div>
 
-<!-- Search Filters -->
-<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
-    <div class="card-body p-6">
-        <form method="GET" action="{{ url_for('tarificador') }}" class="space-y-6 w-full">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Folio -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio</label>
-                    <input type="text" name="t_folio" class="input input-bordered w-full h-10" placeholder="TAR-..."
-                        value="{{ request.args.get('t_folio', '') }}">
-                </div>
+    <!-- Search Filters -->
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div class="card-body p-6">
+            <form method="GET" action="{{ url_for('tarificador') }}" class="space-y-6 w-full">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Folio -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
+                        <input type="text" name="t_folio" class="input input-bordered w-full h-10" placeholder="TAR-..."
+                            value="{{ request.args.get('t_folio', '') }}">
+                    </div>
 
-                <!-- Cliente -->
-                <div class="form-control relative">
-                    <label
-                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
-                    <input type="text" name="t_cliente" class="input input-bordered w-full h-10"
-                        placeholder="Filtrar por nombre de cliente..." value="{{ request.args.get('t_cliente', '') }}"
-                        oninput="filterGeneric(this, 'clientes')" autocomplete="off">
-                    <div
-                        class="generic-suggestions absolute z-[100] w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                    <!-- Cliente -->
+                    <div class="form-control relative">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cliente</label>
+                        <input type="text" name="t_cliente" class="input input-bordered w-full h-10"
+                            placeholder="Filtrar por nombre de cliente..."
+                            value="{{ request.args.get('t_cliente', '') }}" oninput="filterGeneric(this, 'clientes')"
+                            autocomplete="off">
+                        <div
+                            class="generic-suggestions absolute z-[100] w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                        </div>
+                    </div>
+
+                    <!-- Mes -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Mes</label>
+                        <select name="t_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
+                            <option value="" selected>Todos los meses</option>
+                            <option value="01" {{ 'selected' if request.args.get('t_mes')=='01' else '' }}>Enero
+                            </option>
+                            <option value="02" {{ 'selected' if request.args.get('t_mes')=='02' else '' }}>Febrero
+                            </option>
+                            <option value="03" {{ 'selected' if request.args.get('t_mes')=='03' else '' }}>Marzo
+                            </option>
+                            <option value="04" {{ 'selected' if request.args.get('t_mes')=='04' else '' }}>Abril
+                            </option>
+                            <option value="05" {{ 'selected' if request.args.get('t_mes')=='05' else '' }}>Mayo</option>
+                            <option value="06" {{ 'selected' if request.args.get('t_mes')=='06' else '' }}>Junio
+                            </option>
+                            <option value="07" {{ 'selected' if request.args.get('t_mes')=='07' else '' }}>Julio
+                            </option>
+                            <option value="08" {{ 'selected' if request.args.get('t_mes')=='08' else '' }}>Agosto
+                            </option>
+                            <option value="09" {{ 'selected' if request.args.get('t_mes')=='09' else '' }}>Septiembre
+                            </option>
+                            <option value="10" {{ 'selected' if request.args.get('t_mes')=='10' else '' }}>Octubre
+                            </option>
+                            <option value="11" {{ 'selected' if request.args.get('t_mes')=='11' else '' }}>Noviembre
+                            </option>
+                            <option value="12" {{ 'selected' if request.args.get('t_mes')=='12' else '' }}>Diciembre
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Año -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Año</label>
+                        <select name="t_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                            <option value="" selected>Año</option>
+                            {% for y in range(2023, 2031) %}
+                            <option value="{{ y }}" {{ 'selected' if request.args.get('t_anio')==y|string else '' }}>{{
+                                y }}
+                            </option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
 
-                <!-- Mes -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
-                    <select name="t_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
-                        <option value="" selected>Todos los meses</option>
-                        <option value="01" {{ 'selected' if request.args.get('t_mes')=='01' else '' }}>Enero</option>
-                        <option value="02" {{ 'selected' if request.args.get('t_mes')=='02' else '' }}>Febrero</option>
-                        <option value="03" {{ 'selected' if request.args.get('t_mes')=='03' else '' }}>Marzo</option>
-                        <option value="04" {{ 'selected' if request.args.get('t_mes')=='04' else '' }}>Abril</option>
-                        <option value="05" {{ 'selected' if request.args.get('t_mes')=='05' else '' }}>Mayo</option>
-                        <option value="06" {{ 'selected' if request.args.get('t_mes')=='06' else '' }}>Junio</option>
-                        <option value="07" {{ 'selected' if request.args.get('t_mes')=='07' else '' }}>Julio</option>
-                        <option value="08" {{ 'selected' if request.args.get('t_mes')=='08' else '' }}>Agosto</option>
-                        <option value="09" {{ 'selected' if request.args.get('t_mes')=='09' else '' }}>Septiembre
-                        </option>
-                        <option value="10" {{ 'selected' if request.args.get('t_mes')=='10' else '' }}>Octubre</option>
-                        <option value="11" {{ 'selected' if request.args.get('t_mes')=='11' else '' }}>Noviembre
-                        </option>
-                        <option value="12" {{ 'selected' if request.args.get('t_mes')=='12' else '' }}>Diciembre
-                        </option>
-                    </select>
+                <!-- Botones row -->
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                        <span class="icon-[tabler--search] size-5"></span>
+                        <span>Buscar</span>
+                    </button>
+                    <a href="{{ url_for('tarificador') }}" class="btn btn-soft btn-secondary h-10 min-h-0 btn-square"
+                        title="Limpiar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path
+                                d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                            <path d="M22 22l-5 -5" />
+                            <path d="M17 22l5 -5" />
+                        </svg>
+                    </a>
                 </div>
-
-                <!-- Año -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
-                    <select name="t_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
-                        <option value="" selected>Año</option>
-                        {% for y in range(2023, 2031) %}
-                        <option value="{{ y }}" {{ 'selected' if request.args.get('t_anio')==y|string else '' }}>{{ y }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <!-- Botones row -->
-            <div class="flex gap-3 pt-2">
-                <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
-                    <span class="icon-[tabler--search] size-5"></span>
-                    <span>Buscar</span>
-                </button>
-                <a href="{{ url_for('tarificador') }}" class="btn btn-soft btn-secondary h-10 min-h-0 btn-square"
-                    title="Limpiar">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path
-                            d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
-                        <path d="M22 22l-5 -5" />
-                        <path d="M17 22l5 -5" />
-                    </svg>
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-    <div class="card-body p-0">
-        <div class="overflow-x-auto">
-            <table class="table table-lg">
-                <thead class="bg-base-200/50">
-                    <tr>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Acciones</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Folio</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Cliente</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Fecha</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Precio m3</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-base-content/5">
-                    {% for data in tarificadores %}
-                    <tr class="hover:bg-base-200/30 transition-colors">
-                        <td>
-                            <div class="flex gap-2">
-                                <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
-                                    <button id="dropdown-actions-{{ data.folio_tar }}" type="button"
-                                        class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
-                                        aria-expanded="false" aria-label="Dropdown">
-                                        <span class="icon-[tabler--dots-vertical] size-4"></span>
-                                        <span>Ver</span>
-                                        <span
-                                            class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
-                                        aria-orientation="vertical"
-                                        aria-labelledby="dropdown-actions-{{ data.folio_tar }}">
-                                        <li>
-                                            <a class="dropdown-item flex items-center gap-2"
-                                                href="{{ url_for('detalle_tarificador', folio=data.folio_tar) }}">
-                                                <span class="icon-[tabler--eye] size-4"></span>
-                                                Detalles
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="{{ url_for('ver_tarificador', folio=data.folio_tar) }}"
-                                                target="_blank" class="dropdown-item flex items-center gap-2">
-                                                <span class="icon-[tabler--file-type-pdf] size-4"></span>
-                                                <span>PDF</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <hr class="dropdown-divider my-1 border-base-content/10">
-                                        </li>
-                                        <li>
-                                            <form action="{{ url_for('eliminar_tarificador', folio=data.folio_tar) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('¿Seguro que desea borrar este registro de tarificación? Esta acción no se puede deshacer.');"
-                                                class="w-full">
-                                                <button type="submit"
-                                                    class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
-                                                    <span class="icon-[tabler--trash] size-4"></span>
-                                                    Borrar
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                            </div>
-                        </td>
-                        <td>
-                            <span class="font-bold text-primary">{{ data.folio_tar }}</span>
-                        </td>
-                        <td class="font-medium text-base-content">{{ data.nombre_cliente }}</td>
-                        <td class="text-base-content/60">{{ data.fecha_tar }}</td>
-                        <td>
-                            <span class="badge badge-outline badge-success font-bold">${{ data.precio_m3_total }}</span>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5" class="text-center py-20">
-                            <div class="flex flex-col items-center gap-4">
-                                <span class="icon-[tabler--calculator-off] size-16 text-base-content/20"></span>
-                                <p class="text-base-content/40 font-medium">No se encontraron registros de tarificación
-                                    con los criterios de búsqueda.</p>
-                                <a href="{{ url_for('nuevo_tarificador') }}"
-                                    class="btn btn-outline btn-primary btn-sm mt-2">Nuevo cálculo</a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            </form>
         </div>
     </div>
 
-    {% if total_pages > 1 %}
-    <div class="card-footer bg-base-200/30 border-t border-base-content/10 p-4">
-        <div class="flex justify-center flex-wrap gap-2">
-            {% if page > 1 %}
-            <a href="{{ url_for('tarificador', page=page-1) }}" class="btn btn-soft btn-secondary btn-sm">
-                <span class="icon-[tabler--chevron-left] size-4"></span>
-                Anterior
-            </a>
-            {% endif %}
 
-            <div class="join">
-                {% for p in range(1, total_pages + 1) %}
-                <a href="{{ url_for('tarificador', page=p) }}"
-                    class="join-item btn btn-sm {% if p == page %}btn-primary{% else %}btn-ghost{% endif %}">
-                    {{ p }}
-                </a>
-                {% endfor %}
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div
+            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+            <span class="icon-[tabler--list-details] size-5 text-primary"></span>
+            <span>Listado de Análisis</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="overflow-x-auto">
+                <table class="table table-lg">
+                    <thead class="bg-base-200/50">
+                        <tr>
+                            <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Acciones</th>
+                            <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Folio</th>
+                            <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Cliente</th>
+                            <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Fecha</th>
+                            <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Precio m3</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-base-content/5">
+                        {% for data in tarificadores %}
+                        <tr class="hover:bg-base-200/30 transition-colors">
+                            <td>
+                                <div class="flex gap-2">
+                                    <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
+                                        <button id="dropdown-actions-{{ data.folio_tar }}" type="button"
+                                            class="dropdown-toggle btn btn-soft btn-secondary btn-sm"
+                                            aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+                                            <span class="icon-[tabler--dots-vertical] size-4"></span>
+                                            <span>Ver</span>
+                                            <span
+                                                class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
+                                            aria-orientation="vertical"
+                                            aria-labelledby="dropdown-actions-{{ data.folio_tar }}">
+                                            <li>
+                                                <a class="dropdown-item flex items-center gap-2"
+                                                    href="{{ url_for('detalle_tarificador', folio=data.folio_tar) }}">
+                                                    <span class="icon-[tabler--eye] size-4"></span>
+                                                    Detalles
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ url_for('ver_tarificador', folio=data.folio_tar) }}"
+                                                    target="_blank" class="dropdown-item flex items-center gap-2">
+                                                    <span class="icon-[tabler--file-type-pdf] size-4"></span>
+                                                    <span>PDF</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider my-1 border-base-content/10">
+                                            </li>
+                                            <li>
+                                                <form
+                                                    action="{{ url_for('eliminar_tarificador', folio=data.folio_tar) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('¿Seguro que desea borrar este registro de tarificación? Esta acción no se puede deshacer.');"
+                                                    class="w-full">
+                                                    <button type="submit"
+                                                        class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
+                                                        <span class="icon-[tabler--trash] size-4"></span>
+                                                        Borrar
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </div>
+                            </td>
+                            <td>
+                                <span class="font-bold text-primary">{{ data.folio_tar }}</span>
+                            </td>
+                            <td class="font-medium text-base-content">{{ data.nombre_cliente }}</td>
+                            <td class="text-base-content/60">{{ data.fecha_tar }}</td>
+                            <td>
+                                <span class="badge badge-outline badge-success font-bold">${{ data.precio_m3_total
+                                    }}</span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-20">
+                                <div class="flex flex-col items-center gap-4">
+                                    <span class="icon-[tabler--calculator-off] size-16 text-base-content/20"></span>
+                                    <p class="text-base-content/40 font-medium">No se encontraron registros de
+                                        tarificación
+                                        con los criterios de búsqueda.</p>
+                                    <a href="{{ url_for('nuevo_tarificador') }}"
+                                        class="btn btn-outline btn-primary btn-sm mt-2">Nuevo cálculo</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            {% if page < total_pages %} <a href="{{ url_for('tarificador', page=page+1) }}"
-                class="btn btn-soft btn-secondary btn-sm">
-                Siguiente
-                <span class="icon-[tabler--chevron-right] size-4"></span>
+        {% if total_pages > 1 %}
+        <div class="card-footer bg-base-200/30 border-t border-base-content/10 p-4">
+            <div class="flex justify-center flex-wrap gap-2">
+                {% if page > 1 %}
+                <a href="{{ url_for('tarificador', page=page-1) }}" class="btn btn-soft btn-secondary btn-sm">
+                    <span class="icon-[tabler--chevron-left] size-4"></span>
+                    Anterior
                 </a>
                 {% endif %}
+
+                <div class="join">
+                    {% for p in range(1, total_pages + 1) %}
+                    <a href="{{ url_for('tarificador', page=p) }}"
+                        class="join-item btn btn-sm {% if p == page %}btn-primary{% else %}btn-ghost{% endif %}">
+                        {{ p }}
+                    </a>
+                    {% endfor %}
+                </div>
+
+                {% if page < total_pages %} <a href="{{ url_for('tarificador', page=page+1) }}"
+                    class="btn btn-soft btn-secondary btn-sm">
+                    Siguiente
+                    <span class="icon-[tabler--chevron-right] size-4"></span>
+                    </a>
+                    {% endif %}
+            </div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 <script id="autocomplete-json" type="application/json">{{ clientes_all|tojson|safe }}</script>
 

@@ -3,703 +3,757 @@
 {% block title %}{{ 'Detalle' if permiso else 'Nuevo' }} Permiso de Descarga - Sistema Cophi{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-    <div>
-        <div class="flex items-center gap-2 mb-1">
-            <a href="{{ url_for('permisos_descarga') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
-                <span class="icon-[tabler--arrow-left] size-5"></span>
-            </a>
-            <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle' if permiso else 'Nuevo' }} Permiso de Descarga
-            </h1>
+<div class="w-full p-0 space-y-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <a href="{{ url_for('permisos_descarga') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
+                    <span class="icon-[tabler--arrow-left] size-5"></span>
+                </a>
+                <h1 class="text-3xl font-bold text-base-content flex items-center gap-3">
+                    <span class="icon-[tabler--id] size-10" style="color: #0099cf !important;"></span>
+                    <span>{{ 'Detalle' if permiso else 'Nuevo' }} Permiso de Descarga</span>
+                </h1>
+            </div>
+            <p class="text-base-content/60 font-medium ml-10">
+                {{ 'Consulta y edita los datos del cuestionario para trámites municipales.' if permiso else 'Complete el
+                formulario para generar el trámite de descarga municipal.' }}
+            </p>
         </div>
-        <p class="text-base-content/60 font-medium ml-10">
-            {{ 'Consulta y edita los datos del cuestionario para trámites municipales.' if permiso else 'Complete el
-            formulario para generar el trámite de descarga municipal.' }}
-        </p>
-    </div>
-    {% if permiso %}
-    <div class="flex gap-2">
-        <div class="dropdown">
-            <button class="btn btn-soft btn-secondary shadow-sm" type="button" id="btn-ver-docs"
-                data-bs-toggle="dropdown">
-                <span class="icon-[tabler--file-download] size-5"></span>
-                <span>Ver Documentos</span>
-                <span class="icon-[tabler--chevron-down] size-4 opacity-50"></span>
+        {% if permiso %}
+        <div class="flex gap-2">
+            <div class="dropdown">
+                <button class="btn btn-soft btn-secondary shadow-sm" type="button" id="btn-ver-docs"
+                    data-bs-toggle="dropdown">
+                    <span class="icon-[tabler--file-download] size-5"></span>
+                    <span>Ver Documentos</span>
+                    <span class="icon-[tabler--chevron-down] size-4 opacity-50"></span>
+                </button>
+                <ul class="dropdown-menu shadow-lg border border-base-content/10">
+                    <li><a class="dropdown-item flex items-center gap-2"
+                            href="{{ url_for('ver_permiso_pdf', nis=permiso.nis, tipo='Cuestionario') }}"
+                            target="_blank"><span class="icon-[tabler--file-text] size-4"></span> Cuestionario</a></li>
+                    <li><a class="dropdown-item flex items-center gap-2"
+                            href="{{ url_for('ver_permiso_pdf', nis=permiso.nis, tipo='Acuse') }}" target="_blank"><span
+                                class="icon-[tabler--clipboard-check] size-4"></span> Acuse</a></li>
+                    <li><a class="dropdown-item flex items-center gap-2"
+                            href="{{ url_for('ver_permiso_pdf', nis=permiso.nis, tipo='Carta_Poder') }}"
+                            target="_blank"><span class="icon-[tabler--certificate] size-4"></span> Carta Poder</a></li>
+                </ul>
+            </div>
+            <button type="button" class="btn btn-primary shadow-sm" onclick="enableEdit()" id="btn-editar">
+                <span class="icon-[tabler--edit] size-5"></span>
+                Editar
             </button>
-            <ul class="dropdown-menu shadow-lg border border-base-content/10">
-                <li><a class="dropdown-item flex items-center gap-2"
-                        href="{{ url_for('ver_permiso_pdf', nis=permiso.nis, tipo='Cuestionario') }}"
-                        target="_blank"><span class="icon-[tabler--file-text] size-4"></span> Cuestionario</a></li>
-                <li><a class="dropdown-item flex items-center gap-2"
-                        href="{{ url_for('ver_permiso_pdf', nis=permiso.nis, tipo='Acuse') }}" target="_blank"><span
-                            class="icon-[tabler--clipboard-check] size-4"></span> Acuse</a></li>
-                <li><a class="dropdown-item flex items-center gap-2"
-                        href="{{ url_for('ver_permiso_pdf', nis=permiso.nis, tipo='Carta_Poder') }}"
-                        target="_blank"><span class="icon-[tabler--certificate] size-4"></span> Carta Poder</a></li>
-            </ul>
         </div>
-        <button type="button" class="btn btn-primary shadow-sm" onclick="enableEdit()" id="btn-editar">
-            <span class="icon-[tabler--edit] size-5"></span>
-            Editar
-        </button>
-    </div>
-    {% endif %}
-</div>
-
-<form action="{{ url_for('nuevo_permiso_descarga') }}" method="POST" enctype="multipart/form-data"
-    class="space-y-8 pb-20">
-
-    <!-- INFORMACIÓN DEL FOLIO -->
-    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-        <div
-            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold uppercase tracking-widest text-sm flex items-center gap-2">
-            <span class="icon-[tabler--tag] size-5 text-primary"></span>
-            <span>Información del Folio</span>
-        </div>
-        <div class="card-body p-6 flex flex-col md:flex-row gap-6">
-            <div class="form-control flex-1">
-                <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Folio</label>
-                <input type="text" id="folio" name="folio" placeholder="PER-MMYY-###"
-                    class="input input-bordered w-full font-bold text-primary always-locked"
-                    value="{{ (permiso.folio if permiso else suggested_folio) or '' }}" required readonly>
-            </div>
-            <div class="form-control flex-1">
-                <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Fecha de
-                    Creación</label>
-                <input type="text" id="fecha_creacion" name="fecha_creacion"
-                    class="input input-bordered w-full always-locked"
-                    value="{{ (permiso.fecha_creacion if permiso else todays_date) or '' }}" readonly>
-            </div>
-        </div>
+        {% endif %}
     </div>
 
-    <!-- CARD DE CARGA DE CROQUIS -->
-    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-        <div
-            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2 font-black uppercase tracking-widest text-sm">
-            <span class="icon-[tabler--map-pin] size-5 text-primary"></span>
-            <span>Croquis y Ubicación</span>
-        </div>
-        <div class="card-body p-6">
-            <div class="form-control">
-                <label class="label font-bold text-xs uppercase text-base-content/60 mb-2">
-                    <span class="flex items-center gap-2">
-                        <span class="icon-[tabler--photo] size-4"></span>
-                        Imagen de Croquis / Coordenadas
-                    </span>
-                </label>
+    <form action="{{ url_for('nuevo_permiso_descarga') }}" method="POST" enctype="multipart/form-data"
+        class="flex flex-col gap-8 pb-20">
 
-                <!-- Área de carga con diseño atractivo -->
+        <!-- INFORMACIÓN DEL FOLIO -->
+        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+            <div
+                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                <span class="icon-[tabler--hash] size-5 text-primary"></span>
+                <span>Información del Folio</span>
+            </div>
+            <div class="card-body p-6 flex flex-col md:flex-row gap-6">
+                <div class="form-control flex-1">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio</label>
+                    <input type="text" id="folio" name="folio" placeholder="PER-MMYY-###"
+                        class="input input-bordered w-full font-bold text-primary always-locked"
+                        value="{{ (permiso.folio if permiso else suggested_folio) or '' }}" required readonly>
+                </div>
+                <div class="form-control flex-1">
+                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Fecha de
+                        Creación</label>
+                    <input type="text" id="fecha_creacion" name="fecha_creacion"
+                        class="input input-bordered w-full always-locked"
+                        value="{{ (permiso.fecha_creacion if permiso else todays_date) or '' }}" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD DE CARGA DE CROQUIS -->
+        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+            <div
+                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                <span class="icon-[tabler--map-pin] size-5 text-primary"></span>
+                <span>Croquis y Ubicación</span>
+            </div>
+            <div class="card-body p-6">
+                <div class="form-control space-y-2">
+                    <label class="label font-bold text-xs uppercase text-base-content/60 mb-2">
+                        <span class="flex items-center gap-2">
+                            <span class="icon-[tabler--photo] size-4"></span>
+                            Imagen de Croquis / Coordenadas
+                        </span>
+                    </label>
+
+                    <!-- Área de carga con diseño atractivo -->
+                    <div
+                        class="relative border-2 border-dashed border-primary/30 rounded-xl bg-gradient-to-br from-primary/5 to-transparent hover:border-primary/50 hover:from-primary/10 transition-all duration-300 group">
+                        <!-- Input file oculto -->
+                        <input type="file" id="croquis_file_input" name="croquis_file" accept="image/*"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            onchange="updateFilePreview(this)" {{ 'disabled' if permiso else '' }}>
+
+                        <!-- Contenido visual del área de carga -->
+                        <div id="upload-area" class="p-8 text-center">
+                            <!-- Icono y texto por defecto (cuando no hay archivo) -->
+                            <div id="upload-prompt" class="space-y-3">
+                                <div class="flex justify-center">
+                                    <div
+                                        class="bg-primary/10 rounded-full p-4 group-hover:bg-primary/20 transition-colors">
+                                        <span class="icon-[tabler--photo-up] size-12 text-primary"></span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-base font-bold text-base-content/80">
+                                        Selecciona o arrastra una imagen
+                                    </p>
+                                    <p class="text-xs text-base-content/50 mt-1">
+                                        JPG, PNG hasta 10MB
+                                    </p>
+                                </div>
+                                <div class="pt-2">
+                                    <span class="btn btn-primary btn-sm">
+                                        <span class="icon-[tabler--upload] size-4"></span>
+                                        Elegir Archivo
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Información del archivo cargado (oculto por defecto) -->
+                            <div id="file-preview" class="hidden space-y-3">
+                                <div class="flex justify-center">
+                                    <div class="bg-success/10 rounded-full p-4">
+                                        <span class="icon-[tabler--photo-check] size-12 text-success"></span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="badge badge-success gap-2 text-xs font-bold">
+                                        <span class="icon-[tabler--check] size-3"></span>
+                                        Archivo Cargado
+                                    </div>
+                                    <p id="file-name" class="text-sm font-bold text-base-content truncate px-4"></p>
+                                    <p id="file-size" class="text-xs text-base-content/60"></p>
+                                </div>
+                                <div class="pt-2">
+                                    <span class="btn btn-outline btn-primary btn-sm">
+                                        <span class="icon-[tabler--refresh] size-4"></span>
+                                        Cambiar Archivo
+                                    </span>
+                                </div>
+                            </div>
+
+                            {% if permiso and permiso.croquis_imagen %}
+                            <!-- Estado inicial cuando ya existe una imagen -->
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    document.getElementById('upload-prompt').classList.add('hidden');
+                                    document.getElementById('file-preview').classList.remove('hidden');
+                                    document.getElementById('file-name').textContent = 'Imagen existente';
+                                    document.getElementById('file-size').textContent = 'Archivo previamente cargado';
+                                });
+                            </script>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Ayuda descriptiva -->
+                    <label class="label">
+                        <span class="label-text-alt opacity-60 flex items-start gap-2">
+                            <span class="icon-[tabler--info-circle] size-4 mt-0.5 flex-shrink-0"></span>
+                            <span>Sube una imagen (JPG/PNG) del plano o ubicación. Se mostrará en el documento
+                                generado.</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCION 1: IDENTIFICACION -->
+        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+            <div
+                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                <span
+                    class="bg-primary text-primary-content rounded-full size-6 flex items-center justify-center text-xs">1</span>
+                <span>Identificación del Negocio</span>
+            </div>
+            <div class="card-body p-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="form-control">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">NIS</label>
+                        <input type="text" name="nis" value="{{ permiso.nis if permiso else suggested_nis }}" required
+                            class="input input-bordered w-full font-mono font-black text-primary font-bold"
+                            {{ 'readonly' if permiso else '' }}>
+                    </div>
+                    <div class="form-control md:col-span-3 relative">
+                        <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Nombre de
+                            la
+                            Empresa / Establecimiento</label>
+                        <input type="text" id="nombre_empresa" name="nombre_empresa"
+                            class="input input-bordered w-full font-bold"
+                            value="{{ permiso.nombre_empresa if permiso else '' }}" placeholder="Buscar cliente..."
+                            oninput="fillClient(this)" {{ 'disabled' if permiso else '' }}>
+                        <div id="suggestions-box"
+                            class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                        </div>
+                    </div>
+                    <div class="form-control md:col-span-2">
+                        <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Giro según
+                            Licencia</label>
+                        <input type="text" name="giro_licencia" class="input input-bordered w-full"
+                            value="{{ permiso.giro_licencia if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                    </div>
+                    <div class="form-control md:col-span-2">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Descripción
+                            Específica del Giro</label>
+                        <input type="text" name="giro_descripcion" class="input input-bordered w-full"
+                            value="{{ permiso.giro_descripcion if permiso else '' }}" {{ 'disabled' if permiso else ''
+                            }}>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCION 2 & 3: PROPIETARIO Y ARRENDATARIO -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Propietario -->
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                 <div
-                    class="relative border-2 border-dashed border-primary/30 rounded-xl bg-gradient-to-br from-primary/5 to-transparent hover:border-primary/50 hover:from-primary/10 transition-all duration-300 group">
-                    <!-- Input file oculto -->
-                    <input type="file" id="croquis_file_input" name="croquis_file" accept="image/*"
-                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        onchange="updateFilePreview(this)" {{ 'disabled' if permiso else '' }}>
-
-                    <!-- Contenido visual del área de carga -->
-                    <div id="upload-area" class="p-8 text-center">
-                        <!-- Icono y texto por defecto (cuando no hay archivo) -->
-                        <div id="upload-prompt" class="space-y-3">
-                            <div class="flex justify-center">
-                                <div class="bg-primary/10 rounded-full p-4 group-hover:bg-primary/20 transition-colors">
-                                    <span class="icon-[tabler--photo-up] size-12 text-primary"></span>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="text-base font-bold text-base-content/80">
-                                    Selecciona o arrastra una imagen
-                                </p>
-                                <p class="text-xs text-base-content/50 mt-1">
-                                    JPG, PNG hasta 10MB
-                                </p>
-                            </div>
-                            <div class="pt-2">
-                                <span class="btn btn-primary btn-sm">
-                                    <span class="icon-[tabler--upload] size-4"></span>
-                                    Elegir Archivo
-                                </span>
-                            </div>
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span
+                        class="bg-secondary text-secondary-content rounded-full size-6 flex items-center justify-center text-xs">2</span>
+                    <span>Datos del Propietario</span>
+                </div>
+                <div class="card-body p-6 space-y-4">
+                    <div class="form-control">
+                        <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Nombre
+                            Completo</label>
+                        <input type="text" id="prop_nombre" name="prop_nombre" class="input input-bordered w-full"
+                            value="{{ permiso.prop_nombre if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                    </div>
+                    <div class="form-control">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">RFC</label>
+                        <input type="text" name="prop_rfc" class="input input-bordered w-full"
+                            value="{{ permiso.prop_rfc if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                    </div>
+                    <div class="form-control">
+                        <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Calle y
+                            Número</label>
+                        <input type="text" id="prop_direccion" name="prop_direccion" class="input input-bordered w-full"
+                            value="{{ permiso.prop_direccion if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label
+                                class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs text-base-content/60">Colonia</label>
+                            <input type="text" name="prop_colonia" class="input input-bordered w-full"
+                                value="{{ permiso.prop_colonia if permiso else '' }}" {{ 'disabled' if permiso else ''
+                                }}>
                         </div>
-
-                        <!-- Información del archivo cargado (oculto por defecto) -->
-                        <div id="file-preview" class="hidden space-y-3">
-                            <div class="flex justify-center">
-                                <div class="bg-success/10 rounded-full p-4">
-                                    <span class="icon-[tabler--photo-check] size-12 text-success"></span>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="badge badge-success gap-2 text-xs font-bold">
-                                    <span class="icon-[tabler--check] size-3"></span>
-                                    Archivo Cargado
-                                </div>
-                                <p id="file-name" class="text-sm font-bold text-base-content truncate px-4"></p>
-                                <p id="file-size" class="text-xs text-base-content/60"></p>
-                            </div>
-                            <div class="pt-2">
-                                <span class="btn btn-outline btn-primary btn-sm">
-                                    <span class="icon-[tabler--refresh] size-4"></span>
-                                    Cambiar Archivo
-                                </span>
-                            </div>
+                        <div class="form-control">
+                            <label
+                                class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Municipio</label>
+                            <input type="text" name="prop_municipio" class="input input-bordered w-full"
+                                value="{{ permiso.prop_municipio if permiso else '' }}" {{ 'disabled' if permiso else ''
+                                }}>
                         </div>
-
-                        {% if permiso and permiso.croquis_imagen %}
-                        <!-- Estado inicial cuando ya existe una imagen -->
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                document.getElementById('upload-prompt').classList.add('hidden');
-                                document.getElementById('file-preview').classList.remove('hidden');
-                                document.getElementById('file-name').textContent = 'Imagen existente';
-                                document.getElementById('file-size').textContent = 'Archivo previamente cargado';
-                            });
-                        </script>
-                        {% endif %}
+                        <div class="form-control">
+                            <label
+                                class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Teléfono</label>
+                            <input type="text" id="prop_telefono" name="prop_telefono"
+                                class="input input-bordered w-full"
+                                value="{{ permiso.prop_telefono if permiso else '' }}" {{ 'disabled' if permiso else ''
+                                }}>
+                        </div>
+                        <div class="form-control">
+                            <label
+                                class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">C.P.</label>
+                            <input type="text" name="prop_cp" class="input input-bordered w-full"
+                                value="{{ permiso.prop_cp if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Ayuda descriptiva -->
-                <label class="label">
-                    <span class="label-text-alt opacity-60 flex items-start gap-2">
-                        <span class="icon-[tabler--info-circle] size-4 mt-0.5 flex-shrink-0"></span>
-                        <span>Sube una imagen (JPG/PNG) del plano o ubicación. Se mostrará en el documento
-                            generado.</span>
-                    </span>
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <!-- SECCION 1: IDENTIFICACION -->
-    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-        <div
-            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2 font-black uppercase tracking-widest text-sm">
-            <span
-                class="bg-primary text-primary-content rounded-full size-6 flex items-center justify-center text-xs">1</span>
-            <span>Identificación del Negocio</span>
-        </div>
-        <div class="card-body p-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="form-control">
-                    <label class="label font-bold text-xs uppercase text-base-content/60">NIS</label>
-                    <input type="text" name="nis" value="{{ permiso.nis if permiso else suggested_nis }}" required
-                        class="input input-bordered w-full font-mono font-black text-primary" {{ 'readonly' if permiso
-                        else '' }}>
+            <!-- Arrendatario -->
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span
+                        class="bg-info text-info-content rounded-full size-6 flex items-center justify-center text-xs">3</span>
+                    <span>Arrendatario / Persona Moral</span>
                 </div>
-                <div class="form-control md:col-span-3 relative">
-                    <label class="label font-bold text-xs uppercase text-base-content/60">Nombre de la Empresa /
-                        Establecimiento</label>
-                    <input type="text" id="nombre_empresa" name="nombre_empresa"
-                        class="input input-bordered w-full font-bold"
-                        value="{{ permiso.nombre_empresa if permiso else '' }}" placeholder="Buscar cliente..."
-                        oninput="fillClient(this)" {{ 'disabled' if permiso else '' }}>
-                    <div id="suggestions-box"
-                        class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                <div class="card-body p-6 space-y-4">
+                    <div class="form-control">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs text-base-content/60">Razón
+                            Social</label>
+                        <input type="text" id="arr_nombre" name="arr_nombre" class="input input-bordered w-full"
+                            value="{{ permiso.arr_nombre if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
                     </div>
-                </div>
-                <div class="form-control md:col-span-2">
-                    <label class="label font-bold text-xs uppercase text-base-content/60">Giro según Licencia</label>
-                    <input type="text" name="giro_licencia" class="input input-bordered w-full"
-                        value="{{ permiso.giro_licencia if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                </div>
-                <div class="form-control md:col-span-2">
-                    <label class="label font-bold text-xs uppercase text-base-content/60">Descripción Específica del
-                        Giro</label>
-                    <input type="text" name="giro_descripcion" class="input input-bordered w-full"
-                        value="{{ permiso.giro_descripcion if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SECCION 2 & 3: PROPIETARIO Y ARRENDATARIO -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Propietario -->
-        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-            <div
-                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2 font-black uppercase tracking-widest text-sm">
-                <span
-                    class="bg-secondary text-secondary-content rounded-full size-6 flex items-center justify-center text-xs">2</span>
-                <span>Datos del Propietario</span>
-            </div>
-            <div class="card-body p-6 space-y-4">
-                <div class="form-control">
-                    <label class="label font-bold text-xs text-base-content/60 uppercase">Nombre Completo</label>
-                    <input type="text" id="prop_nombre" name="prop_nombre" class="input input-bordered w-full"
-                        value="{{ permiso.prop_nombre if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                </div>
-                <div class="form-control">
-                    <label class="label font-bold text-xs text-base-content/60 uppercase">RFC</label>
-                    <input type="text" name="prop_rfc" class="input input-bordered w-full"
-                        value="{{ permiso.prop_rfc if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                </div>
-                <div class="form-control">
-                    <label class="label font-bold text-xs text-base-content/60 uppercase">Calle y Número</label>
-                    <input type="text" id="prop_direccion" name="prop_direccion" class="input input-bordered w-full"
-                        value="{{ permiso.prop_direccion if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-50">Colonia</label><input type="text"
-                            name="prop_colonia" class="input input-bordered w-full input-sm"
-                            value="{{ permiso.prop_colonia if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">RFC
+                                Moral</label>
+                            <input type="text" name="arr_rfc" class="input input-bordered w-full"
+                                value="{{ permiso.arr_rfc if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                        </div>
+                        <div class="form-control">
+                            <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">INE
+                                Rep.</label>
+                            <input type="text" name="arr_ine" class="input input-bordered w-full"
+                                value="{{ permiso.arr_ine if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                        </div>
                     </div>
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-50">Municipio</label><input type="text"
-                            name="prop_municipio" class="input input-bordered w-full input-sm"
-                            value="{{ permiso.prop_municipio if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                    <div class="form-control">
+                        <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Calle y
+                            Número</label>
+                        <input type="text" id="arr_direccion" name="arr_direccion" class="input input-bordered w-full"
+                            value="{{ permiso.arr_direccion if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
                     </div>
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-50">Teléfono</label><input type="text"
-                            id="prop_telefono" name="prop_telefono" class="input input-bordered w-full input-sm"
-                            value="{{ permiso.prop_telefono if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                    </div>
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-50">C.P.</label><input type="text"
-                            name="prop_cp" class="input input-bordered w-full input-sm"
-                            value="{{ permiso.prop_cp if permiso else '' }}" {{ 'disabled' if permiso else '' }}></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Arrendatario -->
-        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-            <div
-                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2 font-black uppercase tracking-widest text-sm">
-                <span
-                    class="bg-info text-info-content rounded-full size-6 flex items-center justify-center text-xs">3</span>
-                <span>Arrendatario / Persona Moral</span>
-            </div>
-            <div class="card-body p-6 space-y-4">
-                <div class="form-control">
-                    <label class="label font-bold text-xs text-base-content/60 uppercase">Razón Social</label>
-                    <input type="text" id="arr_nombre" name="arr_nombre" class="input input-bordered w-full"
-                        value="{{ permiso.arr_nombre if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-control"><label class="label text-[10px] uppercase font-bold opacity-50">RFC
-                            Moral</label><input type="text" name="arr_rfc" class="input input-bordered w-full input-sm"
-                            value="{{ permiso.arr_rfc if permiso else '' }}" {{ 'disabled' if permiso else '' }}></div>
-                    <div class="form-control"><label class="label text-[10px] uppercase font-bold opacity-50">INE
-                            Rep.</label><input type="text" name="arr_ine" class="input input-bordered w-full input-sm"
-                            value="{{ permiso.arr_ine if permiso else '' }}" {{ 'disabled' if permiso else '' }}></div>
-                </div>
-                <div class="form-control">
-                    <label class="label font-bold text-xs text-base-content/60 uppercase">Calle y Número</label>
-                    <input type="text" id="arr_direccion" name="arr_direccion" class="input input-bordered w-full"
-                        value="{{ permiso.arr_direccion if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-50">Colonia</label><input type="text"
-                            name="arr_colonia" class="input input-bordered w-full input-sm"
+                    <div class="form-control">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Colonia</label>
+                        <input type="text" name="arr_colonia" class="input input-bordered w-full"
                             value="{{ permiso.arr_colonia if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
                     </div>
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-50">Municipio</label><input type="text"
-                            name="arr_municipio" class="input input-bordered w-full input-sm"
+                    <div class="form-control">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Municipio</label>
+                        <input type="text" name="arr_municipio" class="input input-bordered w-full"
                             value="{{ permiso.arr_municipio if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
                     </div>
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-50">Teléfono</label><input type="text"
-                            id="arr_telefono" name="arr_telefono" class="input input-bordered w-full input-sm"
+                    <div class="form-control">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Teléfono</label>
+                        <input type="text" id="arr_telefono" name="arr_telefono" class="input input-bordered w-full"
                             value="{{ permiso.arr_telefono if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
                     </div>
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-50">C.P.</label><input type="text"
-                            name="arr_cp" class="input input-bordered w-full input-sm"
-                            value="{{ permiso.arr_cp if permiso else '' }}" {{ 'disabled' if permiso else '' }}></div>
+                    <div class="form-control">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">C.P.</label>
+                        <input type="text" name="arr_cp" class="input input-bordered w-full"
+                            value="{{ permiso.arr_cp if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- SECCION 4 & 5: OPERACION Y ABASTECIMIENTO -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-            <div
-                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2 font-black uppercase tracking-widest text-sm">
-                <span
-                    class="bg-warning text-warning-content rounded-full size-6 flex items-center justify-center text-xs">4</span>
-                <span>Operación y Abastecimiento</span>
-            </div>
-            <div class="card-body p-6 space-y-6">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-control"><label class="label text-xs uppercase font-bold opacity-60">No.
-                            Empleados</label><input type="text" name="num_empleados" class="input input-bordered w-full"
-                            value="{{ permiso.num_empleados if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                    </div>
-                    <div class="form-control"><label class="label text-xs uppercase font-bold opacity-60">No.
-                            Turnos</label><input type="text" name="turnos" class="input input-bordered w-full"
-                            value="{{ permiso.turnos if permiso else '' }}" {{ 'disabled' if permiso else '' }}></div>
-                    <div class="form-control col-span-2"><label
-                            class="label text-xs uppercase font-bold opacity-60">Horario</label><input type="text"
-                            name="horario_atencion" class="input input-bordered w-full"
-                            value="{{ permiso.horario_atencion if permiso else '' }}" {{ 'disabled' if permiso else ''
-                            }}></div>
+        <!-- SECCION 4 & 5: OPERACION Y ABASTECIMIENTO -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span
+                        class="bg-warning text-warning-content rounded-full size-6 flex items-center justify-center text-xs">4</span>
+                    <span>Operación y Abastecimiento</span>
                 </div>
-                <hr class="border-base-content/5">
-                <div class="space-y-4">
-                    <label class="label text-xs uppercase font-black tracking-wider text-primary">Fuentes de
-                        Agua</label>
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between p-3 bg-base-200/30 rounded-lg">
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" name="pozo" value="Si" class="checkbox checkbox-primary"
-                                    {{ 'checked' if (permiso and permiso.pozo|lower=='si' ) else '' }} {{ 'disabled' if
-                                    permiso else '' }}>
-                                <span class="text-sm font-bold">Pozo</span>
-                            </label>
-                            <input type="text" name="num_concesion_pozo" placeholder="No. Concesión"
-                                class="input input-bordered input-sm w-1/2"
-                                value="{{ permiso.num_concesion_pozo if permiso else '' }}" {{ 'disabled' if permiso
-                                else '' }}>
+                <div class="card-body p-6 space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-control space-y-2"><label
+                                class="label text-xs uppercase font-bold opacity-60">No.
+                                Empleados</label><input type="text" name="num_empleados"
+                                class="input input-bordered w-full"
+                                value="{{ permiso.num_empleados if permiso else '' }}" {{ 'disabled' if permiso else ''
+                                }}>
                         </div>
-                        <div class="flex flex-col gap-2 p-3 bg-base-200/30 rounded-lg">
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" name="pipas" value="Si" class="checkbox checkbox-primary"
-                                    {{ 'checked' if (permiso and permiso.pipas|lower=='si' ) else '' }} {{ 'disabled' if
-                                    permiso else '' }}>
-                                <span class="text-sm font-bold">Pipas de Agua</span>
-                            </label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="text" name="prom_pipas_mes" placeholder="Pipas/Mes"
-                                    class="input input-bordered input-xs"
-                                    value="{{ permiso.prom_pipas_mes if permiso else '' }}" {{ 'disabled' if permiso
+                        <div class="form-control space-y-2"><label
+                                class="label text-xs uppercase font-bold opacity-60">No.
+                                Turnos</label><input type="text" name="turnos" class="input input-bordered w-full"
+                                value="{{ permiso.turnos if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                        </div>
+                        <div class="form-control col-span-2 space-y-2"><label
+                                class="label text-xs uppercase font-bold opacity-60">Horario</label><input type="text"
+                                name="horario_atencion" class="input input-bordered w-full"
+                                value="{{ permiso.horario_atencion if permiso else '' }}" {{ 'disabled' if permiso
+                                else '' }}></div>
+                    </div>
+                    <hr class="border-base-content/5">
+                    <div class="space-y-4">
+                        <label class="label text-xs uppercase font-black tracking-wider text-primary">Fuentes de
+                            Agua</label>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between p-3 bg-base-200/30 rounded-lg">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="pozo" value="Si" class="checkbox checkbox-primary"
+                                        {{ 'checked' if (permiso and permiso.pozo|lower=='si' ) else '' }} {{ 'disabled'
+                                        if permiso else '' }}>
+                                    <span class="text-sm font-bold">Pozo</span>
+                                </label>
+                                <input type="text" name="num_concesion_pozo" placeholder="No. Concesión"
+                                    class="input input-bordered input-sm w-1/2"
+                                    value="{{ permiso.num_concesion_pozo if permiso else '' }}" {{ 'disabled' if permiso
                                     else '' }}>
-                                <input type="text" name="capacidad_pipas" placeholder="Capacidad"
-                                    class="input input-bordered input-xs"
-                                    value="{{ permiso.capacidad_pipas if permiso else '' }}" {{ 'disabled' if permiso
+                            </div>
+                            <div class="flex flex-col gap-2 p-3 bg-base-200/30 rounded-lg">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="pipas" value="Si" class="checkbox checkbox-primary"
+                                        {{ 'checked' if (permiso and permiso.pipas|lower=='si' ) else '' }}
+                                        {{ 'disabled' if permiso else '' }}>
+                                    <span class="text-sm font-bold">Pipas de Agua</span>
+                                </label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" name="prom_pipas_mes" placeholder="Pipas/Mes"
+                                        class="input input-bordered input-xs"
+                                        value="{{ permiso.prom_pipas_mes if permiso else '' }}" {{ 'disabled' if permiso
+                                        else '' }}>
+                                    <input type="text" name="capacidad_pipas" placeholder="Capacidad"
+                                        class="input input-bordered input-xs"
+                                        value="{{ permiso.capacidad_pipas if permiso else '' }}" {{ 'disabled' if
+                                        permiso else '' }}>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-base-200/30 rounded-lg">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="red" value="Si" class="checkbox checkbox-primary"
+                                        {{ 'checked' if (permiso and permiso.red|lower=='si' ) else '' }} {{ 'disabled'
+                                        if permiso else '' }}>
+                                    <span class="text-sm font-bold">Red Municipal</span>
+                                </label>
+                                <input type="text" name="num_tomas" placeholder="No. Tomas"
+                                    class="input input-bordered input-sm w-1/3"
+                                    value="{{ permiso.num_tomas if permiso else '' }}" {{ 'disabled' if permiso else ''
+                                    }}>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventario Hidráulico -->
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span
+                        class="bg-error text-error-content rounded-full size-6 flex items-center justify-center text-xs">5</span>
+                    <span>Inventario Hidráulico</span>
+                </div>
+                <div class="card-body p-6 space-y-6">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="form-control space-y-2"><label
+                                class="label text-[10px] uppercase font-bold opacity-60">WC</label><input type="number"
+                                name="total_wc" class="input input-bordered w-full"
+                                value="{{ permiso.total_wc if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                        </div>
+                        <div class="form-control space-y-2"><label
+                                class="label text-[10px] uppercase font-bold opacity-60">Mingitorios</label><input
+                                type="number" name="total_mingitorios" class="input input-bordered w-full"
+                                value="{{ permiso.total_mingitorios if permiso else '' }}" {{ 'disabled' if permiso
+                                else '' }}></div>
+                        <div class="form-control space-y-2"><label
+                                class="label text-[10px] uppercase font-bold opacity-60">Lavamanos</label><input
+                                type="number" name="total_lavamanos" class="input input-bordered w-full"
+                                value="{{ permiso.total_lavamanos if permiso else '' }}" {{ 'disabled' if permiso
+                                else '' }}></div>
+                        <div class="form-control space-y-2"><label
+                                class="label text-[10px] uppercase font-bold opacity-60">Regaderas</label><input
+                                type="number" name="total_regaderas" class="input input-bordered w-full"
+                                value="{{ permiso.total_regaderas if permiso else '' }}" {{ 'disabled' if permiso
+                                else '' }}></div>
+                    </div>
+                    <hr class="border-base-content/5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-control space-y-2">
+                            <label class="label text-[10px] uppercase font-bold opacity-60">Cisternas (No. / Cap.
+                                L)</label>
+                            <div class="join w-full">
+                                <input type="number" name="total_cisternas" class="input input-bordered join-item w-1/3"
+                                    value="{{ permiso.total_cisternas if permiso else '' }}" {{ 'disabled' if permiso
+                                    else '' }}>
+                                <input type="text" name="cap_cisternas" class="input input-bordered join-item w-2/3"
+                                    value="{{ permiso.cap_cisternas if permiso else '' }}" {{ 'disabled' if permiso
                                     else '' }}>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between p-3 bg-base-200/30 rounded-lg">
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" name="red" value="Si" class="checkbox checkbox-primary"
-                                    {{ 'checked' if (permiso and permiso.red|lower=='si' ) else '' }} {{ 'disabled' if
-                                    permiso else '' }}>
-                                <span class="text-sm font-bold">Red Municipal</span>
-                            </label>
-                            <input type="text" name="num_tomas" placeholder="No. Tomas"
-                                class="input input-bordered input-sm w-1/3"
-                                value="{{ permiso.num_tomas if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                        <div class="form-control space-y-2">
+                            <label class="label text-[10px] uppercase font-bold opacity-60">Tinacos (No. / Cap.
+                                L)</label>
+                            <div class="join w-full">
+                                <input type="number" name="total_tinacos" class="input input-bordered join-item w-1/3"
+                                    value="{{ permiso.total_tinacos if permiso else '' }}" {{ 'disabled' if permiso
+                                    else '' }}>
+                                <input type="text" name="cap_tinacos" class="input input-bordered join-item w-2/3"
+                                    value="{{ permiso.cap_tinacos if permiso else '' }}" {{ 'disabled' if permiso
+                                    else '' }}>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="border-base-content/5">
+                    <div class="flex flex-col gap-3 p-4 bg-primary/5 rounded-xl">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="tiene_comedor" value="Si" class="checkbox checkbox-primary"
+                                {{ 'checked' if (permiso and permiso.tiene_comedor|lower=='si' ) else '' }}
+                                {{ 'disabled' if permiso else '' }}>
+                            <span class="text-sm font-black uppercase text-primary">¿Cuenta con servicio de
+                                Comedor?</span>
+                        </label>
+                        <div class="form-control space-y-2">
+                            <label class="label text-[10px] uppercase font-bold opacity-60">Mecanismos de Ahorro</label>
+                            <textarea name="mecanismos_ahorro" class="textarea textarea-bordered w-full" rows="2"
+                                placeholder="Ej. Ahorradores, mingitorios secos..." {{ 'disabled' if permiso else ''
+                                }}>{{ permiso.mecanismos_ahorro if permiso else '' }}</textarea>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Inventario Hidráulico -->
+        <!-- SECCION 6: REGISTRO Y PRETRATAMIENTO -->
         <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
             <div
-                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2 font-black uppercase tracking-widest text-sm">
+                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                 <span
-                    class="bg-error text-error-content rounded-full size-6 flex items-center justify-center text-xs">5</span>
-                <span>Inventario Hidráulico</span>
+                    class="bg-success text-success-content rounded-full size-6 flex items-center justify-center text-xs">6</span>
+                <span>Descargas, Registro y Pretratamiento</span>
             </div>
             <div class="card-body p-6 space-y-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-60">WC</label><input type="number"
-                            name="total_wc" class="input input-bordered w-full"
-                            value="{{ permiso.total_wc if permiso else '' }}" {{ 'disabled' if permiso else '' }}></div>
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-60">Mingitorios</label><input
-                            type="number" name="total_mingitorios" class="input input-bordered w-full"
-                            value="{{ permiso.total_mingitorios if permiso else '' }}" {{ 'disabled' if permiso else ''
-                            }}></div>
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-60">Lavamanos</label><input
-                            type="number" name="total_lavamanos" class="input input-bordered w-full"
-                            value="{{ permiso.total_lavamanos if permiso else '' }}" {{ 'disabled' if permiso else ''
-                            }}></div>
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-60">Regaderas</label><input
-                            type="number" name="total_regaderas" class="input input-bordered w-full"
-                            value="{{ permiso.total_regaderas if permiso else '' }}" {{ 'disabled' if permiso else ''
-                            }}></div>
-                </div>
-                <hr class="border-base-content/5">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-control">
-                        <label class="label text-[10px] uppercase font-bold opacity-60">Cisternas (No. / Cap. L)</label>
-                        <div class="join w-full">
-                            <input type="number" name="total_cisternas" class="input input-bordered join-item w-1/3"
-                                value="{{ permiso.total_cisternas if permiso else '' }}" {{ 'disabled' if permiso
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Volumen -->
+                    <div class="space-y-4">
+                        <h4
+                            class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                            Control de Volumen</h4>
+                        <div class="form-control space-y-2">
+                            <label class="flex items-center gap-3 cursor-pointer mb-2">
+                                <input type="checkbox" name="descarga_muni" value="Si" class="checkbox checkbox-success"
+                                    {{ 'checked' if (permiso and permiso.descarga_muni|lower=='si' ) else '' }}
+                                    {{ 'disabled' if permiso else '' }}>
+                                <span class="text-sm font-bold">Descarga al Municipio</span>
+                            </label>
+                            <input type="text" name="prom_descarga_muni" placeholder="m3/mes"
+                                class="input input-bordered w-full"
+                                value="{{ permiso.prom_descarga_muni if permiso else '' }}" {{ 'disabled' if permiso
                                 else '' }}>
-                            <input type="text" name="cap_cisternas" class="input input-bordered join-item w-2/3"
-                                value="{{ permiso.cap_cisternas if permiso else '' }}" {{ 'disabled' if permiso else ''
-                                }}>
                         </div>
-                    </div>
-                    <div class="form-control">
-                        <label class="label text-[10px] uppercase font-bold opacity-60">Tinacos (No. / Cap. L)</label>
-                        <div class="join w-full">
-                            <input type="number" name="total_tinacos" class="input input-bordered join-item w-1/3"
-                                value="{{ permiso.total_tinacos if permiso else '' }}" {{ 'disabled' if permiso else ''
-                                }}>
-                            <input type="text" name="cap_tinacos" class="input input-bordered join-item w-2/3"
-                                value="{{ permiso.cap_tinacos if permiso else '' }}" {{ 'disabled' if permiso else ''
-                                }}>
-                        </div>
-                    </div>
-                </div>
-                <hr class="border-base-content/5">
-                <div class="flex flex-col gap-3 p-4 bg-primary/5 rounded-xl">
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" name="tiene_comedor" value="Si" class="checkbox checkbox-primary"
-                            {{ 'checked' if (permiso and permiso.tiene_comedor|lower=='si' ) else '' }} {{ 'disabled' if
-                            permiso else '' }}>
-                        <span class="text-sm font-black uppercase text-primary">¿Cuenta con servicio de Comedor?</span>
-                    </label>
-                    <div class="form-control">
-                        <label class="label text-[10px] uppercase font-bold opacity-60">Mecanismos de Ahorro</label>
-                        <textarea name="mecanismos_ahorro" class="textarea textarea-bordered w-full" rows="2"
-                            placeholder="Ej. Ahorradores, mingitorios secos..." {{ 'disabled' if permiso else ''
-                            }}>{{ permiso.mecanismos_ahorro if permiso else '' }}</textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SECCION 6: REGISTRO Y PRETRATAMIENTO -->
-    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-        <div
-            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2 font-black uppercase tracking-widest text-sm">
-            <span
-                class="bg-success text-success-content rounded-full size-6 flex items-center justify-center text-xs">6</span>
-            <span>Descargas, Registro y Pretratamiento</span>
-        </div>
-        <div class="card-body p-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Volumen -->
-                <div class="space-y-4">
-                    <h4 class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
-                        Control de Volumen</h4>
-                    <div class="form-control">
-                        <label class="flex items-center gap-3 cursor-pointer mb-2">
-                            <input type="checkbox" name="descarga_muni" value="Si" class="checkbox checkbox-success"
-                                {{ 'checked' if (permiso and permiso.descarga_muni|lower=='si' ) else '' }}
-                                {{ 'disabled' if permiso else '' }}>
-                            <span class="text-sm font-bold">Descarga al Municipio</span>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="tiene_medidor_descargas" value="Si"
+                                class="checkbox checkbox-success" {{ 'checked' if (permiso and
+                                permiso.tiene_medidor_descargas|lower=='si' ) else '' }} {{ 'disabled' if permiso
+                                else '' }}>
+                            <span class="text-sm font-bold">¿Tiene Medidor de Descarga?</span>
                         </label>
-                        <input type="text" name="prom_descarga_muni" placeholder="m3/mes"
+                    </div>
+
+                    <!-- Registro -->
+                    <div class="space-y-4">
+                        <h4
+                            class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                            Datos del Registro</h4>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="tiene_registro" value="Si" class="checkbox checkbox-success"
+                                {{ 'checked' if (permiso and permiso.tiene_registro|lower=='si' ) else '' }}
+                                {{ 'disabled' if permiso else '' }}>
+                            <span class="text-sm font-bold">¿Cuenta con Registro?</span>
+                        </label>
+                        <div class="form-control space-y-2"><label
+                                class="label text-[10px] uppercase font-bold opacity-50">Localización</label><input
+                                type="text" name="localización_registro" class="input input-bordered w-full input-sm"
+                                value="{{ permiso.localización_registro if permiso else '' }}" {{ 'disabled' if permiso
+                                else '' }}></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="form-control space-y-2"><label
+                                    class="label text-[10px] uppercase font-bold opacity-50">Diám
+                                    (pulg)</label><input type="text" name="diametro_registro"
+                                    class="input input-bordered w-full input-sm"
+                                    value="{{ permiso.diametro_registro if permiso else '' }}" {{ 'disabled' if permiso
+                                    else '' }}></div>
+                            <div class="form-control space-y-2"><label
+                                    class="label text-[10px] uppercase font-bold opacity-50">Prof
+                                    (m)</label><input type="text" name="profundidad_registro"
+                                    class="input input-bordered w-full input-sm"
+                                    value="{{ permiso.profundidad_registro if permiso else '' }}" {{ 'disabled' if
+                                    permiso else '' }}></div>
+                        </div>
+                    </div>
+
+                    <!-- Pretratamiento -->
+                    <div class="space-y-4">
+                        <h4
+                            class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
+                            Pretratamiento</h4>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="tiene_pretrat" value="Si" class="checkbox checkbox-success"
+                                {{ 'checked' if (permiso and permiso.tiene_pretrat|lower=='si' ) else '' }}
+                                {{ 'disabled' if permiso else '' }}>
+                            <span class="text-sm font-bold">¿Tiene Pretratamiento?</span>
+                        </label>
+                        <div class="form-control space-y-2"><label
+                                class="label text-[10px] uppercase font-bold opacity-50">Operación
+                                / Sistema</label><input type="text" name="operación_pretratamiento"
+                                class="input input-bordered w-full input-sm" placeholder="Ej. Trampa de grasa"
+                                value="{{ permiso.operación_pretratamiento if permiso else '' }}" {{ 'disabled' if
+                                permiso else '' }}></div>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="tiene_analisis" value="Si" class="checkbox checkbox-success"
+                                {{ 'checked' if (permiso and permiso.tiene_analisis|lower=='si' ) else '' }}
+                                {{ 'disabled' if permiso else '' }}>
+                            <span class="text-sm font-bold">¿Tiene Análisis Recientes?</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-control space-y-2"><label
+                            class="label text-xs uppercase font-bold opacity-60">Disposición Final
+                            de Residuos</label><input type="text" name="disposicion_residuos"
                             class="input input-bordered w-full"
-                            value="{{ permiso.prom_descarga_muni if permiso else '' }}" {{ 'disabled' if permiso else ''
+                            value="{{ permiso.disposicion_residuos if permiso else '' }}" {{ 'disabled' if permiso
+                            else '' }}></div>
+                    <div class="form-control space-y-2"><label
+                            class="label text-xs uppercase font-bold opacity-60">Descripción
+                            Detallada Sistema</label><textarea name="desc_pretratamiento"
+                            class="textarea textarea-bordered w-full" rows="1" {{ 'disabled' if permiso else ''
+                            }}>{{ permiso.desc_pretratamiento if permiso else '' }}</textarea></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCION 7: CONTROL Y ACUSE -->
+        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+            <div
+                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs text-primary">
+                <span class="icon-[tabler--calendar-check] size-5"></span>
+                <span>Control de Acuse y Testigos</span>
+            </div>
+            <div class="card-body p-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Fecha de Acuse</label>
+                        <input type="text" name="fecha_acuse" class="input input-bordered w-full"
+                            value="{{ permiso.fecha_acuse if permiso else '' }}" placeholder="dd/mm/aaaa" {{ 'disabled'
+                            if permiso else '' }}>
+                    </div>
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Testigo 1</label>
+                        <input type="text" name="testigo1_nombre" class="input input-bordered w-full"
+                            value="{{ permiso.testigo1_nombre if permiso else '' }}" {{ 'disabled' if permiso else ''
                             }}>
                     </div>
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" name="tiene_medidor_descargas" value="Si"
-                            class="checkbox checkbox-success" {{ 'checked' if (permiso and
-                            permiso.tiene_medidor_descargas|lower=='si' ) else '' }} {{ 'disabled' if permiso else ''
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60">Testigo 2</label>
+                        <input type="text" name="testigo2_nombre" class="input input-bordered w-full"
+                            value="{{ permiso.testigo2_nombre if permiso else '' }}" {{ 'disabled' if permiso else ''
                             }}>
-                        <span class="text-sm font-bold">¿Tiene Medidor de Descarga?</span>
-                    </label>
-                </div>
-
-                <!-- Registro -->
-                <div class="space-y-4">
-                    <h4 class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
-                        Datos del Registro</h4>
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" name="tiene_registro" value="Si" class="checkbox checkbox-success"
-                            {{ 'checked' if (permiso and permiso.tiene_registro|lower=='si' ) else '' }} {{ 'disabled'
-                            if permiso else '' }}>
-                        <span class="text-sm font-bold">¿Cuenta con Registro?</span>
-                    </label>
-                    <div class="form-control"><label
-                            class="label text-[10px] uppercase font-bold opacity-50">Localización</label><input
-                            type="text" name="localización_registro" class="input input-bordered w-full input-sm"
-                            value="{{ permiso.localización_registro if permiso else '' }}" {{ 'disabled' if permiso
-                            else '' }}></div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="form-control"><label class="label text-[10px] uppercase font-bold opacity-50">Diám
-                                (pulg)</label><input type="text" name="diametro_registro"
-                                class="input input-bordered w-full input-sm"
-                                value="{{ permiso.diametro_registro if permiso else '' }}" {{ 'disabled' if permiso
-                                else '' }}></div>
-                        <div class="form-control"><label class="label text-[10px] uppercase font-bold opacity-50">Prof
-                                (m)</label><input type="text" name="profundidad_registro"
-                                class="input input-bordered w-full input-sm"
-                                value="{{ permiso.profundidad_registro if permiso else '' }}" {{ 'disabled' if permiso
-                                else '' }}></div>
                     </div>
                 </div>
-
-                <!-- Pretratamiento -->
-                <div class="space-y-4">
-                    <h4 class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
-                        Pretratamiento</h4>
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" name="tiene_pretrat" value="Si" class="checkbox checkbox-success"
-                            {{ 'checked' if (permiso and permiso.tiene_pretrat|lower=='si' ) else '' }} {{ 'disabled' if
-                            permiso else '' }}>
-                        <span class="text-sm font-bold">¿Tiene Pretratamiento?</span>
-                    </label>
-                    <div class="form-control"><label class="label text-[10px] uppercase font-bold opacity-50">Operación
-                            / Sistema</label><input type="text" name="operación_pretratamiento"
-                            class="input input-bordered w-full input-sm" placeholder="Ej. Trampa de grasa"
-                            value="{{ permiso.operación_pretratamiento if permiso else '' }}" {{ 'disabled' if permiso
-                            else '' }}></div>
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" name="tiene_analisis" value="Si" class="checkbox checkbox-success"
-                            {{ 'checked' if (permiso and permiso.tiene_analisis|lower=='si' ) else '' }} {{ 'disabled'
-                            if permiso else '' }}>
-                        <span class="text-sm font-bold">¿Tiene Análisis Recientes?</span>
-                    </label>
-                </div>
-            </div>
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-control"><label class="label text-xs uppercase font-bold opacity-60">Disposición Final
-                        de Residuos</label><input type="text" name="disposicion_residuos"
-                        class="input input-bordered w-full"
-                        value="{{ permiso.disposicion_residuos if permiso else '' }}" {{ 'disabled' if permiso else ''
-                        }}></div>
-                <div class="form-control"><label class="label text-xs uppercase font-bold opacity-60">Descripción
-                        Detallada Sistema</label><textarea name="desc_pretratamiento"
-                        class="textarea textarea-bordered w-full" rows="1" {{ 'disabled' if permiso else ''
-                        }}>{{ permiso.desc_pretratamiento if permiso else '' }}</textarea></div>
             </div>
         </div>
-    </div>
 
-    <!-- SECCION 7: CONTROL Y ACUSE -->
-    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-        <div
-            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2 font-black uppercase tracking-widest text-sm text-primary">
-            <span class="icon-[tabler--calendar-check] size-5"></span>
-            <span>Control de Acuse y Testigos</span>
+        <div class="flex justify-end gap-3 pt-4">
+            <a href="{{ url_for('permisos_descarga') }}" class="btn btn-ghost">Cancelar</a>
+            <button type="submit" class="btn btn-primary btn-wide shadow-lg {{ 'hidden' if permiso else '' }}"
+                id="btn-submit">
+                <span class="icon-[tabler--device-floppy] size-5"></span>
+                Guardar Permiso
+            </button>
         </div>
-        <div class="card-body p-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="form-control">
-                    <label class="label font-bold text-xs uppercase text-base-content/60">Fecha de Acuse</label>
-                    <input type="text" name="fecha_acuse" class="input input-bordered w-full"
-                        value="{{ permiso.fecha_acuse if permiso else '' }}" placeholder="dd/mm/aaaa" {{ 'disabled' if
-                        permiso else '' }}>
-                </div>
-                <div class="form-control">
-                    <label class="label font-bold text-xs uppercase text-base-content/60">Testigo 1</label>
-                    <input type="text" name="testigo1_nombre" class="input input-bordered w-full"
-                        value="{{ permiso.testigo1_nombre if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                </div>
-                <div class="form-control">
-                    <label class="label font-bold text-xs uppercase text-base-content/60">Testigo 2</label>
-                    <input type="text" name="testigo2_nombre" class="input input-bordered w-full"
-                        value="{{ permiso.testigo2_nombre if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
-                </div>
-            </div>
-        </div>
-    </div>
+    </form>
 
-    <div class="flex justify-end gap-3 pt-4">
-        <a href="{{ url_for('permisos_descarga') }}" class="btn btn-ghost">Cancelar</a>
-        <button type="submit" class="btn btn-primary btn-wide shadow-lg {{ 'hidden' if permiso else '' }}"
-            id="btn-submit">
-            <span class="icon-[tabler--device-floppy] size-5"></span>
-            Guardar Permiso
-        </button>
-    </div>
-</form>
+    <script id="clients-data" type="application/json">{{ clientes|tojson|safe }}</script>
 
-<script id="clients-data" type="application/json">{{ clientes|tojson|safe }}</script>
+    <script>
+        const clientsData = JSON.parse(document.getElementById('clients-data').textContent);
 
-<script>
-    const clientsData = JSON.parse(document.getElementById('clients-data').textContent);
+        function enableEdit() {
+            document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
+            document.querySelector('input[name="nis"]').readOnly = true;
 
-    function enableEdit() {
-        document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
-        document.querySelector('input[name="nis"]').readOnly = true;
-
-        const btnSubmit = document.getElementById('btn-submit');
-        if (btnSubmit) btnSubmit.classList.remove('hidden');
-        const btnEdit = document.getElementById('btn-editar');
-        if (btnEdit) btnEdit.classList.add('hidden');
-    }
-
-    function normalizeStr(str) {
-        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    }
-
-    function fillClient(input) {
-        const val = normalizeStr(input.value);
-        const box = document.getElementById('suggestions-box');
-        box.innerHTML = '';
-        box.classList.add('hidden');
-
-        if (!val) return;
-
-        const matches = clientsData.filter(c => normalizeStr(c.nombre_empresa || '').includes(val));
-
-        if (matches.length > 0) {
-            box.classList.remove('hidden');
-            matches.forEach(match => {
-                const div = document.createElement('div');
-                div.className = 'p-3 hover:bg-base-200 cursor-pointer border-b border-base-content/5 last:border-0';
-                div.innerHTML = `<div class="font-bold text-sm">${match.nombre_empresa}</div><div class="text-xs opacity-60">${match.ID || ''}</div>`;
-                div.onclick = () => selectClient(match);
-                box.appendChild(div);
-            });
+            const btnSubmit = document.getElementById('btn-submit');
+            if (btnSubmit) btnSubmit.classList.remove('hidden');
+            const btnEdit = document.getElementById('btn-editar');
+            if (btnEdit) btnEdit.classList.add('hidden');
         }
-    }
 
-    function selectClient(client) {
-        document.getElementById('nombre_empresa').value = client.nombre_empresa;
-        document.getElementById('prop_nombre').value = client.nombre_empresa;
-        document.getElementById('arr_nombre').value = client.nombre_empresa;
+        function normalizeStr(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
 
-        const dir = client.direccion_empresa || '';
-        document.getElementById('prop_direccion').value = dir;
-        document.getElementById('arr_direccion').value = dir;
+        function fillClient(input) {
+            const val = normalizeStr(input.value);
+            const box = document.getElementById('suggestions-box');
+            box.innerHTML = '';
+            box.classList.add('hidden');
 
-        const tel = client.telefono_empresa || '';
-        document.getElementById('prop_telefono').value = tel;
-        document.getElementById('arr_telefono').value = tel;
+            if (!val) return;
 
-        document.getElementById('suggestions-box').classList.add('hidden');
-    }
+            const matches = clientsData.filter(c => normalizeStr(c.nombre_empresa || '').includes(val));
 
-    document.addEventListener('click', () => {
-        document.getElementById('suggestions-box').classList.add('hidden');
-    });
-
-    // Función para actualizar el preview del archivo de croquis
-    function updateFilePreview(input) {
-        const uploadPrompt = document.getElementById('upload-prompt');
-        const filePreview = document.getElementById('file-preview');
-        const fileName = document.getElementById('file-name');
-        const fileSize = document.getElementById('file-size');
-
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-
-            // Formatear el tamaño del archivo
-            let size = file.size;
-            let unit = 'bytes';
-
-            if (size >= 1024 * 1024) {
-                size = (size / (1024 * 1024)).toFixed(2);
-                unit = 'MB';
-            } else if (size >= 1024) {
-                size = (size / 1024).toFixed(2);
-                unit = 'KB';
+            if (matches.length > 0) {
+                box.classList.remove('hidden');
+                matches.forEach(match => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3 hover:bg-base-200 cursor-pointer border-b border-base-content/5 last:border-0';
+                    div.innerHTML = `<div class="font-bold text-sm">${match.nombre_empresa}</div><div class="text-xs opacity-60">${match.ID || ''}</div>`;
+                    div.onclick = () => selectClient(match);
+                    box.appendChild(div);
+                });
             }
-
-            // Actualizar UI
-            fileName.textContent = file.name;
-            fileSize.textContent = `${size} ${unit}`;
-
-            // Mostrar preview y ocultar prompt
-            uploadPrompt.classList.add('hidden');
-            filePreview.classList.remove('hidden');
-        } else {
-            // Si se cancela la selección, volver al estado inicial
-            uploadPrompt.classList.remove('hidden');
-            filePreview.classList.add('hidden');
         }
-    }
 
-</script>
+        function selectClient(client) {
+            document.getElementById('nombre_empresa').value = client.nombre_empresa;
+            document.getElementById('prop_nombre').value = client.nombre_empresa;
+            document.getElementById('arr_nombre').value = client.nombre_empresa;
+
+            const dir = client.direccion_empresa || '';
+            document.getElementById('prop_direccion').value = dir;
+            document.getElementById('arr_direccion').value = dir;
+
+            const tel = client.telefono_empresa || '';
+            document.getElementById('prop_telefono').value = tel;
+            document.getElementById('arr_telefono').value = tel;
+
+            document.getElementById('suggestions-box').classList.add('hidden');
+        }
+
+        document.addEventListener('click', () => {
+            document.getElementById('suggestions-box').classList.add('hidden');
+        });
+
+        // Función para actualizar el preview del archivo de croquis
+        function updateFilePreview(input) {
+            const uploadPrompt = document.getElementById('upload-prompt');
+            const filePreview = document.getElementById('file-preview');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+
+                // Formatear el tamaño del archivo
+                let size = file.size;
+                let unit = 'bytes';
+
+                if (size >= 1024 * 1024) {
+                    size = (size / (1024 * 1024)).toFixed(2);
+                    unit = 'MB';
+                } else if (size >= 1024) {
+                    size = (size / 1024).toFixed(2);
+                    unit = 'KB';
+                }
+
+                // Actualizar UI
+                fileName.textContent = file.name;
+                fileSize.textContent = `${size} ${unit}`;
+
+                // Mostrar preview y ocultar prompt
+                uploadPrompt.classList.add('hidden');
+                filePreview.classList.remove('hidden');
+            } else {
+                // Si se cancela la selección, volver al estado inicial
+                uploadPrompt.classList.remove('hidden');
+                filePreview.classList.add('hidden');
+            }
+        }
+
+    </script>
+</div>
 {% endblock %}

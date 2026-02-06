@@ -40,7 +40,49 @@ def read_users():
                 users[uid] = row
     return users
 
-# Paths configuration
+# --- Flexible Field Mapping ---
+FIELD_MAPPING = {
+    'folio_cot': ['folio_cot', 'folio', 'Folio'],
+    'nombre_cliente': ['nombre_cliente', 'cliente', 'Cliente', 'Nombre Cliente', 'nombre_empresa'],
+    'nombre_cot': ['nombre_cot', 'nombre', 'Nombre', 'nombre_cotizacion', 'nombre_cotización'],
+    'fecha_cot': ['fecha_cot', 'fecha', 'Fecha', 'fecha_cotización'],
+    'id_cliente': ['id_cliente', 'id', 'ID', 'ID Cliente', 'folio'],
+    'razon_social_cliente': ['razon_social_cliente', 'razon_social', 'Razon Social', 'Razón Social'],
+    'direccion_cliente': ['direccion_cliente', 'direccion', 'Direccion', 'Dirección'],
+    'telefono_contacto': ['telefono_contacto', 'telefono', 'Teléfono', 'Telefono'],
+    'nombre_item': ['nombre_item', 'item', 'Nombre', 'Nombre del Concepto'],
+    'descripcion_item': ['descripcion_item', 'descripcion', 'Descripción', 'Concepto'],
+    'unidad_item': ['unidad_item', 'unidad', 'Unidad'],
+    'cantidad_item': ['cantidad_item', 'cantidad', 'Cant', 'Cantidad'],
+    'precio_unitario_item': ['precio_unitario_item', 'precio', 'Precio U', 'Precio Unitario', 'Precio'],
+    'importe_item': ['importe_item', 'importe', 'Importe', 'Subtotal Item'],
+    'subtotal': ['subtotal', 'Subtotal'],
+    'iva': ['iva', 'IVA'],
+    'total': ['total', 'Total', 'Total Final'],
+    'terminos': ['terminos', 'Terminos', 'Términos', 'Condiciones']
+}
+
+def safe_get_field(row, field_name):
+    """Obtiene un valor del diccionario intentando exact match, case-insensitive y alias."""
+    if not row: return ''
+    
+    # 1. Exact match
+    if field_name in row: return str(row[field_name] or '')
+    
+    # 2. Case insensitive exact match
+    for k in row:
+        if str(k).lower().strip() == field_name.lower():
+            return str(row[k] or '')
+            
+    # 3. Aliases mapping
+    aliases = FIELD_MAPPING.get(field_name, [])
+    for alias in aliases:
+        if alias in row: return str(row[alias] or '')
+        for k in row:
+            if str(k).lower().strip() == alias.lower():
+                return str(row[k] or '')
+                
+    return ''
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 COTIZACIONES_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Cotizacion', 'cotizaciones.csv'))
 ORDENES_CSV = os.path.abspath(os.path.join(BASE_DIR, '..', 'Orden de trabajo', 'ordenes_desazolve.csv'))
@@ -141,9 +183,8 @@ def read_csv(filepath):
             with open(filepath, mode='r', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    # Extra columns in a row end up with None as the key in DictReader
-                    # We skip those and ensure all other keys/values are strings
-                    clean_row = {str(k): (str(v) if v is not None else '') 
+                    # Limpiar llaves y valores (quitar espacios y Nones)
+                    clean_row = {str(k).strip(): (str(v) if v is not None else '') 
                                 for k, v in row.items() if k is not None}
                     items.append(clean_row)
         except Exception as e:
@@ -154,17 +195,17 @@ def read_csv(filepath):
                     reader = csv.DictReader(f)
                     items = []
                     for row in reader:
-                        clean_row = {str(k): (str(v) if v is not None else '') 
+                        clean_row = {str(k).strip(): (str(v) if v is not None else '') 
                                     for k, v in row.items() if k is not None}
                         items.append(clean_row)
             except Exception as e2:
                 print(f"Error reading fallback {filepath}: {e2}")
 
     print(f"Loaded {len(items)} items from {filepath}")
-    # Filter out empty rows (where all values are None or empty strings)
+    # Filter out empty rows
     items = [row for row in items if any(val and str(val).strip() for val in row.values())]
     if items:
-        print(f"First item keys: {items[0].keys()}")
+        print(f"First item keys: {list(items[0].keys())}")
     return items
 
 def get_cotizacion_data(folio):
@@ -481,14 +522,13 @@ def nueva_cotizacion():
     
     # Normalize keys function
     def normalize_item(item, tipo):
-        # Ensure we have common keys: nombre, descripcion, precio, unidad, categoria
-        # Note: CSV headers might be capitalized. We'll map them.
+        # Utilizar safe_get_field para ser flexible con los nombres de las columnas
         return {
-            'nombre': item.get('Nombre') or item.get('nombre') or '',
-            'descripcion': item.get('Nombre') or item.get('nombre') or '', 
-            'precio': item.get('Precio') or item.get('precio') or '0',
-            'unidad': item.get('Unidad') or item.get('unidad') or 'pza',
-            'categoria': item.get('Categoría') or item.get('categoria') or tipo
+            'nombre': safe_get_field(item, 'nombre_item'),
+            'descripcion': safe_get_field(item, 'descripcion_item') or safe_get_field(item, 'nombre_item'),
+            'precio': safe_get_field(item, 'precio_unitario_item') or '0',
+            'unidad': safe_get_field(item, 'unidad_item') or 'pza',
+            'categoria': safe_get_field(item, 'Categoría') or safe_get_field(item, 'categoria') or tipo
         }
 
     for p in productos:
@@ -518,16 +558,11 @@ def nueva_cotizacion():
     
     suggested_folio = f"{prefix}{max_num + 1:03d}"
 
-    try:
-        return render_template('crear_cotizacion.html', 
-                             inventario=inventario, 
-                             clientes=clientes, 
-                             suggested_folio=suggested_folio,
-                             todays_date=now.strftime('%d/%m/%Y'))
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise e
+    return render_template('crear_cotizacion.html', 
+                         inventario=inventario, 
+                         clientes=clientes, 
+                         suggested_folio=suggested_folio,
+                         todays_date=now.strftime('%d/%m/%Y'))
 
 @app.route('/eliminar_cotizacion/<folio>', methods=['POST'])
 @login_required

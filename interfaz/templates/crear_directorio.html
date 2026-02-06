@@ -39,8 +39,8 @@ Cophi{% endblock %}
 
 <!-- Menú de Navegación y Acciones (Solo visible en modo edición/detalle) -->
 {% if not is_new %}
-<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
-    <div class="card-body gap-6">
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden mb-6">
+    <div class="card-body p-6 space-y-4">
         <h6 class="text-base-content/70 font-semibold mb-0">Sección:</h6>
         <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
             <div class="input max-w-xl items-center pe-0">
@@ -81,20 +81,23 @@ Cophi{% endblock %}
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Tarjeta: Registro (Folio y Fecha) -->
                 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden lg:col-span-2">
-                    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2">
+                    <div
+                        class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                         <span class="icon-[tabler--tag] size-5 text-primary"></span>
-                        <h3 class="font-black uppercase tracking-wider text-sm">Información del Registro</h3>
+                        <span>Información del Registro</span>
                     </div>
                     <div class="card-body p-6 flex flex-col md:flex-row gap-6">
-                        <div class="form-control flex-1">
-                            <label class="label font-bold text-xs uppercase text-base-content/60">Folio</label>
+                        <div class="form-control flex-1 space-y-2">
+                            <label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                             <input type="text" name="folio"
                                 value="{{ (item.get('folio') if item else suggested_folio) or suggested_folio or '' }}"
                                 required class="input input-bordered w-full font-black text-primary always-locked"
                                 readonly>
                         </div>
-                        <div class="form-control flex-1">
-                            <label class="label font-bold text-xs uppercase text-base-content/60">Fecha de
+                        <div class="form-control flex-1 space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha
+                                de
                                 Registro</label>
                             <input type="text" name="fecha_creacion"
                                 value="{{ (item.get('fecha_creacion') if item else todays_date) or todays_date or '' }}"
@@ -105,35 +108,41 @@ Cophi{% endblock %}
 
                 <!-- Tarjeta Principal: Identificación -->
                 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-                    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2">
+                    <div
+                        class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                         <span class="icon-[tabler--id] size-5 text-primary"></span>
-                        <h3 class="font-black uppercase tracking-wider text-sm">Identificación y Contacto</h3>
+                        <span>Identificación y Contacto</span>
                     </div>
                     <div class="card-body p-6 space-y-4">
-                        <div class="form-control">
-                            <label class="label font-bold text-xs uppercase text-base-content/60">Nombre Empresa /
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre
+                                Empresa /
                                 Negocio</label>
                             <input type="text" name="nombre_empresa" value="{{ item.get('nombre_empresa', '') }}"
                                 required class="input input-bordered w-full font-black text-primary" {% if not is_new
                                 %}disabled{% endif %} placeholder="Ej. Abarrotes Don Pepe">
                         </div>
-                        <div class="form-control">
-                            <label class="label font-bold text-xs uppercase text-base-content/60">Propietario /
+                        <div class="form-control space-y-2">
+                            <label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Propietario
+                                /
                                 Representante</label>
                             <input type="text" name="propietario_empresa"
                                 value="{{ item.get('propietario_empresa', '') }}" class="input input-bordered w-full" {%
                                 if not is_new %}disabled{% endif %} placeholder="Nombre del dueño o responsable">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">RFC
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">RFC
                                     Propietario</label>
                                 <input type="text" name="rfc_propietario" value="{{ item.get('rfc_propietario', '') }}"
                                     class="input input-bordered w-full font-mono uppercase" {% if not is_new
                                     %}disabled{% endif %} placeholder="RFC del Propietario">
                             </div>
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">RFC
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">RFC
                                     Empresa</label>
                                 <input type="text" name="rfc_empresa" value="{{ item.get('rfc_empresa', '') }}"
                                     class="input input-bordered w-full font-mono uppercase" {% if not is_new
@@ -141,48 +150,57 @@ Cophi{% endblock %}
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">Tipo /
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tipo
+                                    /
                                     Giro</label>
                                 <input type="text" name="tipo_empresa" value="{{ item.get('tipo_empresa', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
                                     placeholder="Ej. Restaurante, Taller...">
                             </div>
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">Teléfono</label>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Teléfono</label>
                                 <input type="text" name="telefono_empresa"
                                     value="{{ item.get('telefono_empresa', '') }}" class="input input-bordered w-full"
                                     {% if not is_new %}disabled{% endif %} placeholder="Ej. 55 1234 5678">
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">Calle y
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Calle
+                                    y
                                     Número</label>
                                 <input type="text" name="calle_num_empresa"
                                     value="{{ item.get('calle_num_empresa', '') }}" class="input input-bordered w-full"
                                     {% if not is_new %}disabled{% endif %} placeholder="Ej. Av. Reforma 123">
                             </div>
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">Colonia</label>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Colonia</label>
                                 <input type="text" name="colonia_empresa" value="{{ item.get('colonia_empresa', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
                                     placeholder="Ej. Centro">
                             </div>
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">C.P.</label>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">C.P.</label>
                                 <input type="text" name="cp_empresa" value="{{ item.get('cp_empresa', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
                                     placeholder="Ej. 72000">
                             </div>
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">Municipio</label>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Municipio</label>
                                 <input type="text" name="municipio_empresa"
                                     value="{{ item.get('municipio_empresa', '') }}" class="input input-bordered w-full"
                                     {% if not is_new %}disabled{% endif %} placeholder="Ej. Puebla">
                             </div>
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">Localidad</label>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Localidad</label>
                                 <input type="text" name="localidad_empresa"
                                     value="{{ item.get('localidad_empresa', '') }}" class="input input-bordered w-full"
                                     {% if not is_new %}disabled{% endif %} placeholder="Ej. San Baltazar">
@@ -194,40 +212,47 @@ Cophi{% endblock %}
                 {% if tipo == 'clientes' %}
                 <!-- Tarjeta: Datos Fiscales (Solo Clientes) -->
                 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-                    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2">
+                    <div
+                        class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                         <span class="icon-[tabler--receipt-tax] size-5 text-secondary"></span>
-                        <h3 class="font-black uppercase tracking-wider text-sm">Datos Fiscales y Contrato</h3>
+                        <span>Datos Fiscales y Contrato</span>
                     </div>
                     <div class="card-body p-6 space-y-4">
-                        <div class="form-control">
-                            <label class="label font-bold text-xs uppercase text-base-content/60">Razón Social</label>
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Razón
+                                Social</label>
                             <input type="text" name="razon_social" value="{{ item.get('razon_social', '') }}"
                                 class="input input-bordered w-full font-bold text-secondary" {% if not is_new
                                 %}disabled{% endif %} placeholder="Razón Social Completa">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">Giro
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Giro
                                     Licencia</label>
                                 <input type="text" name="giro_licencia" value="{{ item.get('giro_licencia', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                             </div>
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">NIS
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">NIS
                                     (Contrato Agua)</label>
                                 <input type="text" name="nis" value="{{ item.get('nis', '') }}"
                                     class="input input-bordered w-full font-mono text-secondary" {% if not is_new
                                     %}disabled{% endif %}>
                             </div>
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">No. Permiso
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
+                                    Permiso
                                     Descargas</label>
                                 <input type="text" name="no_permiso_descargas"
                                     value="{{ item.get('no_permiso_descargas', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                             </div>
-                            <div class="form-control">
-                                <label class="label font-bold text-xs uppercase text-base-content/60">Vigencia
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Vigencia
                                     Permiso</label>
                                 <input type="text" name="vegencia_permiso_descargas"
                                     value="{{ item.get('vegencia_permiso_descargas', '') }}"
@@ -240,10 +265,10 @@ Cophi{% endblock %}
 
                 <!-- Tarjeta: Servicios e Infraestructura (Solo Clientes) -->
                 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden lg:col-span-2">
-                    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 flex items-center gap-2">
+                    <div
+                        class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                         <span class="icon-[tabler--tool] size-5 text-info"></span>
-                        <h3 class="font-black uppercase tracking-wider text-sm">Infraestructura Hidráulica y Servicios
-                        </h3>
+                        <span>Infraestructura Hidráulica y Servicios</span>
                     </div>
                     <div class="card-body p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -252,8 +277,9 @@ Cophi{% endblock %}
                                 <h4
                                     class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
                                     Almacenamiento</h4>
-                                <div class="form-control">
-                                    <label class="label text-xs uppercase font-bold text-base-content/60">Cisternas
+                                <div class="form-control space-y-2">
+                                    <label
+                                        class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cisternas
                                         (No. / Cap.)</label>
                                     <div class="flex gap-2">
                                         <input type="text" name="total_cisternas"
@@ -265,8 +291,9 @@ Cophi{% endblock %}
                                             class="input input-bordered w-2/3" placeholder="Liters" {% if not is_new
                                             %}disabled{% endif %}>
                                     </div>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">Tinacos
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tinacos
                                             (No. / Cap.)</label>
                                         <div class="flex gap-2">
                                             <input type="text" name="total_tinacos"
@@ -286,28 +313,32 @@ Cophi{% endblock %}
                                     <h4
                                         class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
                                         Muebles Sanitarios</h4>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">No.
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
                                             W.C.</label>
                                         <input type="number" name="no_wc" value="{{ item.get('no_wc', '') }}"
                                             class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                                     </div>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">No.
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
                                             Mingitorios</label>
                                         <input type="number" name="no_mingitorios"
                                             value="{{ item.get('no_mingitorios', '') }}"
                                             class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                                     </div>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">No.
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
                                             Lavamanos</label>
                                         <input type="number" name="no_lavamanos"
                                             value="{{ item.get('no_lavamanos', '') }}"
                                             class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                                     </div>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">No.
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
                                             Regaderas</label>
                                         <input type="number" name="no_regaderas"
                                             value="{{ item.get('no_regaderas', '') }}"
@@ -320,8 +351,9 @@ Cophi{% endblock %}
                                     <h4
                                         class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
                                         Abastecimiento</h4>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">Pozo
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Pozo
                                             (Si-No / No. Conc)</label>
                                         <div class="flex gap-2">
                                             <input type="text" name="pozo" value="{{ item.get('pozo', '') }}"
@@ -333,8 +365,10 @@ Cophi{% endblock %}
                                                 is_new %}disabled{% endif %}>
                                         </div>
                                     </div>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">Tomas /
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tomas
+                                            /
                                             Red (No. / Red)</label>
                                         <div class="flex gap-2">
                                             <input type="text" name="num_tomas" value="{{ item.get('num_tomas', '') }}"
@@ -352,8 +386,9 @@ Cophi{% endblock %}
                                     <h4
                                         class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
                                         Pipas y Medidor</h4>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">Pipas
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Pipas
                                             (Prom. / Cap.)</label>
                                         <div class="flex gap-2">
                                             <input type="text" name="prom_pipas_mes"
@@ -366,8 +401,9 @@ Cophi{% endblock %}
                                                 %}disabled{% endif %}>
                                         </div>
                                     </div>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">Medidor
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Medidor
                                             (S-N / Serie)</label>
                                         <div class="flex gap-2">
                                             <input type="text" name="medidor_agua "
@@ -387,8 +423,9 @@ Cophi{% endblock %}
                                     <h4
                                         class="text-xs font-black uppercase text-base-content/40 border-b border-base-content/5 pb-2">
                                         Descargas</h4>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">Registro
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Registro
                                             (S-N / Loc.)</label>
                                         <div class="flex gap-2">
                                             <input type="text" name="tiene_registro"
@@ -401,8 +438,9 @@ Cophi{% endblock %}
                                                 is_new %}disabled{% endif %}>
                                         </div>
                                     </div>
-                                    <div class="form-control">
-                                        <label class="label text-xs uppercase font-bold text-base-content/60">Trampas
+                                    <div class="form-control space-y-2">
+                                        <label
+                                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Trampas
                                             (No. / Cap.)</label>
                                         <div class="flex gap-2">
                                             <input type="text" name="no_trampas_grasa"
@@ -438,7 +476,7 @@ Cophi{% endblock %}
     <div id="tab-cotizaciones" class="tab-content hidden animate-in fade-in slide-in-from-bottom-5">
         <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
             <div
-                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center">
+                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center uppercase tracking-widest text-xs">
                 <span>Historial de Cotizaciones</span>
             </div>
             <div class="card-body p-0">
@@ -479,8 +517,10 @@ Cophi{% endblock %}
     <div id="tab-ordenes" class="tab-content hidden animate-in fade-in slide-in-from-bottom-5">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Desazolves -->
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
-                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-4 font-bold">Desazolves</div>
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-4 font-bold uppercase tracking-widest text-xs">
+                    Desazolves</div>
                 <div class="card-body p-0 max-h-96 overflow-y-auto">
                     <table class="table table-sm">
                         <tbody class="divide-y divide-base-content/5">
@@ -504,8 +544,10 @@ Cophi{% endblock %}
                 </div>
             </div>
             <!-- Trampas -->
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
-                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-4 font-bold">Trampas Grasa
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-4 font-bold uppercase tracking-widest text-xs">
+                    Trampas Grasa
                 </div>
                 <div class="card-body p-0 max-h-96 overflow-y-auto">
                     <table class="table table-sm">
@@ -530,8 +572,10 @@ Cophi{% endblock %}
                 </div>
             </div>
             <!-- Visitas -->
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
-                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-4 font-bold">Visitas Técnicas
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-4 font-bold uppercase tracking-widest text-xs">
+                    Visitas Técnicas
                 </div>
                 <div class="card-body p-0 max-h-96 overflow-y-auto">
                     <table class="table table-sm">
@@ -672,50 +716,52 @@ Cophi{% endblock %}
                         <!-- Marker -->
                         {% set pos = latest_consumo if latest_consumo < 100 else 100 %} <div
                             class="absolute h-8 w-1 bg-base-content top-[-8px] shadow-sm transform transition-all duration-1000"
-                            style="left: {{ pos }}%;">
+                            style="left: {{ pos if pos is defined else 0 }}%;">
                             <div
                                 class="absolute top-[-25px] left-1/2 -translate-x-1/2 font-black text-[10px] whitespace-nowrap bg-base-content text-base-100 px-1.5 py-0.5 rounded">
-                                {{ latest_consumo }} m³</div>
+                                {{ latest_consumo }} m³
+                            </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="flex justify-between mt-2 text-[10px] font-bold text-base-content/30 tracking-tighter">
-                    <span>0</span><span>40</span><span>80</span><span>100+</span>
-                </div>
+            <div class="flex justify-between mt-2 text-[10px] font-bold text-base-content/30 tracking-tighter">
+                <span>0</span><span>40</span><span>80</span><span>100+</span>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-        <div class="card-body p-0">
-            <table class="table table-lg">
-                <thead class="bg-base-200/30">
-                    <tr>
-                        <th>Folio</th>
-                        <th>Lectura</th>
-                        <th>Consumo (m³)</th>
-                        <th class="text-right">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-base-content/5">
-                    {% for d in consumos %}
-                    <tr class="hover:bg-base-200/30">
-                        <td><span class="font-bold text-primary">{{ d.folio }}</span></td>
-                        <td class="text-base-content/60">{{ d.fecha_lectura }}</td>
-                        <td><span class="badge badge-outline border-base-content/10 font-black text-base-content">{{
-                                d.consumo }} m³</span></td>
-                        <td class="text-right"><a href="{{ url_for('detalle_consumo', folio=d.folio) }}"
-                                class="btn btn-soft btn-secondary btn-sm">Ver</a></td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="4" class="text-center py-10 opacity-40">Sin consumos registrados.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+    <div class="card-body p-0">
+        <table class="table table-lg">
+            <thead class="bg-base-200/30">
+                <tr>
+                    <th>Folio</th>
+                    <th>Lectura</th>
+                    <th>Consumo (m³)</th>
+                    <th class="text-right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-base-content/5">
+                {% for d in consumos %}
+                <tr class="hover:bg-base-200/30">
+                    <td><span class="font-bold text-primary">{{ d.folio }}</span></td>
+                    <td class="text-base-content/60">{{ d.fecha_lectura }}</td>
+                    <td><span class="badge badge-outline border-base-content/10 font-black text-base-content">{{
+                            d.consumo }} m³</span></td>
+                    <td class="text-right"><a href="{{ url_for('detalle_consumo', folio=d.folio) }}"
+                            class="btn btn-soft btn-secondary btn-sm">Ver</a></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center py-10 opacity-40">Sin consumos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
 </div>
 {% endif %}
 

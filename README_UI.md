@@ -71,11 +71,12 @@ Para añadir una barra de búsqueda a una nueva página, usa esta estructura den
 
 ### B. Tabla de Datos Estándar
 Las tablas deben tener ciertas características obligatorias:
-1.  Estar dentro de un `card` con `overflow-hidden`.
-2.  Usar `table-lg` para buen espaciado.
-3.  **Menú de Acciones:** La primera columna siempre debe ser acciones (Ver/Editar/Borrar).
-4.  **Estado Vacío:** Usar `{% else %}` en el bucle `for` para mostrar un mensaje amigable cuando no hay datos.
-5.  **Responsividad:** Envolver siempre en `<div class="overflow-x-auto">`.
+1.  **Tarjeta Separada:** Los filtros de búsqueda NUNCA deben ir dentro de la misma tarjeta que la tabla. Deben estar en una tarjeta superior con `mb-6`.
+2.  Estar dentro de un `card` con `overflow-hidden`.
+3.  Usar `table-lg` para buen espaciado.
+4.  **Menú de Acciones:** La primera columna siempre debe ser acciones (Ver/Editar/Borrar).
+5.  **Estado Vacío:** Usar `{% else %}` en el bucle `for` para mostrar un mensaje amigable cuando no hay datos.
+6.  **Responsividad:** Envolver siempre en `<div class="overflow-x-auto">`.
 
 **Snippet de Tabla:**
 ```html
@@ -345,12 +346,12 @@ Catálogo oficial de las etiquetas `div` y sus clases estándar para reproducir 
 | Nombre del Componente | Clases Clave (HTML) | Comportamiento / Uso |
 | :--- | :--- | :--- |
 | **1. Contenedor de Página** | `w-full p-6 md:p-10 space-y-6` | Envoltorio principal de todo el contenido. Provee el padding externo responsivo. |
-| **2. Tarjeta Estándar (Card)** | `card bg-base-100 border border-base-content/10 shadow-sm` | El bloque de construcción básico. Úsalo para agrupar cualquier sección (tablas, formularios). |
-| **2.1 Cabecera de Tarjeta** | `card-header bg-base-200/50 border-b border-base-content/10 p-5` | Título de la sección. Úsalo con un icono y `h3.text-sm.uppercase`. |
-| **2.2 Cuerpo de Tarjeta** | `card-body p-6 space-y-4` | Contenedor interno para el contenido de la tarjeta. |
-| **3. Barra de Filtros** | `p-6 border-b border-base-content/10 bg-base-100` | Usado en `ordenes.html` como cabecera pegajosa o barra superior de búsqueda. |
-| **4. Grilla de Formulario** | `grid grid-cols-1 lg:grid-cols-2 gap-8` | Estructura para dividir formularios en columnas grandes (Izquierda/Derecha). |
-| **5. Sub-Grilla Inputs** | `grid grid-cols-1 md:grid-cols-2 gap-4 lg:grid-cols-4` | Grilla interna para alinear campos individuales dentro de una tarjeta. |
+| **2. Tarjeta Estándar (Card)** | `card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden` | El bloque de construcción básico. **Siempre** usar `overflow-hidden` para evitar que el contenido sobresalga de los bordes redondeados. |
+| **2.1 Cabecera de Tarjeta** | `card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs` | Título de la sección. El `bg-base-200/50` da el contraste grisáceo estándar. |
+| **2.2 Cuerpo de Tarjeta** | `card-body p-6 space-y-4` | Contenedor interno. El padding de `p-6` es el estándar absoluto para el contenido. |
+| **3. Comportamiento en Columnas (Formularios)** | `grid grid-cols-1 md:grid-cols-2 gap-4` | **Regla de Oro:** Cuando un card deba dividirse en 2 columnas, usar esta grilla dentro del `card-body`. |
+| **4. Comportamiento Multi-Columna (Tablas)** | `tr.hover:bg-base-200/20.divide-x.divide-base-content/5` | Para vistas con muchos datos (como el Tarificador), usar tablas con `divide-x` para separar visualmente las celdas y `hover` para seguimiento. |
+| **5. Etiquetas (Labels)** | `label font-bold text-xs uppercase text-base-content/60 tracking-widest` | Estilo estándar para todos los labels de los inputs. |
 | **6. Split-Flex (Inputs)** | `flex gap-2` (Hijos: `w-1/3`, `w-2/3`) | **CRÍTICO:** Para dividir un solo campo en dos (No./Cap). Reemplaza a grid en este caso específico. |
 | **7. Contenedor Tabs** | `card bg-base-100 border... mb-6` | Barra flotante que contiene el `<select>` de navegación y botones de acción. |
 | **8. Estado Vacío (Tabla)** | `text-center py-20 opacity-40` | `td` único para mostrar mensajes cuando no hay datos en una tabla. |

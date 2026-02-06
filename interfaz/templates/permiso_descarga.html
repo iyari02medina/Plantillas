@@ -26,13 +26,13 @@
 </div>
 
 <!-- Search Filters -->
-<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden mb-6">
     <div class="card-body p-6">
         <form method="GET" action="{{ url_for('permisos_descarga') }}" class="space-y-6 w-full">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- NIS -->
                 <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio</label>
+                    <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                     <input type="text" name="p_nis" class="input input-bordered w-full h-10"
                         placeholder="Buscar FOLIO..." value="{{ request.args.get('p_nis', '') }}">
                 </div>
@@ -40,7 +40,7 @@
                 <!-- Cliente -->
                 <div class="form-control relative">
                     <label
-                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
+                        class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cliente</label>
                     <input type="text" name="p_cliente" class="input input-bordered w-full h-10"
                         placeholder="Filtrar por nombre o empresa..." value="{{ request.args.get('p_cliente', '') }}"
                         oninput="filterGeneric(this, 'clientes')" autocomplete="off">
@@ -51,7 +51,7 @@
 
                 <!-- Mes -->
                 <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes
+                    <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Mes
                         Acuse</label>
                     <select name="p_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Todos los meses</option>
@@ -75,7 +75,7 @@
 
                 <!-- Año -->
                 <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
+                    <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Año</label>
                     <select name="p_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
                         <option value="" selected>Año</option>
                         {% for y in range(2023, 2031) %}
@@ -111,17 +111,23 @@
 
 
 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+    <div
+        class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+        <span class="icon-[tabler--list-details] size-5 text-primary"></span>
+        <span>Listado de Permisos</span>
+    </div>
     <div class="card-body p-0">
         <div class="overflow-x-auto">
             <table class="table table-lg">
                 <thead class="bg-base-200/50">
                     <tr>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Acciones</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Folio</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">NIS</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Establecimiento</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs">Interesado</th>
-                        <th class="text-base-content/70 font-bold uppercase tracking-wider text-xs text-center">Fecha
+                        <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Acciones</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Folio</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">NIS</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Establecimiento
+                        </th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Interesado</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs text-center">Fecha
                             Acuse</th>
                     </tr>
                 </thead>

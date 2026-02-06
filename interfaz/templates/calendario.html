@@ -47,9 +47,8 @@
 
             <!-- Selector de Tipo -->
             <div class="form-control mb-4">
-                <label class="label">
-                    <span class="label-text font-bold">Tipo de Actividad</span>
-                </label>
+                <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tipo de
+                    Actividad</label>
                 <select id="tipo_evento" class="select select-bordered w-full"
                     onchange="cambiarFormularioEvento(this.value)">
                     <option value="">-- Seleccione --</option>
@@ -65,25 +64,30 @@
                 method="POST">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Folio</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                         <input type="text" name="folio_des" class="input input-bordered" placeholder="OT-DES-..."
                             required>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Cliente</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cliente</label>
                         <input type="text" name="nombre_cliente" class="input input-bordered" required>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Fecha</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha</label>
                         <input type="date" name="fecha_des" class="input input-bordered" value="{{ now_formatted }}"
                             required>
                     </div>
                     <div class="form-control md:col-span-2">
-                        <label class="label"><span class="label-text">Ubicación del Área</span></label>
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Ubicación
+                            del Área</label>
                         <input type="text" name="ubicacion_area" class="input input-bordered">
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Tipo de Tubería</span></label>
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tipo de
+                            Tubería</label>
                         <select name="tipo_tuberia" class="select select-bordered">
                             <option>PVC</option>
                             <option>Concreto</option>
@@ -91,7 +95,8 @@
                         </select>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Diámetro (pulg)</span></label>
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Diámetro
+                            (pulg)</label>
                         <input type="text" name="diametro_tuberia" class="input input-bordered">
                     </div>
                 </div>
@@ -107,25 +112,30 @@
                 method="POST">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Folio</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                         <input type="text" name="folio_lt" class="input input-bordered" placeholder="OT-TRA-..."
                             required>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Cliente</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cliente</label>
                         <input type="text" name="nombre_cliente" class="input input-bordered" required>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Fecha</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha</label>
                         <input type="date" name="fecha_lt" class="input input-bordered" value="{{ now_formatted }}"
                             required>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Ubicación del Equipo</span></label>
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Ubicación
+                            del Equipo</label>
                         <input type="text" name="ubicacion_equipo" class="input input-bordered">
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Tipo de Trampa</span></label>
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tipo de
+                            Trampa</label>
                         <select name="tipo_trampa" class="select select-bordered">
                             <option>Estándar</option>
                             <option>Prefabricada</option>
@@ -133,7 +143,8 @@
                         </select>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Capacidad (L)</span></label>
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Capacidad
+                            (L)</label>
                         <input type="text" name="capacidad_trampa" class="input input-bordered">
                     </div>
                 </div>
@@ -149,20 +160,24 @@
                 method="POST">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Folio</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                         <input type="text" name="folio_vt" class="input input-bordered" placeholder="VT-..." required>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Cliente</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cliente</label>
                         <input type="text" name="nombre_cliente" class="input input-bordered" required>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Fecha</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha</label>
                         <input type="date" name="fecha_vt" class="input input-bordered" value="{{ now_formatted }}"
                             required>
                     </div>
                     <div class="form-control md:col-span-2">
-                        <label class="label"><span class="label-text">Dirección</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Dirección</label>
                         <input type="text" name="direccion_cliente" class="input input-bordered">
                     </div>
                 </div>
@@ -178,20 +193,24 @@
                 method="POST">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Folio</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                         <input type="text" name="folio_tar" class="input input-bordered" placeholder="AUTO" required>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Fecha de Muestreo</span></label>
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha de
+                            Muestreo</label>
                         <input type="date" name="fecha_tar" class="input input-bordered" value="{{ now_formatted }}"
                             required>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Cliente</span></label>
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cliente</label>
                         <input type="text" name="nombre_cliente" class="input input-bordered" required>
                     </div>
                     <div class="form-control">
-                        <label class="label"><span class="label-text">Tipo de Análisis</span></label>
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tipo de
+                            Análisis</label>
                         <select name="tipo_analisis" class="select select-bordered">
                             <option>Agua Potable</option>
                             <option>Agua Residual</option>
@@ -216,7 +235,7 @@
     </div>
 
     <!-- Contenedor del Calendario -->
-    <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
         <div class="card-body p-6">
             <div id="calendar" class="min-h-[600px]"></div>
         </div>

@@ -19,8 +19,8 @@
 </div>
 
 <!-- Barra de Control Compacta -->
-<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
-    <div class="card-body gap-6">
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden mb-6">
+    <div class="card-body p-6 space-y-4">
         <h6 class="text-base-content/70 font-semibold mb-0">Tipo de orden:</h6>
         <div class="input max-w-xl items-center pe-0">
             <select id="tab-selector" class="select select-sm" aria-label="Seleccionar tipo de orden"
@@ -40,533 +40,566 @@
 </div>
 
 <!-- DESAZOLVES -->
-<div id="tab-desazolve" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-visible">
-    <div class="card-header bg-base-200/30 p-4 border-b border-base-content/10">
-        <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
-            <span class="icon-[tabler--list-details] size-5"></span>
-            Lista de Desazolves
-        </h3>
-    </div>
+<div id="tab-desazolve" class="space-y-6">
+    <!-- Filtros Desazolve -->
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div class="p-6">
+            <form method="GET" action="{{ url_for('ordenes') }}" class="space-y-6 w-full">
+                <input type="hidden" name="tab" value="desazolve">
 
-    <!-- Search Filters -->
-    <div class="p-6 border-b border-base-content/10 bg-base-100">
-        <form method="GET" action="{{ url_for('ordenes') }}" class="space-y-6 w-full">
-            <input type="hidden" name="tab" value="desazolve">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                    <!-- Folio -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
+                        <input type="text" name="folio" class="input input-bordered w-full h-10"
+                            placeholder="OT-DES-..." value="{{ request.args.get('folio', '') }}">
+                    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                <!-- Folio -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio</label>
-                    <input type="text" name="folio" class="input input-bordered w-full h-10" placeholder="OT-DES-..."
-                        value="{{ request.args.get('folio', '') }}">
-                </div>
+                    <!-- Cliente -->
+                    <div class="form-control lg:col-span-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cliente</label>
+                        <div class="relative w-full">
+                            <input type="text" name="cliente" class="input input-bordered w-full h-10"
+                                placeholder="Buscar cliente..." value="{{ request.args.get('cliente', '') }}"
+                                autocomplete="off" oninput="filterGeneric(this, 'clientes')"
+                                onfocus="filterGeneric(this, 'clientes')">
 
-                <!-- Cliente -->
-                <div class="form-control lg:col-span-2">
-                    <label
-                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
-                    <div class="relative w-full">
-                        <input type="text" name="cliente" class="input input-bordered w-full h-10"
-                            placeholder="Buscar cliente..." value="{{ request.args.get('cliente', '') }}"
-                            autocomplete="off" oninput="filterGeneric(this, 'clientes')"
-                            onfocus="filterGeneric(this, 'clientes')">
-
-                        <div
-                            class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                            <div
+                                class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Servicio -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Servicio</label>
+                        <select name="servicio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                            <option value="" selected>Todos</option>
+                            <option value="vactor" {{ 'selected' if request.args.get('servicio')=='vactor' else '' }}>
+                                Vactor
+                            </option>
+                            <option value="hidro" {{ 'selected' if request.args.get('servicio')=='hidro' else '' }}>
+                                Hidro
+                            </option>
+                            <option value="guia" {{ 'selected' if request.args.get('servicio')=='guia' else '' }}>Guía
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Mes -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Mes</label>
+                        <select name="mes" class="select select-bordered w-full h-10 min-h-0 px-3">
+                            <option value="" selected>Todos los meses</option>
+                            {% set meses = [('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05',
+                            'Mayo'), ('06', 'Junio'), ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10',
+                            'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')] %}
+                            {% for m_val, m_name in meses %}
+                            <option value="{{ m_val }}" {{ 'selected' if request.args.get('mes')==m_val else '' }}>{{
+                                m_name
+                                }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Año -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Año</label>
+                        <select name="anio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                            <option value="" selected>Año</option>
+                            {% for y in range(2023, 2031) %}
+                            <option value="{{ y }}" {{ 'selected' if request.args.get('anio')==y|string else '' }}>{{ y
+                                }}
+                            </option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
 
-                <!-- Servicio -->
-                <div class="form-control">
-                    <label
-                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Servicio</label>
-                    <select name="servicio" class="select select-bordered w-full h-10 min-h-0 px-3">
-                        <option value="" selected>Todos</option>
-                        <option value="vactor" {{ 'selected' if request.args.get('servicio')=='vactor' else '' }}>Vactor
-                        </option>
-                        <option value="hidro" {{ 'selected' if request.args.get('servicio')=='hidro' else '' }}>Hidro
-                        </option>
-                        <option value="guia" {{ 'selected' if request.args.get('servicio')=='guia' else '' }}>Guía
-                        </option>
-                    </select>
+                <!-- Botones row -->
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                        <span class="icon-[tabler--search] size-5"></span>
+                        <span>Buscar</span>
+                    </button>
+                    <a href="{{ url_for('ordenes', tab='desazolve') }}"
+                        class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path
+                                d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                            <path d="M22 22l-5 -5" />
+                            <path d="M17 22l5 -5" />
+                        </svg>
+                    </a>
                 </div>
-
-                <!-- Mes -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
-                    <select name="mes" class="select select-bordered w-full h-10 min-h-0 px-3">
-                        <option value="" selected>Todos los meses</option>
-                        {% set meses = [('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05',
-                        'Mayo'), ('06', 'Junio'), ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10',
-                        'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')] %}
-                        {% for m_val, m_name in meses %}
-                        <option value="{{ m_val }}" {{ 'selected' if request.args.get('mes')==m_val else '' }}>{{ m_name
-                            }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <!-- Año -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
-                    <select name="anio" class="select select-bordered w-full h-10 min-h-0 px-3">
-                        <option value="" selected>Año</option>
-                        {% for y in range(2023, 2031) %}
-                        <option value="{{ y }}" {{ 'selected' if request.args.get('anio')==y|string else '' }}>{{ y }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <!-- Botones row -->
-            <div class="flex gap-3 pt-2">
-                <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
-                    <span class="icon-[tabler--search] size-5"></span>
-                    <span>Buscar</span>
-                </button>
-                <a href="{{ url_for('ordenes', tab='desazolve') }}"
-                    class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path
-                            d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
-                        <path d="M22 22l-5 -5" />
-                        <path d="M17 22l5 -5" />
-                    </svg>
-                </a>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
-    <div class="card-body p-0 overflow-visible">
-        <div class="overflow-x-auto">
-            <table class="table table-lg">
-                <thead class="bg-base-200/50">
-                    <tr>
-                        <th>Acciones</th>
-                        <th>Folio</th>
-                        <th>Fecha</th>
-                        <th>Cliente</th>
-                        <th>Ubicación</th>
-                        <th>Servicio</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-base-content/5">
-                    {% for orden in desazolves|reverse %}
-                    {% if orden.folio_des %}
-                    <tr class="hover:bg-base-200/30 transition-colors">
-                        <td>
-                            <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
-                                <button id="dropdown-des-{{ orden.folio_des }}" type="button"
-                                    class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
-                                    aria-expanded="false" aria-label="Dropdown">
-                                    <span class="icon-[tabler--dots-vertical] size-4"></span>
-                                    <span>Ver</span>
-                                    <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
-                                </button>
-                                <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
-                                    aria-orientation="vertical" aria-labelledby="dropdown-des-{{ orden.folio_des }}">
-                                    <li>
-                                        <a class="dropdown-item flex items-center gap-2"
-                                            href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_des) }}">
-                                            <span class="icon-[tabler--eye] size-4"></span>
-                                            Detalles
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item flex items-center gap-2"
-                                            href="{{ url_for('ver_orden_pdf', tipo='desazolve', folio=orden.folio_des) }}"
-                                            target="_blank">
-                                            <span class="icon-[tabler--file-type-pdf] size-4"></span>
-                                            PDF
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider my-1 border-base-content/10">
-                                    </li>
-                                    <li>
-                                        <form
-                                            action="{{ url_for('eliminar_orden', tipo='desazolve', folio=orden.folio_des) }}"
-                                            method="POST"
-                                            onsubmit="return confirm('¿Seguro que desea borrar esta orden de desazolve? Esta acción no se puede deshacer.');"
-                                            class="w-full">
-                                            <button type="submit"
-                                                class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
-                                                <span class="icon-[tabler--trash] size-4"></span>
-                                                Borrar
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        </td>
-                        <td><span class="font-bold text-primary">{{ orden.folio_des }}</span></td>
-                        <td class="text-base-content/60">{{ orden.fecha_des }}</td>
-                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
-                        <td class="text-sm truncate max-w-xs">{{ orden.ubicacion_area }}</td>
-                        <td>
-                            <div class="flex gap-1">
-                                {% if orden.equipo_vactor == 'x' %}<span
-                                    class="badge badge-soft badge-primary text-[10px]">Vactor</span>{% endif %}
-                                {% if orden.equipo_hidro == 'x' %}<span
-                                    class="badge badge-soft badge-info text-[10px]">Hidro</span>{% endif %}
-                                {% if orden.equipo_guia == 'x' %}<span
-                                    class="badge badge-soft badge-secondary text-[10px]">Guía</span>{% endif %}
-                            </div>
-                        </td>
-                    </tr>
-                    {% endif %}
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center py-16 text-base-content/40 font-medium">No hay órdenes de
-                            desazolve registradas.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Tabla Desazolve -->
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div
+            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+            <h3 class="font-bold flex items-center gap-2 text-primary">
+                <span class="icon-[tabler--list-details] size-5"></span>
+                Lista de Desazolves
+            </h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="overflow-x-auto">
+                <table class="table table-lg">
+                    <thead class="bg-base-200/50">
+                        <tr>
+                            <th>Acciones</th>
+                            <th>Folio</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Ubicación</th>
+                            <th>Servicio</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-base-content/5">
+                        {% for orden in desazolves|reverse %}
+                        {% if orden.folio_des %}
+                        <tr class="hover:bg-base-200/30 transition-colors">
+                            <td>
+                                <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
+                                    <button id="dropdown-des-{{ orden.folio_des }}" type="button"
+                                        class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
+                                        aria-expanded="false" aria-label="Dropdown">
+                                        <span class="icon-[tabler--dots-vertical] size-4"></span>
+                                        <span>Ver</span>
+                                        <span
+                                            class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
+                                        aria-orientation="vertical"
+                                        aria-labelledby="dropdown-des-{{ orden.folio_des }}">
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('detalle_orden', tipo='desazolve', folio=orden.folio_des) }}">
+                                                <span class="icon-[tabler--eye] size-4"></span>
+                                                Detalles
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('ver_orden_pdf', tipo='desazolve', folio=orden.folio_des) }}"
+                                                target="_blank">
+                                                <span class="icon-[tabler--file-type-pdf] size-4"></span>
+                                                PDF
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider my-1 border-base-content/10">
+                                        </li>
+                                        <li>
+                                            <form
+                                                action="{{ url_for('eliminar_orden', tipo='desazolve', folio=orden.folio_des) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('¿Seguro que desea borrar esta orden de desazolve? Esta acción no se puede deshacer.');"
+                                                class="w-full">
+                                                <button type="submit"
+                                                    class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
+                                                    <span class="icon-[tabler--trash] size-4"></span>
+                                                    Borrar
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td><span class="font-bold text-primary">{{ orden.folio_des }}</span></td>
+                            <td class="text-base-content/60">{{ orden.fecha_des }}</td>
+                            <td class="font-medium">{{ orden.nombre_cliente }}</td>
+                            <td class="text-sm truncate max-w-xs">{{ orden.ubicacion_area }}</td>
+                            <td>
+                                <div class="flex gap-1">
+                                    {% if orden.equipo_vactor == 'x' %}<span
+                                        class="badge badge-soft badge-primary text-[10px]">Vactor</span>{% endif %}
+                                    {% if orden.equipo_hidro == 'x' %}<span
+                                        class="badge badge-soft badge-info text-[10px]">Hidro</span>{% endif %}
+                                    {% if orden.equipo_guia == 'x' %}<span
+                                        class="badge badge-soft badge-secondary text-[10px]">Guía</span>{% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-16 text-base-content/40 font-medium">No hay órdenes de
+                                desazolve registradas.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- TRAMPAS -->
-<div id="tab-trampas" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-visible hidden">
-    <div class="card-header bg-base-200/30 p-4 border-b border-base-content/10">
-        <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
-            <span class="icon-[tabler--list-details] size-5"></span>
-            Lista de Trampas de Grasa
-        </h3>
-    </div>
+<div id="tab-trampas" class="space-y-6 hidden">
+    <!-- Filtros Trampas -->
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div class="p-6">
+            <form method="GET" action="{{ url_for('ordenes') }}" class="space-y-6 w-full">
+                <input type="hidden" name="tab" value="trampas">
 
-    <!-- Search Filters -->
-    <div class="p-6 border-b border-base-content/10 bg-base-100">
-        <form method="GET" action="{{ url_for('ordenes') }}" class="space-y-6 w-full">
-            <input type="hidden" name="tab" value="trampas">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Folio -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
+                        <input type="text" name="t_folio" class="input input-bordered w-full h-10"
+                            placeholder="OT-TRA-..." value="{{ request.args.get('t_folio', '') }}">
+                    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Folio -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio</label>
-                    <input type="text" name="t_folio" class="input input-bordered w-full h-10" placeholder="OT-TRA-..."
-                        value="{{ request.args.get('t_folio', '') }}">
-                </div>
+                    <!-- Cliente -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
+                        <div class="relative w-full">
+                            <input type="text" name="t_cliente" class="input input-bordered w-full h-10"
+                                placeholder="Buscar cliente..." value="{{ request.args.get('t_cliente', '') }}"
+                                autocomplete="off" oninput="filterGeneric(this, 'clientes')"
+                                onfocus="filterGeneric(this, 'clientes')">
 
-                <!-- Cliente -->
-                <div class="form-control">
-                    <label
-                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
-                    <div class="relative w-full">
-                        <input type="text" name="t_cliente" class="input input-bordered w-full h-10"
-                            placeholder="Buscar cliente..." value="{{ request.args.get('t_cliente', '') }}"
-                            autocomplete="off" oninput="filterGeneric(this, 'clientes')"
-                            onfocus="filterGeneric(this, 'clientes')">
-
-                        <div
-                            class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                            <div
+                                class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Mes -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
+                        <select name="t_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
+                            <option value="" selected>Todos los meses</option>
+                            {% set meses = [('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05',
+                            'Mayo'), ('06', 'Junio'), ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10',
+                            'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')] %}
+                            {% for m_val, m_name in meses %}
+                            <option value="{{ m_val }}" {{ 'selected' if request.args.get('t_mes')==m_val else '' }}>{{
+                                m_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Año -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
+                        <select name="t_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                            <option value="" selected>Año</option>
+                            {% for y in range(2023, 2031) %}
+                            <option value="{{ y }}" {{ 'selected' if request.args.get('t_anio')==y|string else '' }}>{{
+                                y }}
+                            </option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
 
-                <!-- Mes -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
-                    <select name="t_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
-                        <option value="" selected>Todos los meses</option>
-                        {% set meses = [('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05',
-                        'Mayo'), ('06', 'Junio'), ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10',
-                        'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')] %}
-                        {% for m_val, m_name in meses %}
-                        <option value="{{ m_val }}" {{ 'selected' if request.args.get('t_mes')==m_val else '' }}>{{
-                            m_name }}</option>
-                        {% endfor %}
-                    </select>
+                <!-- Botones row -->
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                        <span class="icon-[tabler--search] size-5"></span>
+                        <span>Buscar</span>
+                    </button>
+                    <a href="{{ url_for('ordenes', tab='trampas') }}"
+                        class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path
+                                d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                            <path d="M22 22l-5 -5" />
+                            <path d="M17 22l5 -5" />
+                        </svg>
+                    </a>
                 </div>
-
-                <!-- Año -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
-                    <select name="t_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
-                        <option value="" selected>Año</option>
-                        {% for y in range(2023, 2031) %}
-                        <option value="{{ y }}" {{ 'selected' if request.args.get('t_anio')==y|string else '' }}>{{ y }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <!-- Botones row -->
-            <div class="flex gap-3 pt-2">
-                <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
-                    <span class="icon-[tabler--search] size-5"></span>
-                    <span>Buscar</span>
-                </button>
-                <a href="{{ url_for('ordenes', tab='trampas') }}"
-                    class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path
-                            d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
-                        <path d="M22 22l-5 -5" />
-                        <path d="M17 22l5 -5" />
-                    </svg>
-                </a>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
-    <div class="card-body p-0 overflow-visible">
-        <div class="overflow-x-auto">
-            <table class="table table-lg">
-                <thead class="bg-base-200/50">
-                    <tr>
-                        <th>Acciones</th>
-                        <th>Folio</th>
-                        <th>Fecha</th>
-                        <th>Cliente</th>
-                        <th>Tipo</th>
-                        <th>Capacidad</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-base-content/5">
-                    {% for orden in trampas|reverse %}
-                    {% if orden.folio_lt %}
-                    <tr class="hover:bg-base-200/30 transition-colors">
-                        <td>
-                            <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
-                                <button id="dropdown-tra-{{ orden.folio_lt }}" type="button"
-                                    class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
-                                    aria-expanded="false" aria-label="Dropdown">
-                                    <span class="icon-[tabler--dots-vertical] size-4"></span>
-                                    <span>Ver Acciones</span>
-                                    <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
-                                </button>
-                                <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
-                                    aria-orientation="vertical" aria-labelledby="dropdown-tra-{{ orden.folio_lt }}">
-                                    <li>
-                                        <a class="dropdown-item flex items-center gap-2"
-                                            href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_lt) }}">
-                                            <span class="icon-[tabler--eye] size-4"></span>
-                                            Ver Detalles
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item flex items-center gap-2"
-                                            href="{{ url_for('ver_orden_pdf', tipo='trampa', folio=orden.folio_lt) }}"
-                                            target="_blank">
-                                            <span class="icon-[tabler--file-text] size-4 text-primary"></span>
-                                            Ver Documento
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider my-1 border-base-content/10">
-                                    </li>
-                                    <li>
-                                        <form
-                                            action="{{ url_for('eliminar_orden', tipo='trampa', folio=orden.folio_lt) }}"
-                                            method="POST"
-                                            onsubmit="return confirm('¿Seguro que desea borrar esta orden de limpieza de trampa? Esta acción no se puede deshacer.');"
-                                            class="w-full">
-                                            <button type="submit"
-                                                class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
-                                                <span class="icon-[tabler--trash] size-4"></span>
-                                                Borrar
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        </td>
-                        <td><span class="font-bold text-primary">{{ orden.folio_lt }}</span></td>
-                        <td class="text-base-content/60">{{ orden.fecha_lt }}</td>
-                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
-                        <td>{{ orden.tipo_trampa }}</td>
-                        <td>{{ orden.capacidad_trampa }}</td>
-                    </tr>
-                    {% endif %}
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center py-16 text-base-content/40 font-medium">No hay órdenes de
-                            trampas registradas.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Tabla Trampas -->
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div
+            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+            <h3 class="font-bold flex items-center gap-2 text-primary">
+                <span class="icon-[tabler--list-details] size-5"></span>
+                Lista de Trampas de Grasa
+            </h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="overflow-x-auto">
+                <table class="table table-lg">
+                    <thead class="bg-base-200/50">
+                        <tr>
+                            <th>Acciones</th>
+                            <th>Folio</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Tipo</th>
+                            <th>Capacidad</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-base-content/5">
+                        {% for orden in trampas|reverse %}
+                        {% if orden.folio_lt %}
+                        <tr class="hover:bg-base-200/30 transition-colors">
+                            <td>
+                                <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
+                                    <button id="dropdown-tra-{{ orden.folio_lt }}" type="button"
+                                        class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
+                                        aria-expanded="false" aria-label="Dropdown">
+                                        <span class="icon-[tabler--dots-vertical] size-4"></span>
+                                        <span>Ver Acciones</span>
+                                        <span
+                                            class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
+                                        aria-orientation="vertical" aria-labelledby="dropdown-tra-{{ orden.folio_lt }}">
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('detalle_orden', tipo='trampa', folio=orden.folio_lt) }}">
+                                                <span class="icon-[tabler--eye] size-4"></span>
+                                                Ver Detalles
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('ver_orden_pdf', tipo='trampa', folio=orden.folio_lt) }}"
+                                                target="_blank">
+                                                <span class="icon-[tabler--file-text] size-4 text-primary"></span>
+                                                Ver Documento
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider my-1 border-base-content/10">
+                                        </li>
+                                        <li>
+                                            <form
+                                                action="{{ url_for('eliminar_orden', tipo='trampa', folio=orden.folio_lt) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('¿Seguro que desea borrar esta orden de limpieza de trampa? Esta acción no se puede deshacer.');"
+                                                class="w-full">
+                                                <button type="submit"
+                                                    class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
+                                                    <span class="icon-[tabler--trash] size-4"></span>
+                                                    Borrar
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td><span class="font-bold text-primary">{{ orden.folio_lt }}</span></td>
+                            <td class="text-base-content/60">{{ orden.fecha_lt }}</td>
+                            <td class="font-medium">{{ orden.nombre_cliente }}</td>
+                            <td>{{ orden.tipo_trampa }}</td>
+                            <td>{{ orden.capacidad_trampa }}</td>
+                        </tr>
+                        {% endif %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-16 text-base-content/40 font-medium">No hay órdenes de
+                                trampas registradas.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- VISITAS -->
-<div id="tab-visitas" class="card bg-base-100 border border-base-content/10 shadow-sm overflow-visible hidden">
-    <div class="card-header bg-base-200/30 p-4 border-b border-base-content/10">
-        <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
-            <span class="icon-[tabler--list-details] size-5"></span>
-            Lista de Visitas Técnicas
-        </h3>
-    </div>
+<div id="tab-visitas" class="space-y-6 hidden">
+    <!-- Filtros Visitas -->
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div class="p-6">
+            <form method="GET" action="{{ url_for('ordenes') }}" class="space-y-6 w-full">
+                <input type="hidden" name="tab" value="visitas">
 
-    <!-- Search Filters -->
-    <div class="p-6 border-b border-base-content/10 bg-base-100">
-        <form method="GET" action="{{ url_for('ordenes') }}" class="space-y-6 w-full">
-            <input type="hidden" name="tab" value="visitas">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Folio -->
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio
+                            VT</label>
+                        <input type="text" name="v_folio" class="input input-bordered w-full h-10" placeholder="VT-..."
+                            value="{{ request.args.get('v_folio', '') }}">
+                    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Folio -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio
-                        VT</label>
-                    <input type="text" name="v_folio" class="input input-bordered w-full h-10" placeholder="VT-..."
-                        value="{{ request.args.get('v_folio', '') }}">
-                </div>
+                    <!-- Cliente -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
+                        <div class="relative w-full">
+                            <input type="text" name="v_cliente" class="input input-bordered w-full h-10"
+                                placeholder="Buscar cliente..." value="{{ request.args.get('v_cliente', '') }}"
+                                autocomplete="off" oninput="filterGeneric(this, 'clientes')"
+                                onfocus="filterGeneric(this, 'clientes')">
 
-                <!-- Cliente -->
-                <div class="form-control">
-                    <label
-                        class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Cliente</label>
-                    <div class="relative w-full">
-                        <input type="text" name="v_cliente" class="input input-bordered w-full h-10"
-                            placeholder="Buscar cliente..." value="{{ request.args.get('v_cliente', '') }}"
-                            autocomplete="off" oninput="filterGeneric(this, 'clientes')"
-                            onfocus="filterGeneric(this, 'clientes')">
-
-                        <div
-                            class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                            <div
+                                class="generic-suggestions hidden absolute z-[9999] w-full bg-base-100 border border-base-300 shadow-2xl max-h-48 overflow-y-auto rounded-md mt-1 top-full left-0 border-t-0">
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Mes -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
+                        <select name="v_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
+                            <option value="" selected>Todos los meses</option>
+                            {% set meses = [('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05',
+                            'Mayo'), ('06', 'Junio'), ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10',
+                            'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')] %}
+                            {% for m_val, m_name in meses %}
+                            <option value="{{ m_val }}" {{ 'selected' if request.args.get('v_mes')==m_val else '' }}>{{
+                                m_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Año -->
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
+                        <select name="v_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                            <option value="" selected>Año</option>
+                            {% for y in range(2023, 2031) %}
+                            <option value="{{ y }}" {{ 'selected' if request.args.get('v_anio')==y|string else '' }}>{{
+                                y }}
+                            </option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
 
-                <!-- Mes -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Mes</label>
-                    <select name="v_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
-                        <option value="" selected>Todos los meses</option>
-                        {% set meses = [('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05',
-                        'Mayo'), ('06', 'Junio'), ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10',
-                        'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')] %}
-                        {% for m_val, m_name in meses %}
-                        <option value="{{ m_val }}" {{ 'selected' if request.args.get('v_mes')==m_val else '' }}>{{
-                            m_name }}</option>
-                        {% endfor %}
-                    </select>
+                <!-- Botones row -->
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                        <span class="icon-[tabler--search] size-5"></span>
+                        <span>Buscar</span>
+                    </button>
+                    <a href="{{ url_for('ordenes', tab='visitas') }}"
+                        class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path
+                                d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
+                            <path d="M22 22l-5 -5" />
+                            <path d="M17 22l5 -5" />
+                        </svg>
+                    </a>
                 </div>
-
-                <!-- Año -->
-                <div class="form-control">
-                    <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Año</label>
-                    <select name="v_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
-                        <option value="" selected>Año</option>
-                        {% for y in range(2023, 2031) %}
-                        <option value="{{ y }}" {{ 'selected' if request.args.get('v_anio')==y|string else '' }}>{{ y }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <!-- Botones row -->
-            <div class="flex gap-3 pt-2">
-                <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
-                    <span class="icon-[tabler--search] size-5"></span>
-                    <span>Buscar</span>
-                </button>
-                <a href="{{ url_for('ordenes', tab='visitas') }}"
-                    class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-tabler icons-tabler-outline icon-tabler-filter-x">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path
-                            d="M13.758 19.414l-4.758 1.586v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.345v-2.227h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v1.5" />
-                        <path d="M22 22l-5 -5" />
-                        <path d="M17 22l5 -5" />
-                    </svg>
-                </a>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
-    <div class="card-body p-0 overflow-visible">
-        <div class="overflow-x-auto">
-            <table class="table table-lg">
-                <thead class="bg-base-200/50">
-                    <tr>
-                        <th>Acciones</th>
-                        <th>Folio VT</th>
-                        <th>Fecha</th>
-                        <th>Cliente</th>
-                        <th>Dirección</th>
-                        <th>No. Cliente</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-base-content/5">
-                    {% for orden in visitas|reverse %}
-                    {% if orden.folio_vt %}
-                    <tr class="hover:bg-base-200/30 transition-colors">
-                        <td>
-                            <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
-                                <button id="dropdown-vis-{{ orden.folio_vt }}" type="button"
-                                    class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
-                                    aria-expanded="false" aria-label="Dropdown">
-                                    <span class="icon-[tabler--dots-vertical] size-4"></span>
-                                    <span>Ver Acciones</span>
-                                    <span class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
-                                </button>
-                                <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
-                                    aria-orientation="vertical" aria-labelledby="dropdown-vis-{{ orden.folio_vt }}">
-                                    <li>
-                                        <a class="dropdown-item flex items-center gap-2"
-                                            href="{{ url_for('detalle_orden', tipo='visita', folio=orden.folio_vt) }}">
-                                            <span class="icon-[tabler--eye] size-4"></span>
-                                            Ver Detalles
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item flex items-center gap-2"
-                                            href="{{ url_for('ver_orden_pdf', tipo='visita', folio=orden.folio_vt) }}"
-                                            target="_blank">
-                                            <span class="icon-[tabler--file-text] size-4 text-primary"></span>
-                                            Ver Documento
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider my-1 border-base-content/10">
-                                    </li>
-                                    <li>
-                                        <form
-                                            action="{{ url_for('eliminar_orden', tipo='visita', folio=orden.folio_vt) }}"
-                                            method="POST"
-                                            onsubmit="return confirm('¿Seguro que desea borrar esta visita técnica? Esta acción no se puede deshacer.');"
-                                            class="w-full">
-                                            <button type="submit"
-                                                class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
-                                                <span class="icon-[tabler--trash] size-4"></span>
-                                                Borrar
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        </td>
-                        <td><span class="font-bold text-primary">{{ orden.folio_vt }}</span></td>
-                        <td class="text-base-content/60">{{ orden.fecha_vt }}</td>
-                        <td class="font-medium">{{ orden.nombre_cliente }}</td>
-                        <td class="text-sm truncate max-w-xs">{{ orden.direccion_cliente }}</td>
-                        <td>{{ orden.no_cliente }}</td>
-                    </tr>
-                    {% endif %}
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center py-16 text-base-content/40 font-medium">No hay visitas
-                            técnicas registradas.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Tabla Visitas -->
+    <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+        <div
+            class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+            <h3 class="font-bold flex items-center gap-2 text-primary">
+                <span class="icon-[tabler--list-details] size-5"></span>
+                Lista de Visitas Técnicas
+            </h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="overflow-x-auto">
+                <table class="table table-lg">
+                    <thead class="bg-base-200/50">
+                        <tr>
+                            <th>Acciones</th>
+                            <th>Folio VT</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Dirección</th>
+                            <th>No. Cliente</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-base-content/5">
+                        {% for orden in visitas|reverse %}
+                        {% if orden.folio_vt %}
+                        <tr class="hover:bg-base-200/30 transition-colors">
+                            <td>
+                                <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
+                                    <button id="dropdown-vis-{{ orden.folio_vt }}" type="button"
+                                        class="dropdown-toggle btn btn-soft btn-secondary btn-sm" aria-haspopup="menu"
+                                        aria-expanded="false" aria-label="Dropdown">
+                                        <span class="icon-[tabler--dots-vertical] size-4"></span>
+                                        <span>Ver Acciones</span>
+                                        <span
+                                            class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu"
+                                        aria-orientation="vertical" aria-labelledby="dropdown-vis-{{ orden.folio_vt }}">
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('detalle_orden', tipo='visita', folio=orden.folio_vt) }}">
+                                                <span class="icon-[tabler--eye] size-4"></span>
+                                                Ver Detalles
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item flex items-center gap-2"
+                                                href="{{ url_for('ver_orden_pdf', tipo='visita', folio=orden.folio_vt) }}"
+                                                target="_blank">
+                                                <span class="icon-[tabler--file-text] size-4 text-primary"></span>
+                                                Ver Documento
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider my-1 border-base-content/10">
+                                        </li>
+                                        <li>
+                                            <form
+                                                action="{{ url_for('eliminar_orden', tipo='visita', folio=orden.folio_vt) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('¿Seguro que desea borrar esta visita técnica? Esta acción no se puede deshacer.');"
+                                                class="w-full">
+                                                <button type="submit"
+                                                    class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
+                                                    <span class="icon-[tabler--trash] size-4"></span>
+                                                    Borrar
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td><span class="font-bold text-primary">{{ orden.folio_vt }}</span></td>
+                            <td class="text-base-content/60">{{ orden.fecha_vt }}</td>
+                            <td class="font-medium">{{ orden.nombre_cliente }}</td>
+                            <td class="text-sm truncate max-w-xs">{{ orden.direccion_cliente }}</td>
+                            <td>{{ orden.no_cliente }}</td>
+                        </tr>
+                        {% endif %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-16 text-base-content/40 font-medium">No hay visitas
+                                técnicas registradas.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

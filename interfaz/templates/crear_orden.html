@@ -44,19 +44,21 @@
                     <span>Datos del Folio</span>
                 </div>
                 <div class="card-body p-6 space-y-4">
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Folio</label>
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                         <input type="text"
                             name="folio_{{ 'des' if tipo=='desazolve' else 'lt' if tipo=='trampa' else 'vt' }}"
                             value="{{ folio }}" readonly required
                             class="input input-bordered w-full font-black text-primary">
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Fecha de Servicio</label>
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha de
+                            Servicio</label>
                         <input type="text"
                             name="fecha_{{ 'des' if tipo=='desazolve' else 'lt' if tipo=='trampa' else 'vt' }}"
                             value="{{ orden.get('fecha_' + ( 'des' if tipo=='desazolve' else 'lt' if tipo=='trampa' else 'vt' ), todays_date) }}"
-                            class="input input-bordered w-full" {{ 'disabled' if not is_new else '' }}>
+                            class="input input-bordered w-full font-bold" readonly>
                     </div>
                 </div>
             </div>
@@ -68,8 +70,9 @@
                     <span>Información del Cliente</span>
                 </div>
                 <div class="card-body p-6 space-y-4">
-                    <div class="form-control relative">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Nombre / Empresa</label>
+                    <div class="form-control relative space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre /
+                            Empresa</label>
                         <input type="text" id="nombre_cliente" name="cliente" placeholder="Buscar..." autocomplete="off"
                             class="input input-bordered w-full font-bold" oninput="fillClient(this)" required
                             value="{{ orden.get('cliente', '') }}" {{ 'disabled' if not is_new else '' }}>
@@ -77,13 +80,15 @@
                             class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
                         </div>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Dirección</label>
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Dirección</label>
                         <textarea id="direccion_cliente" name="direccion" class="textarea textarea-bordered w-full"
                             rows="2" {{ 'disabled' if not is_new else '' }}>{{ orden.get('direccion', '') }}</textarea>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Teléfono</label>
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Teléfono</label>
                         <input type="text" id="telefono_cliente" name="telefono" class="input input-bordered w-full"
                             value="{{ orden.get('telefono', '') }}" {{ 'disabled' if not is_new else '' }}>
                     </div>
@@ -98,13 +103,15 @@
                     <span>Horarios de Servicio</span>
                 </div>
                 <div class="card-body p-6 grid grid-cols-2 gap-4">
-                    <div class="form-control">
-                        <label class="label font-bold text-[10px] uppercase opacity-50">Hora Inicial</label>
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Hora
+                            Inicial</label>
                         <input type="text" name="hora_inicial" class="input input-bordered w-full"
                             value="{{ orden.get('hora_inicial', '') }}" {{ 'disabled' if not is_new else '' }}>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-[10px] uppercase opacity-50">Hora Final</label>
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Hora
+                            Final</label>
                         <input type="text" name="hora_final" class="input input-bordered w-full"
                             value="{{ orden.get('hora_final', '') }}" {{ 'disabled' if not is_new else '' }}>
                     </div>
@@ -118,7 +125,7 @@
 
             <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                 <div
-                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-sm">
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                     <span class="icon-[tabler--clipboard-check] size-5 text-success"></span>
                     <span>Detalles Técnicos y Observaciones</span>
                 </div>
@@ -126,59 +133,73 @@
 
                     {% if tipo == 'desazolve' %}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Ubicación
+                        <div class="form-control space-y-2"><label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Ubicación
                                 del Servicio</label><input type="text" name="ubicacion"
                                 class="input input-bordered w-full" value="{{ orden.get('ubicacion', '') }}"
                                 {{ 'disabled' if not is_new else '' }}></div>
-                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Metros de
+                        <div class="form-control space-y-2"><label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Metros de
                                 Manguera</label><input type="text" name="metros_manguera"
                                 class="input input-bordered w-full" value="{{ orden.get('metros_manguera', '') }}"
                                 {{ 'disabled' if not is_new else '' }}></div>
-                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Tramo /
+                        <div class="form-control space-y-2"><label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tramo /
                                 Línea</label><input type="text" name="tramo" class="input input-bordered w-full"
                                 value="{{ orden.get('tramo', '') }}" {{ 'disabled' if not is_new else '' }}></div>
-                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Condición
+                        <div class="form-control space-y-2"><label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Condición
                                 Final</label><input type="text" name="condicion_final"
                                 class="input input-bordered w-full" value="{{ orden.get('condicion_final', '') }}"
                                 {{ 'disabled' if not is_new else '' }}></div>
                     </div>
                     {% elif tipo == 'trampa' %}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Ubicación
+                        <div class="form-control space-y-2"><label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Ubicación
                                 de la Trampa</label><input type="text" name="ubicacion"
                                 class="input input-bordered w-full" value="{{ orden.get('ubicacion', '') }}"
                                 {{ 'disabled' if not is_new else '' }}></div>
-                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Capacidad
+                        <div class="form-control space-y-2"><label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Capacidad
                                 (Litros)</label><input type="text" name="capacidad" class="input input-bordered w-full"
                                 value="{{ orden.get('capacidad', '') }}" {{ 'disabled' if not is_new else '' }}></div>
-                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Residuos
+                        <div class="form-control space-y-2"><label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Residuos
                                 Retirados</label><input type="text" name="residuos" class="input input-bordered w-full"
                                 value="{{ orden.get('residuos', '') }}" {{ 'disabled' if not is_new else '' }}></div>
-                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Estado de
+                        <div class="form-control space-y-2"><label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Estado de
                                 la Trampa</label><input type="text" name="estado_trampa"
                                 class="input input-bordered w-full" value="{{ orden.get('estado_trampa', '') }}"
                                 {{ 'disabled' if not is_new else '' }}></div>
                     </div>
                     {% elif tipo == 'visita' %}
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase opacity-60">Motivo de la Visita</label>
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Motivo de
+                            la Visita</label>
                         <input type="text" name="motivo" class="input input-bordered w-full"
                             value="{{ orden.get('motivo', '') }}" {{ 'disabled' if not is_new else '' }}>
                     </div>
                     {% endif %}
 
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase opacity-60">Observaciones Generales</label>
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Observaciones
+                            Generales</label>
                         <textarea name="observaciones" class="textarea textarea-bordered w-full" rows="4" {{ 'disabled'
                             if not is_new else '' }}>{{ orden.get('observaciones', '') }}</textarea>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Nombre de
+                        <div class="form-control space-y-2"><label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre de
                                 quien Recibe</label><input type="text" name="nombre_recibe"
                                 class="input input-bordered w-full" value="{{ orden.get('nombre_recibe', '') }}"
                                 {{ 'disabled' if not is_new else '' }}></div>
-                        <div class="form-control"><label class="label font-bold text-xs uppercase opacity-60">Nombre del
+                        <div class="form-control space-y-2"><label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre
+                                del
                                 Técnico</label><input type="text" name="tecnico_nombre"
                                 class="input input-bordered w-full" value="{{ orden.get('tecnico_nombre', '') }}"
                                 {{ 'disabled' if not is_new else '' }}></div>
@@ -189,14 +210,16 @@
             <!-- Evidencia Fotográfica -->
             <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                 <div
-                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-sm">
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                     <span class="icon-[tabler--camera] size-5 text-warning"></span>
                     <span>Evidencia Fotográfica</span>
                 </div>
                 <div class="card-body p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="space-y-4">
-                            <label class="label font-bold text-xs uppercase opacity-60 justify-center">Antes del
+                            <label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest justify-center">Antes
+                                del
                                 Servicio</label>
                             <div class="flex flex-col items-center gap-4">
                                 {% if orden.foto_antes %}
@@ -212,7 +235,9 @@
                             </div>
                         </div>
                         <div class="space-y-4">
-                            <label class="label font-bold text-xs uppercase opacity-60 justify-center">Después del
+                            <label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest justify-center">Después
+                                del
                                 Servicio</label>
                             <div class="flex flex-col items-center gap-4">
                                 {% if orden.foto_despues %}
@@ -251,7 +276,7 @@
     function enableEdit() {
         document.querySelectorAll('input, select, textarea').forEach(el => {
             const name = el.getAttribute('name');
-            if (name && !name.startsWith('folio_')) { // Protegemos inputs de folio para que sigan readonly
+            if (name && !name.startsWith('folio_') && !name.startsWith('fecha_')) { // Protegemos inputs de folio y fecha para que sigan readonly
                 el.disabled = false;
             }
         });

@@ -8,9 +8,8 @@
         <div class="flex items-center gap-2 mb-1">
             <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle' if cotizacion else 'Nueva' }} Cotización</h1>
         </div>
-        <p class="text-base-content/60 font-medium ml-10">
-            {{ 'Consulta y edita los conceptos de esta cotización.' if cotizacion else 'Ingrese los datos del cliente y
-            los conceptos a cotizar.' }}
+        <p class="text-base-content/60 font-medium ml-10 uppercase tracking-widest text-xs font-black">
+            Módulo de Cotizaciones
         </p>
     </div>
     {% if cotizacion %}
@@ -35,28 +34,30 @@
 
         <!-- Columna Izquierda: Datos Cliente -->
         <div class="lg:col-span-1 space-y-6">
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                 <div
                     class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                     <span class="icon-[tabler--file-info] size-5 text-primary"></span>
                     <span>Información General</span>
                 </div>
                 <div class="card-body p-6 space-y-4">
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Folio Cotización</label>
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio
+                            Cotización</label>
                         <input type="text" name="folio_cot" placeholder="COT-MMYY-###"
                             value="{{ suggested_folio if not cotizacion else cotizacion.folio_cot }}"
                             class="input input-bordered w-full font-black text-primary always-locked" readonly required>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Nombre de
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre de
                             Cotización</label>
                         <input type="text" name="nombre_cot" value="{{ cotizacion.nombre_cot if cotizacion else '' }}"
                             class="input input-bordered w-full font-bold" placeholder="Ej. Servicio de Mantenimiento..."
                             {{ 'disabled' if cotizacion else '' }} required>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Fecha de Creación</label>
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha de
+                            Creación</label>
                         <input type="text" name="fecha_cot"
                             value="{{ cotizacion.fecha_cot if cotizacion else todays_date }}"
                             class="input input-bordered w-full always-locked" readonly>
@@ -71,8 +72,9 @@
                     <span>Datos del Cliente</span>
                 </div>
                 <div class="card-body p-6 space-y-4">
-                    <div class="form-control relative">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Nombre / Empresa</label>
+                    <div class="form-control relative space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre /
+                            Empresa</label>
                         <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar..."
                             autocomplete="off" class="input input-bordered w-full font-bold" oninput="fillClient(this)"
                             required value="{{ cotizacion.nombre_cliente if cotizacion else '' }}" {{ 'disabled' if
@@ -83,21 +85,24 @@
                             class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
                         </div>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Razón Social</label>
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Razón
+                            Social</label>
                         <input type="text" id="razon_social_cliente" name="razon_social_cliente"
                             class="input input-bordered w-full"
                             value="{{ cotizacion.razon_social_cliente if cotizacion else '' }}" {{ 'disabled' if
                             cotizacion else '' }}>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Dirección</label>
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Dirección</label>
                         <textarea id="direccion_cliente" name="direccion_cliente"
                             class="textarea textarea-bordered w-full" rows="2" {{ 'disabled' if cotizacion else ''
                             }}>{{ cotizacion.direccion_cliente if cotizacion else '' }}</textarea>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase text-base-content/60">Teléfono</label>
+                    <div class="form-control space-y-2">
+                        <label
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Teléfono</label>
                         <input type="text" id="telefono_contacto" name="telefono_contacto"
                             class="input input-bordered w-full"
                             value="{{ cotizacion.telefono_contacto if cotizacion else '' }}" {{ 'disabled' if cotizacion
@@ -109,24 +114,31 @@
 
         <!-- Columna Derecha: Conceptos -->
         <div class="lg:col-span-2 space-y-6">
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm" style="min-height: 350px;">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden"
+                style="min-height: 350px;">
                 <div
-                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center">
-                    <h3 class="text-sm font-black uppercase tracking-widest text-base-content/40">Conceptos de la
-                        Cotización</h3>
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--list-details] size-5 text-primary"></span>
+                    <span>Conceptos de la Cotización</span>
                 </div>
-                <div class="card-body p-0 overflow-visible">
+                <div class="card-body p-0">
                     <div class="">
                         <table class="table table-lg">
                             <thead class="bg-base-200/30">
                                 <tr>
-                                    <th class="text-xs uppercase tracking-wider text-base-content/70 min-w-48">Nombre
+                                    <th
+                                        class="text-xs uppercase tracking-widest text-base-content/70 min-w-48 font-bold">
+                                        Nombre
                                         Item</th>
-                                    <th class="text-xs uppercase tracking-wider text-base-content/70 min-w-48">
+                                    <th
+                                        class="text-xs uppercase tracking-widest text-base-content/70 min-w-48 font-bold">
                                         Descripción</th>
-                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-24">Unidad</th>
-                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-24">Cant.</th>
-                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-32">Precio U.
+                                    <th class="text-xs uppercase tracking-widest text-base-content/70 w-24 font-bold">
+                                        Unidad</th>
+                                    <th class="text-xs uppercase tracking-widest text-base-content/70 w-24 font-bold">
+                                        Cant.</th>
+                                    <th class="text-xs uppercase tracking-widest text-base-content/70 w-32 font-bold">
+                                        Precio U.
                                     </th>
                                     <th class="w-10"></th>
                                 </tr>
@@ -186,16 +198,19 @@
                     <div
                         class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-base-content/10">
                         <div class="p-6 flex flex-col items-center justify-center gap-1">
-                            <span class="text-[10px] font-black uppercase tracking-widest opacity-40">Subtotal</span>
+                            <span
+                                class="text-[10px] font-black uppercase tracking-widest text-base-content/60">Subtotal</span>
                             <div class="text-2xl font-bold" id="subtotal-display">$0.00</div>
                         </div>
                         <div class="p-6 flex flex-col items-center justify-center gap-1">
-                            <span class="text-[10px] font-black uppercase tracking-widest opacity-40">IVA (16%)</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-base-content/60">IVA
+                                (16%)</span>
                             <div class="text-2xl font-bold" id="iva-display">$0.00</div>
                         </div>
                         <div
                             class="p-6 bg-primary text-primary-content flex flex-col items-center justify-center gap-1">
-                            <span class="text-[10px] font-black uppercase tracking-widest opacity-70">Total Final</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-primary-content/70">Total
+                                Final</span>
                             <div class="text-4xl font-black" id="total-display">$0.00</div>
                         </div>
                     </div>

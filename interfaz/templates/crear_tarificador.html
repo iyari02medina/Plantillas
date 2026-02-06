@@ -32,24 +32,27 @@
     {% endif %}
 </div>
 
-<form action="{{ url_for('nuevo_tarificador') }}" method="POST">
+<form action="{{ url_for('nuevo_tarificador') }}" method="POST" class="space-y-8 pb-20">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Columna Izquierda: Datos Generales -->
         <div class="lg:col-span-1 flex flex-col gap-6">
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
-                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold">Información del
-                    Folio</div>
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--hash] size-5 text-primary"></span>
+                    <span>Información del Folio</span>
+                </div>
                 <div class="card-body p-6 flex flex-col gap-4">
-                    <div class="form-control">
+                    <div class="form-control space-y-2">
                         <label
-                            class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Folio</label>
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                         <input type="text" id="folio_tar" name="folio_tar" placeholder="TAR-MMYY-###"
                             class="input input-bordered w-full font-bold text-primary always-locked"
                             value="{{ suggested_folio if not tarificador else tarificador.folio_tar }}" required
                             readonly {% if tarificador %}disabled{% endif %}>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Fecha de
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha de
                             Creación</label>
                         <input type="text" id="fecha_tar" name="fecha_tar"
                             class="input input-bordered w-full always-locked"
@@ -59,12 +62,15 @@
                 </div>
             </div>
 
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
-                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold">Datos del Cliente
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--user] size-5 text-secondary"></span>
+                    <span>Datos del Cliente</span>
                 </div>
                 <div class="card-body p-6 flex flex-col gap-4">
-                    <div class="form-control relative">
-                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Cliente /
+                    <div class="form-control relative space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Cliente /
                             Empresa</label>
                         <div class="relative">
                             <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar..."
@@ -76,16 +82,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">No.
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
                             Cliente</label>
                         <input type="text" id="no_cliente" name="no_cliente" class="input input-bordered w-full"
                             value="{{ tarificador.no_cliente if tarificador else '' }}" {% if tarificador %}disabled{%
                             endif %}>
                     </div>
-                    <div class="form-control">
+                    <div class="form-control space-y-2">
                         <label
-                            class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Dirección</label>
+                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Dirección</label>
                         <textarea id="direccion_cliente" name="direccion_cliente"
                             class="textarea textarea-bordered w-full" rows="2" {% if tarificador %}disabled{% endif
                             %}>{{ tarificador.direccion_cliente if tarificador else '' }}</textarea>
@@ -93,20 +99,24 @@
                 </div>
             </div>
 
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
-                <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold">Permisos
-                    Relacionados</div>
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--key] size-5 text-primary"></span>
+                    <span>Permisos Relacionados</span>
+                </div>
                 <div class="card-body p-6 flex flex-col gap-4">
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">No. Permiso
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
+                            Permiso
                             Descargas</label>
                         <input type="text" id="no_permiso_descargas" name="no_permiso_descargas"
                             class="input input-bordered w-full"
                             value="{{ tarificador.no_permiso_descargas if tarificador else '' }}" {% if tarificador
                             %}disabled{% endif %}>
                     </div>
-                    <div class="form-control">
-                        <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Vigencia
+                    <div class="form-control space-y-2">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Vigencia
                             Permiso</label>
                         <input type="text" id="vigencia_permiso_descargas" name="vigencia_permiso_descargas"
                             class="input input-bordered w-full"
@@ -119,46 +129,48 @@
 
         <!-- Columna Derecha: Informe y Tabla -->
         <div class="lg:col-span-2 flex flex-col gap-6">
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                 <div
-                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center">
-                    <span>Datos del Informe</span>
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                     <span class="icon-[tabler--microscope] size-5 text-primary"></span>
+                    <span>Datos del Informe</span>
                 </div>
                 <div class="card-body p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="form-control">
+                        <div class="form-control space-y-2">
                             <label
-                                class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Laboratorio</label>
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Laboratorio</label>
                             <input type="text" id="laboratorio" name="laboratorio" class="input input-bordered w-full"
                                 value="{{ tarificador.laboratorio if tarificador else '' }}" {% if tarificador
                                 %}disabled{% endif %}>
                         </div>
-                        <div class="form-control">
-                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Fecha
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha
                                 de Muestreo</label>
                             <input type="text" id="fecha_muestreo" name="fecha_muestreo"
                                 class="input input-bordered w-full"
                                 value="{{ tarificador.fecha_muestreo if tarificador else '' }}" {% if tarificador
                                 %}disabled{% endif %}>
                         </div>
-                        <div class="form-control">
-                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Tipo de
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tipo
+                                de
                                 Muestreo</label>
                             <input type="text" id="tipo_muestreo" name="tipo_muestreo"
                                 class="input input-bordered w-full"
                                 value="{{ tarificador.tipo_muestreo if tarificador else '' }}" {% if tarificador
                                 %}disabled{% endif %}>
                         </div>
-                        <div class="form-control">
-                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">No. de
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No. de
                                 Informe</label>
                             <input type="text" id="no_informe" name="no_informe" class="input input-bordered w-full"
                                 value="{{ tarificador.no_informe if tarificador else '' }}" {% if tarificador
                                 %}disabled{% endif %}>
                         </div>
-                        <div class="form-control md:col-span-2">
-                            <label class="label font-bold text-xs uppercase tracking-wider text-base-content/60">Volumen
+                        <div class="form-control md:col-span-2 space-y-2">
+                            <label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Volumen
                                 Promedio Descargado (m³)</label>
                             <input type="number" step="0.01" id="volumen_promedio_descargado"
                                 name="volumen_promedio_descargado" class="input input-bordered w-full font-bold"
@@ -169,11 +181,13 @@
                 </div>
             </div>
 
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm">
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                 <div
-                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex justify-between items-center">
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--table] size-5 text-info"></span>
                     <span>Resultados de Análisis</span>
-                    <span class="badge badge-soft badge-info font-bold uppercase tracking-wider text-[10px]">Cálculo
+                    <span
+                        class="badge badge-soft badge-info font-bold uppercase tracking-widest text-[10px] ml-auto">Cálculo
                         Automático</span>
                 </div>
                 <div class="card-body p-0">
@@ -181,11 +195,15 @@
                         <table class="table table-lg">
                             <thead class="bg-base-200/30">
                                 <tr>
-                                    <th class="text-xs uppercase tracking-wider text-base-content/70">Parámetro</th>
-                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-24">Resultado
+                                    <th class="text-xs uppercase tracking-widest text-base-content/70 font-bold">
+                                        Parámetro</th>
+                                    <th class="text-xs uppercase tracking-widest text-base-content/70 w-24 font-bold">
+                                        Resultado
                                     </th>
-                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-24">LMP</th>
-                                    <th class="text-xs uppercase tracking-wider text-base-content/70 w-32">Precio ($/m³)
+                                    <th class="text-xs uppercase tracking-widest text-base-content/70 w-24 font-bold">
+                                        LMP</th>
+                                    <th class="text-xs uppercase tracking-widest text-base-content/70 w-32 font-bold">
+                                        Precio ($/m³)
                                     </th>
                                 </tr>
                             </thead>
