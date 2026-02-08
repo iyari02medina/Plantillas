@@ -889,10 +889,14 @@ Cophi{% endblock %}
                                 </div>
 
                                 <!-- Etiqueta Flotante (Floating Label) -->
-                                <!-- Se usa calc() para offsets más precisos si fuera necesario, pero el translate funciona bien -->
                                 <div
-                                    style="position: absolute; top: -38px; left: {{ porcentaje }}%; transform: translateX(-{{ porcentaje }}%); background-color: #0099cf; color: white; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 12px; white-space: nowrap; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); z-index: 20; display: flex; flex-col; align-items: center;">
+                                    style="position: absolute; top: -50px; left: {{ porcentaje }}%; transform: translateX(-{{ porcentaje }}%); background-color: #0099cf; color: white; padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 13px; white-space: nowrap; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 20; display: flex; flex-direction: column; align-items: center; line-height: 1.2;">
                                     <span>{{ total }} m³</span>
+                                    {% if current_tariff %}
+                                    <span style="font-size: 10px; opacity: 0.9; font-weight: normal;">
+                                        Tarifa: ${{ current_tariff.get('total_tarifa', '0') }}
+                                    </span>
+                                    {% endif %}
                                     <!-- Flechita -->
                                     <div
                                         style="position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #0099cf transparent transparent transparent;">
