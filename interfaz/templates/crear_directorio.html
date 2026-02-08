@@ -792,36 +792,65 @@ Cophi{% endblock %}
                     </div>
 
                     <!-- Barra de Progreso por Pasos (Rangos de 20m3) -->
-                    <div class="mt-4">
+                    <!-- Barra de Progreso Continua (Estilos Inline para Robustez) -->
+                    <div class="mt-8 mb-8 w-full select-none" style="position: relative;">
+
+                        <!-- Rótulos Superiores -->
                         <div
-                            class="flex justify-between mb-2 text-[10px] font-bold text-base-content/40 uppercase tracking-widest">
-                            <span>0 m³</span>
-                            <span>Tarifa 1</span>
-                            <span>Tarifa 2</span>
-                            <span>Tarifa 3</span>
-                            <span>Tarifa 4</span>
-                            <span>Mayor</span>
+                            class="flex justify-between text-[10px] font-bold text-base-content/40 uppercase tracking-widest mb-2 px-1">
+                            <span style="width: 0;"></span>
+                            <span style="width: 20%; text-align: center;">Tarifa 1</span>
+                            <span style="width: 20%; text-align: center;">Tarifa 2</span>
+                            <span style="width: 20%; text-align: center;">Tarifa 3</span>
+                            <span style="width: 20%; text-align: center;">Tarifa 4</span>
+                            <span style="width: 20%; text-align: right;">Mayor</span>
                         </div>
-                        <div class="flex items-center gap-x-1 w-full">
-                            {% set total = total_period_actual|default(0)|float %}
-                            {% for i in range(1, 6) %}
-                            {% set is_filled = total >= (i * 20) or (i == 1 and total > 0) %}
-                            <div class="progress-step flex-1" role="progressbar" aria-label="Rango {{ i }}"
-                                aria-valuenow="{{ total }}" aria-valuemin="0" aria-valuemax="100"
-                                style="background-color: {{ '#0099cf' if is_filled else 'rgba(0, 153, 207, 0.1)' }};">
+
+                        {% set total = total_period_actual|default(0)|float %}
+                        <!-- Cálculo seguro de porcentaje -->
+                        {% set porcentaje = (total / 100.0 * 100.0) %}
+                        {% if porcentaje > 100 %}{% set porcentaje = 100 %}{% endif %}
+                        {% if porcentaje < 0 %}{% set porcentaje=0 %}{% endif %} <!-- Contenedor de la Barra (Track) -->
+                            <div
+                                style="position: relative; height: 16px; width: 100%; background-color: #e5e7eb; border-radius: 9999px; margin-top: 10px; margin-bottom: 30px;">
+
+                                <!-- Barra de Relleno (Fill) -->
+                                <div
+                                    style="position: absolute; top: 0; left: 0; height: 100%; background-color: #0099cf; border-radius: 9999px; width: {{ porcentaje }}%; transition: width 0.5s ease-out;">
+                                </div>
+
+                                <!-- División de Segmentos (Overlay) -->
+                                <div
+                                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; pointer-events: none;">
+                                    <div style="width: 20%; border-right: 2px solid #ffffff; height: 100%;"></div>
+                                    <div style="width: 20%; border-right: 2px solid #ffffff; height: 100%;"></div>
+                                    <div style="width: 20%; border-right: 2px solid #ffffff; height: 100%;"></div>
+                                    <div style="width: 20%; border-right: 2px solid #ffffff; height: 100%;"></div>
+                                    <div style="width: 20%; height: 100%;"></div>
+                                </div>
+
+                                <!-- Etiqueta Flotante (Floating Label) -->
+                                <!-- Se usa calc() para offsets más precisos si fuera necesario, pero el translate funciona bien -->
+                                <div
+                                    style="position: absolute; top: -38px; left: {{ porcentaje }}%; transform: translateX(-{{ porcentaje }}%); background-color: #0099cf; color: white; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 12px; white-space: nowrap; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); z-index: 20; display: flex; flex-col; align-items: center;">
+                                    <span>{{ total }} m³</span>
+                                    <!-- Flechita -->
+                                    <div
+                                        style="position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #0099cf transparent transparent transparent;">
+                                    </div>
+                                </div>
                             </div>
-                            {% endfor %}
-                            <p class="text-xs ms-3 font-black whitespace-nowrap" style="color: #0099cf;">{{ total }} m³
-                            </p>
-                        </div>
-                        <div class="flex justify-between mt-2 text-[10px] font-bold text-base-content/30">
-                            <span>0</span>
-                            <span>20</span>
-                            <span>40</span>
-                            <span>60</span>
-                            <span>80</span>
-                            <span>100+</span>
-                        </div>
+
+                            <!-- Rótulos Inferiores (Escala) -->
+                            <div class="flex justify-between mt-2 text-[10px] font-bold text-base-content/30 w-full"
+                                style="padding-top: 5px;">
+                                <span style="width: 10%; text-align: left;">0</span>
+                                <span style="width: 20%; text-align: center; margin-left: -10%;">20</span>
+                                <span style="width: 20%; text-align: center; margin-left: -10%;">40</span>
+                                <span style="width: 20%; text-align: center; margin-left: -10%;">60</span>
+                                <span style="width: 20%; text-align: center; margin-left: -10%;">80</span>
+                                <span style="width: 10%; text-align: right;">100+</span>
+                            </div>
                     </div>
                 </div>
             </div>

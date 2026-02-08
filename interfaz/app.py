@@ -2500,7 +2500,10 @@ def detalle_directorio(tipo, id_val):
                 except: pass
         except: pass
 
-        related_data['total_period_actual'] = hoy_acumulado
+        related_data['total_period_actual'] = float(hoy_acumulado)
+        if hoy_acumulado > 0:
+            latest_consumo = float(hoy_acumulado)
+
         related_data['q_anio'] = q_anio or str(start_date.year)
         related_data['q_mes'] = q_mes or str(start_date.month)
             

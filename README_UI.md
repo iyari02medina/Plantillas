@@ -258,6 +258,61 @@ function filterGeneric(input, type) {
 }
 ```
 
+### F. Monitor de Consumo (Barra de Progreso)
+Este componente visualiza un valor numérico (ej. consumo de agua) en una barra de progreso que parece estar segmentada pero es continua. Incluye una etiqueta que flota sobre la barra y se ajusta para no salirse del contenedor.
+
+**Características Clave:**
+*   **Barra Continua:** Un solo `div` de fondo que se llena porcentualmente.
+*   **Máscara de Segmentos:** Un `div` absoluto superpuesto con bordes transparentes/blancos para simular cortes (tramos de 20 unidades).
+*   **Etiqueta Inteligente:** Usa `transform: translateX(-{{ porcentaje }}%)` para alinearse automáticamente (izquierda al 0%, centro al 50%, derecha al 100%).
+*   **Estilos Inline:** Se recomiendan estilos en línea para propiedades críticas (posicionamiento, colores específicos) para evitar conflictos de purga de CSS.
+
+**Snippet de Implementación:**
+```html
+<!-- Barra de Progreso Continua -->
+<div class="mt-8 mb-8 w-full select-none" style="position: relative;">
+    
+    <!-- Escala Superior (Opcional) -->
+    <div class="flex justify-between text-[10px] font-bold text-base-content/40 uppercase tracking-widest mb-2 px-1">
+        <span style="width: 0;"></span>
+        <span style="width: 20%; text-align: center;">Tarifa 1</span>
+        <!-- ... más segmentos ... -->
+        <span style="width: 20%; text-align: right;">Mayor</span>
+    </div>
+
+    <!-- Lógica Jinja: Clamping (0-100%) -->
+    {% set total = valor_actual|default(0)|float %}
+    {% set porcentaje = (total / VALOR_MAXIMO * 100.0) %}
+    {% if porcentaje > 100 %}{% set porcentaje = 100 %}{% endif %}
+    {% if porcentaje < 0 %}{% set porcentaje = 0 %}{% endif %}
+
+    <!-- Contenedor (Track) -->
+    <div style="position: relative; height: 16px; width: 100%; background-color: #e5e7eb; border-radius: 9999px; margin-top: 10px; margin-bottom: 30px;">
+        
+        <!-- Barra de Relleno (Fill) -->
+        <div style="position: absolute; top: 0; left: 0; height: 100%; background-color: #0099cf; border-radius: 9999px; width: {{ porcentaje }}%; transition: width 0.5s ease-out;">
+        </div>
+
+        <!-- Máscara de Segmentos (Overlay) -->
+        <!-- Ajustar anchos (20%) según el número de segmentos deseados -->
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; pointer-events: none;">
+            <div style="width: 20%; border-right: 2px solid #ffffff; height: 100%;"></div>
+            <div style="width: 20%; border-right: 2px solid #ffffff; height: 100%;"></div>
+            <div style="width: 20%; border-right: 2px solid #ffffff; height: 100%;"></div>
+            <div style="width: 20%; border-right: 2px solid #ffffff; height: 100%;"></div>
+            <div style="width: 20%; height: 100%;"></div>
+        </div>
+
+        <!-- Etiqueta Flotante -->
+        <div style="position: absolute; top: -38px; left: {{ porcentaje }}%; transform: translateX(-{{ porcentaje }}%); background-color: #0099cf; color: white; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 12px; white-space: nowrap; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); z-index: 20;">
+            {{ total }} m³
+            <!-- Flecha Indicadora -->
+            <div style="position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #0099cf transparent transparent transparent;"></div>
+        </div>
+    </div>
+</div>
+```
+
 ## 📱 Guía de Responsividad (Mobile First)
 
 La aplicación está diseñada para ser 100% funcional en móviles. Sigue estas reglas estrictas para mantener este comportamiento:
