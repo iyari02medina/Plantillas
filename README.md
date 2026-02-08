@@ -126,5 +126,22 @@ Usa este prompt para generar indicadores de estado circulares:
 > Here are the code snippets for the block component: 
 >
 > ```html
-> <span class="status"></span>
+> ```
+
+### Progress Steps (Barra de Progreso por Pasos)
+Usa este prompt para generar barras de progreso segmentadas (útil para niveles o tarifas escalonadas):
+
+> I'm using the FlyonUI Tailwind CSS component library in my project. Please integrate the following component into my project:
+>
+> Here are the code snippets for the block component: 
+>
+> ```html
+> <!-- Step variant 1 (Color Corporativo #0099cf) -->
+> <div class="flex items-center gap-x-1">
+>   <div class="progress-step bg-[#0099cf]" role="progressbar" aria-label="Progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" ></div>
+>   <div class="progress-step bg-[#0099cf]/10" role="progressbar" aria-label="Progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" ></div>
+>   <div class="progress-step bg-[#0099cf]/10" role="progressbar" aria-label="Progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" ></div>
+>   <div class="progress-step bg-[#0099cf]/10" role="progressbar" aria-label="Progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" ></div>
+>   <p class="text-xs text-[#0099cf] ms-1 font-medium">25%</p>
+> </div>
 > ```
