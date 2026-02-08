@@ -2540,6 +2540,7 @@ def detalle_directorio(tipo, id_val):
                  current_tariff = rangos[-1]
              
         related_data['current_tariff'] = current_tariff
+        related_data['rangos_list'] = rangos
         
     return render_template('crear_directorio.html', tipo=tipo, is_new=False, item=item, **related_data)
 

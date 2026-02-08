@@ -791,7 +791,66 @@ Cophi{% endblock %}
                         <div id="filter-status" data-has-filter="{{ 'true' if q_anio or q_mes else 'false' }}"></div>
                     </div>
 
-                    <!-- Barra de Progreso por Pasos (Rangos de 20m3) -->
+                    <!-- Acordeón de Tarifas (FlyonUI) -->
+                    <div class="accordion divide-neutral/20 divide-y mb-6 w-full">
+                        <div class="accordion-item group" id="tarifa-info">
+                            <button
+                                class="accordion-toggle inline-flex items-center gap-x-2 text-start w-full py-2 font-black text-[10px] uppercase tracking-widest text-[#0099cf] hover:text-[#007aa6] transition-colors"
+                                aria-controls="tarifa-info-collapse" aria-expanded="false" onclick="
+                                    const c = document.getElementById('tarifa-info-collapse');
+                                    c.classList.toggle('hidden');
+                                    this.setAttribute('aria-expanded', !c.classList.contains('hidden'));
+                                    this.querySelector('.plus').classList.toggle('hidden');
+                                    this.querySelector('.minus').classList.toggle('hidden');">
+                                <span class="icon-[tabler--plus] plus size-4 block shrink-0"></span>
+                                <span class="icon-[tabler--minus] minus size-4 hidden shrink-0"></span>
+                                Ver Tarifas Oficiales Vigentes
+                            </button>
+                            <div id="tarifa-info-collapse"
+                                class="accordion-content hidden w-full overflow-hidden transition-all duration-300"
+                                aria-labelledby="tarifa-info" role="region">
+                                <div class="pb-4 pt-2">
+                                    <div class="overflow-x-auto rounded-lg border border-base-content/5">
+                                        <table class="table table-xs w-full bg-base-100">
+                                            <thead
+                                                class="bg-base-200/50 text-base-content/60 font-bold uppercase tracking-wider">
+                                                <tr>
+                                                    <th class="py-2 px-3">Rango (m³)</th>
+                                                    <th class="text-right py-2 px-3">Agua</th>
+                                                    <th class="text-right py-2 px-3">Drenaje</th>
+                                                    <th class="text-right py-2 px-3">Saneamiento</th>
+                                                    <th class="text-right font-black py-2 px-3 text-base-content">Total
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="text-xs divide-y divide-base-content/5">
+                                                {% for r in rangos_list %}
+                                                <tr class="hover:bg-base-200/20">
+                                                    <td
+                                                        class="font-bold whitespace-nowrap px-3 py-2 text-base-content/70">
+                                                        {{ r.get('minimo') }} - {{ r.get('maximo') }}</td>
+                                                    <td class="text-right px-3 py-2 opacity-80">${{ r.get('tarifa_agua')
+                                                        }}</td>
+                                                    <td class="text-right px-3 py-2 opacity-80">${{
+                                                        r.get('tarifa_drenaje') }}</td>
+                                                    <td class="text-right px-3 py-2 opacity-80">${{
+                                                        r.get('tarifa_saneamiento') }}</td>
+                                                    <td class="text-right font-black px-3 py-2 text-[#0099cf]">${{
+                                                        r.get('total_tarifa') }}</td>
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+                                                    <td colspan="5" class="text-center py-4 italic opacity-50">No hay
+                                                        información de tarifas disponible.</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Barra de Progreso Continua (Estilos Inline para Robustez) -->
                     <div class="mt-8 mb-8 w-full select-none" style="position: relative;">
 
