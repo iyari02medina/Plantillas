@@ -117,3 +117,14 @@ Usa este prompt para generar la barra de búsqueda y filtros estándar:
 >     </div>
 > </div>
 > ```
+
+### Status (Indicadores)
+Usa este prompt para generar indicadores de estado circulares:
+
+> I'm using the FlyonUI Tailwind CSS component library in my project. Please integrate the following component into my project:
+>
+> Here are the code snippets for the block component: 
+>
+> ```html
+> <span class="status"></span>
+> ```

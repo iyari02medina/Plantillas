@@ -2463,9 +2463,44 @@ def detalle_directorio(tipo, id_val):
                 # Default view: Show all history in table, but monitor is current period
                 pass 
             
-        related_data['latest_consumo'] = latest_consumo
-        
-        # Pass filter context to template
+        # Calculate Absolute "Today's" Consumption (independent of filters)
+        hoy_acumulado = 0.0
+        try:
+            # Determinamos el periodo de "hoy"
+            if today.day < corte_day:
+                h_start = datetime.date(today.year if today.month > 1 else today.year - 1, today.month - 1 if today.month > 1 else 12, corte_day)
+            else:
+                h_start = datetime.date(today.year, today.month, corte_day)
+            
+            # El fin de periodo de "hoy" es el siguiente corte
+            if h_start.month == 12: h_end = datetime.date(h_start.year + 1, 1, h_start.day)
+            else:
+                try: h_end = datetime.date(h_start.year, h_start.month + 1, h_start.day)
+                except:
+                    import calendar
+                    h_end = datetime.date(h_start.year, h_start.month + 1, calendar.monthrange(h_start.year, h_start.month + 1)[1])
+
+            for c in consumos_data:
+                try:
+                    fecha_str = c.get('fecha_lectura', '').strip()
+                    l_date = None
+                    if '-' in fecha_str:
+                        p = fecha_str.split('-')
+                        if len(p) == 3:
+                            if len(p[0]) == 4: l_date = datetime.date(int(p[0]), int(p[1]), int(p[2]))
+                            else: l_date = datetime.date(int(p[2]), int(p[1]), int(p[0]))
+                    elif '/' in fecha_str:
+                        p = fecha_str.split('/')
+                        if len(p) == 3:
+                            if len(p[2]) == 4: l_date = datetime.date(int(p[2]), int(p[1]), int(p[0]))
+                            else: l_date = datetime.date(int(p[0]), int(p[1]), int(p[2]))
+                    
+                    if l_date and l_date > h_start and l_date <= h_end:
+                        hoy_acumulado += float(c.get('consumo', 0))
+                except: pass
+        except: pass
+
+        related_data['total_period_actual'] = hoy_acumulado
         related_data['q_anio'] = q_anio or str(start_date.year)
         related_data['q_mes'] = q_mes or str(start_date.month)
             
