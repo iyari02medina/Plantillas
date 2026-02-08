@@ -262,11 +262,11 @@ Cophi{% endblock %}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="form-control space-y-2">
                                 <label
-                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Periodo
-                                    de Servicios</label>
-                                <input type="text" name="periodo_servicios"
-                                    value="{{ item.get('periodo_servicios', '') }}" class="input input-bordered w-full"
-                                    {% if not is_new %}disabled{% endif %} placeholder="Ej. Mensual, Bimestral...">
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Día
+                                    de corte</label>
+                                <input type="text" name="corte_servicio" value="{{ item.get('corte_servicio', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
+                                    placeholder="Ej. Mensual, Bimestral...">
                             </div>
                             <div class="form-control space-y-2">
                                 <label
@@ -769,26 +769,77 @@ Cophi{% endblock %}
             <!-- Nivel Consumo -->
             <div class="lg:col-span-2 card bg-base-100 border border-base-content/10 shadow-sm">
                 <div class="card-body p-6 relative">
-                    <div class="flex justify-between items-center mb-6">
-                        <h4 class="text-xs font-black uppercase tracking-widest text-base-content/40">Monitor de Consumo
-                            Mensual ({{ latest_consumo }} m³)</h4>
-                        <span
-                            class="badge badge-soft {% if latest_consumo > 80 %}badge-error{% elif latest_consumo > 40 %}badge-warning{% else %}badge-success{% endif %} font-black">{{
-                            'ALTO' if latest_consumo > 80 else 'MEDIO' if latest_consumo > 40 else 'BAJO' }}</span>
+                    <!-- Header con Filtros -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                        <div>
+                            <h4 class="text-xs font-black uppercase tracking-widest text-base-content/40 mb-1">Monitor
+                                de Consumo</h4>
+                            <div class="text-xs opacity-60">
+                                Periodo: <span class="font-bold">{{ period_start_date }}</span> (Corte día {{
+                                item.get('corte_servicio', '1') }})
+                            </div>
+                        </div>
+                        <!-- Tag for JS initialization -->
+                        <div id="filter-status" data-has-filter="{{ 'true' if q_anio or q_mes else 'false' }}"></div>
                     </div>
 
-                    <div class="h-4 bg-base-200 rounded-full overflow-hidden flex relative">
-                        <div class="h-full bg-success w-[40%]"></div>
-                        <div class="h-full bg-warning w-[40%]"></div>
-                        <div class="h-full bg-error w-[20%]"></div>
-                        <!-- Marker -->
-                        {% set pos = latest_consumo if latest_consumo < 100 else 100 %} <div
-                            class="absolute h-8 w-1 bg-base-content top-[-8px] shadow-sm transform transition-all duration-1000"
-                            style="left: {{ pos if pos is defined else 0 }}%;">
-                            <div
-                                class="absolute top-[-25px] left-1/2 -translate-x-1/2 font-black text-[10px] whitespace-nowrap bg-base-content text-base-100 px-1.5 py-0.5 rounded">
-                                {{ latest_consumo }} m³
+                    <!-- Barra de Progreso y Medidor -->
+                    <div class="relative pt-6 pb-2">
+                        <!-- Marcador Flotante (Valor Actual) -->
+                        {% set percent = (latest_consumo / 100) * 100 %}
+                        {% if percent > 100 %}{% set percent = 100 %}{% endif %}
+
+                        <div class="absolute top-0 transform -translate-x-1/2 transition-all duration-700 ease-out z-10"
+                            style="--percent-pos: {{ percent }}%; left: var(--percent-pos);">
+                            <div class="flex flex-col items-center">
+                                <div
+                                    class="bg-primary text-primary-content font-black text-xs px-2 py-1 rounded shadow-lg mb-1 whitespace-nowrap">
+                                    {{ latest_consumo }} m³
+                                </div>
+                                <div class="w-0.5 h-6 bg-primary"></div>
                             </div>
+                        </div>
+
+                        <!-- Barra de Fondo (Rangos) -->
+                        <div class="h-4 w-full bg-base-200 rounded-full overflow-hidden flex shadow-inner">
+                            <!-- Rango Bajo (0-40) - 40% del ancho total -->
+                            <div
+                                class="h-full bg-success/20 border-r border-base-100 w-[40%] flex items-center justify-center relative group">
+                                <span
+                                    class="text-[9px] font-black text-success opacity-0 group-hover:opacity-100 transition-opacity absolute">BAJO
+                                    (0-40)</span>
+                            </div>
+                            <!-- Rango Medio (41-80) - 40% del ancho total -->
+                            <div
+                                class="h-full bg-warning/20 border-r border-base-100 w-[40%] flex items-center justify-center relative group">
+                                <span
+                                    class="text-[9px] font-black text-warning opacity-0 group-hover:opacity-100 transition-opacity absolute">MEDIO
+                                    (41-80)</span>
+                            </div>
+                            <!-- Rango Alto (81+) - 20% del ancho total -->
+                            <div class="h-full bg-error/20 w-[20%] flex items-center justify-center relative group">
+                                <span
+                                    class="text-[9px] font-black text-error opacity-0 group-hover:opacity-100 transition-opacity absolute">ALTO
+                                    (81+)</span>
+                            </div>
+                        </div>
+
+                        <!-- Barra de Relleno (Progreso Real) -->
+                        <!-- Superpuesta con opacidad o calculada diferente? 
+                             Mejor usamos un solo contenedor y el marcador indica la posición. 
+                             Si queremos "llenar" la barra hasta el punto, necesitamos un div absoluto encima de los rangos. -->
+                        <div class="absolute top-6 left-0 h-4 rounded-full overflow-hidden pointer-events-none opacity-60"
+                            style="--fill-width: {{ percent }}%; width: var(--fill-width);">
+                            <div class="h-full w-full bg-primary loading-bar-striped"></div>
+                        </div>
+                    </div>
+
+                    <!-- Leyenda de Escala -->
+                    <div class="flex justify-between mt-1 text-[10px] font-bold text-base-content/30 select-none">
+                        <span>0 m³</span>
+                        <span class="pl-[10%]">40 m³</span> <!-- Ajustado visualmente -->
+                        <span class="pl-[15%]">80 m³</span>
+                        <span>100+ m³</span>
                     </div>
                 </div>
             </div>
@@ -797,6 +848,54 @@ Cophi{% endblock %}
                 <span>0</span><span>40</span><span>80</span><span>100+</span>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Filtros de Consumo -->
+<div class="card bg-base-100 border border-base-content/10 shadow-sm mb-6">
+    <div class="card-body p-6">
+        <form method="GET"
+            action="{{ url_for('detalle_directorio', tipo=tipo, id_val=item.get('folio') or item.get('id_cliente')) }}"
+            class="space-y-6 w-full">
+            <input type="hidden" name="tab" value="consumos">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Mes -->
+                <div class="form-control space-y-2">
+                    <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Mes</label>
+                    <select name="q_mes" class="select select-bordered w-full h-10 min-h-0 px-3">
+                        <option value="">Todos los meses</option>
+                        {% set meses_es = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto',
+                        'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'] %}
+                        {% for m in range(1, 13) %}
+                        <option value="{{ m }}" {% if q_mes|int==m %}selected{% endif %}>{{ meses_es[m-1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Año -->
+                <div class="form-control space-y-2">
+                    <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Año</label>
+                    <select name="q_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                        <option value="">Todos los años</option>
+                        {% for y in range(2024, 2031) %}
+                        <option value="{{ y }}" {% if q_anio|int==y %}selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2">
+                    <span class="icon-[tabler--search] size-5"></span>
+                    <span>Buscar</span>
+                </button>
+                <a href="{{ url_for('detalle_directorio', tipo=tipo, id_val=item.get('folio') or item.get('id_cliente')) }}"
+                    class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
+                    <span class="icon-[tabler--filter-x] size-5"></span>
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -874,6 +973,27 @@ Cophi{% endblock %}
             container.appendChild(btn);
         }
     }
+
+    // Initialization on load
+    document.addEventListener('DOMContentLoaded', () => {
+        // Check filtering tab override from server (via query param handling in template context)
+        // Since we are not passing 'tab' explicitly in render_template context unless we do...
+        // Let's rely on URLSearchParams first, then server variable if any.
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let activeTab = urlParams.get('tab');
+        // Use a data attribute to pass server-side filter state safely
+        const filterEl = document.getElementById('filter-status');
+        const hasServerFilter = filterEl ? filterEl.dataset.hasFilter === "true" : false;
+
+        if (hasServerFilter && !activeTab) {
+            activeTab = 'consumos';
+        }
+
+        if (activeTab) {
+            showTab(activeTab);
+        }
+    });
 </script>
 {% endblock %}
 {% endblock %}

@@ -93,73 +93,37 @@
                     </label>
 
                     <!-- Área de carga con diseño atractivo -->
-                    <div
-                        class="relative border-2 border-dashed border-primary/30 rounded-xl bg-gradient-to-br from-primary/5 to-transparent hover:border-primary/50 hover:from-primary/10 transition-all duration-300 group">
-                        <!-- Input file oculto -->
-                        <input type="file" id="croquis_file_input" name="croquis_file" accept="image/*"
-                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                            onchange="updateFilePreview(this)" {{ 'disabled' if permiso else '' }}>
+                    <div data-file-upload='{
+    "url": "/upload",
+    "paramName": "croquis_file",
+    "maxFileSize": "2MB",
+    "extensions": {
+      "jpg": {
+        "icon": "<span class=\"icon-[tabler--photo] size-5\"></span>",
+        "class": "shrink-0 size-5"
+      },
+      "png": {
+        "icon": "<span class=\"icon-[tabler--photo] size-5\"></span>",
+        "class": "shrink-0 size-5"
+      },
+      "jpeg": {
+        "icon": "<span class=\"icon-[tabler--photo] size-5\"></span>",
+        "class": "shrink-0 size-5"
+      }
+    }
+  }'>
 
-                        <!-- Contenido visual del área de carga -->
-                        <div id="upload-area" class="p-8 text-center">
-                            <!-- Icono y texto por defecto (cuando no hay archivo) -->
-                            <div id="upload-prompt" class="space-y-3">
-                                <div class="flex justify-center">
-                                    <div
-                                        class="bg-primary/10 rounded-full p-4 group-hover:bg-primary/20 transition-colors">
-                                        <span class="icon-[tabler--photo-up] size-12 text-primary"></span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <p class="text-base font-bold text-base-content/80">
-                                        Selecciona o arrastra una imagen
-                                    </p>
-                                    <p class="text-xs text-base-content/50 mt-1">
-                                        JPG, PNG hasta 10MB
-                                    </p>
-                                </div>
-                                <div class="pt-2">
-                                    <span class="btn btn-primary btn-sm">
-                                        <span class="icon-[tabler--upload] size-4"></span>
-                                        Elegir Archivo
-                                    </span>
-                                </div>
+                        <div
+                            class="bg-base-200/60 rounded-box flex flex-col justify-center border-2 border-base-content/20 border-dashed">
+                            <div class="text-center cursor-pointer p-12" data-file-upload-trigger="">
+                                <p class="text-base-content/50 mb-3 text-sm">Elige una imagen de hasta 2MB.</p>
+                                <button type="button" class="btn btn-soft btn-sm btn-primary text-nowrap"> <span
+                                        class="icon-[tabler--file-upload] size-4.5 shrink-0"></span> Arrastra y suelta
+                                    para subir </button>
+                                <p class="text-base-content/50 my-2 text-xs">o</p>
+                                <p class="link link-animated link-primary font-medium text-sm">Examinar</p>
                             </div>
-
-                            <!-- Información del archivo cargado (oculto por defecto) -->
-                            <div id="file-preview" class="hidden space-y-3">
-                                <div class="flex justify-center">
-                                    <div class="bg-success/10 rounded-full p-4">
-                                        <span class="icon-[tabler--photo-check] size-12 text-success"></span>
-                                    </div>
-                                </div>
-                                <div class="space-y-2">
-                                    <div class="badge badge-success gap-2 text-xs font-bold">
-                                        <span class="icon-[tabler--check] size-3"></span>
-                                        Archivo Cargado
-                                    </div>
-                                    <p id="file-name" class="text-sm font-bold text-base-content truncate px-4"></p>
-                                    <p id="file-size" class="text-xs text-base-content/60"></p>
-                                </div>
-                                <div class="pt-2">
-                                    <span class="btn btn-outline btn-primary btn-sm">
-                                        <span class="icon-[tabler--refresh] size-4"></span>
-                                        Cambiar Archivo
-                                    </span>
-                                </div>
-                            </div>
-
-                            {% if permiso and permiso.croquis_imagen %}
-                            <!-- Estado inicial cuando ya existe una imagen -->
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    document.getElementById('upload-prompt').classList.add('hidden');
-                                    document.getElementById('file-preview').classList.remove('hidden');
-                                    document.getElementById('file-name').textContent = 'Imagen existente';
-                                    document.getElementById('file-size').textContent = 'Archivo previamente cargado';
-                                });
-                            </script>
-                            {% endif %}
+                            <div class="mx-12 mb-8 space-y-2 empty:m-0" data-file-upload-previews=""></div>
                         </div>
                     </div>
 

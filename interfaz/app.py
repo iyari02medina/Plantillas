@@ -2202,9 +2202,9 @@ def eliminar_directorio_item(tipo, id_val):
         if existing:
             headers = list(existing[0].keys())
         
-        key = 'id_cliente' if tipo == 'clientes' else 'folio'
+        key = 'folio'
         
-        # Deletion logic: try primary key, then ID (for clients), then name
+        # Deletion logic: try primary key (folio), then ID (for clients), then name
         updated_rows = [r for r in existing if str(r.get(key, '')).strip() != str(id_val).strip()]
         
         if len(updated_rows) == len(existing) and tipo == 'clientes':
@@ -2262,11 +2262,14 @@ def detalle_directorio(tipo, id_val):
     data = read_csv(csv_file)
     
     # Find item
-    # Find item
-    key = 'id_cliente' if tipo == 'clientes' else 'folio'
+    key = 'folio' # Both clients and prospects use 'folio' as primary identifier
     item = next((r for r in data if str(r.get(key, '')).strip() == str(id_val).strip()), None)
     
-    # Fallback to 'ID' for clients if primary key didn't match
+    # Fallback to 'id_cliente' if legacy key exists in some rows
+    if not item:
+        item = next((r for r in data if str(r.get('id_cliente', '')).strip() == str(id_val).strip()), None)
+    
+    # Fallback to 'ID' for clients if numeric ID exists
     if not item and tipo == 'clientes':
         item = next((r for r in data if str(r.get('ID', '')).strip() == str(id_val).strip()), None)
 
@@ -2282,7 +2285,7 @@ def detalle_directorio(tipo, id_val):
     # Load Related Data for Clients
     related_data = {}
     if tipo == 'clientes' and item:
-        client_id = item.get('id_cliente', '').strip()
+        client_id = item.get('folio', '').strip() or item.get('id_cliente', '').strip()
         client_name = item.get('nombre_empresa', '').strip().lower()
         
         def filter_rows(rows, id_keys, name_key='nombre_cliente'):
@@ -2333,16 +2336,141 @@ def detalle_directorio(tipo, id_val):
         # Better to sort by folio descending or date if possible. For now, list order (usually chron).
         related_data['consumos'] = consumos_data
         
-        # Calculate Current Tariff based on latest consumption
+        # Calculate Current Tariff based on latest consumption (Accumulated for the period)
         latest_consumo = 0.0
-        if consumos_data:
-            # Assuming last item is latest. If not, needs sorting logic.
-            # Let's try to parse 'consumo'
-            try:
-                latest_consumo = float(consumos_data[-1].get('consumo', 0))
-            except: pass
+        
+        try:
+            # Determine billing period start date
+            corte_day = int(item.get('corte_servicio', 1)) 
+            # If invalid day, default to 1
+            if corte_day < 1 or corte_day > 31: corte_day = 1
+        except:
+            corte_day = 1
+            
+        today = datetime.date.today()
+        q_anio = request.args.get('q_anio', '')
+        q_mes = request.args.get('q_mes', '')
+        
+        # Determine Period Start Date
+        start_date = None
+        end_date = None
+        
+        try:
+             # If filters provided, use them to set start_date
+             if q_anio and q_mes:
+                 target_year = int(q_anio)
+                 target_month = int(q_mes)
+                 
+                 # Logic change: Selecting 'February' shows the period ENDING in February's cutoff.
+                 # This means it shows from Jan corte_day to Feb corte_day.
+                 prev_month = target_month - 1
+                 prev_year = target_year
+                 if prev_month == 0:
+                     prev_month = 12
+                     prev_year -= 1
+                     
+                 try:
+                     start_date = datetime.date(prev_year, prev_month, corte_day)
+                 except ValueError:
+                     import calendar
+                     last_day = calendar.monthrange(prev_year, prev_month)[1]
+                     start_date = datetime.date(prev_year, prev_month, last_day)
+                         
+             # If no filters (default), use current cycle logic
+             if not start_date:
+                 if today.day < corte_day:
+                     # We are in the period that started last month
+                     prev_month = today.month - 1
+                     prev_year = today.year
+                     if prev_month == 0:
+                         prev_month = 12
+                         prev_year -= 1
+                     try:
+                         start_date = datetime.date(prev_year, prev_month, corte_day)
+                     except ValueError:
+                         import calendar
+                         last_day = calendar.monthrange(prev_year, prev_month)[1]
+                         start_date = datetime.date(prev_year, prev_month, last_day)
+                 else:
+                     # We are in the period that started this month
+                     try:
+                         start_date = datetime.date(today.year, today.month, corte_day)
+                     except ValueError:
+                         import calendar
+                         last_day = calendar.monthrange(today.year, today.month)[1]
+                         start_date = datetime.date(today.year, today.month, last_day)
+        except Exception as e:
+             # Ultimate fallback
+             start_date = datetime.date(today.year, today.month, 1)
+
+        # Calculate End Date (Start Date + 1 Month roughly, until next cutoff)
+        # Actually we just want consumos >= start_date AND < next_start_date
+        # Getting next cutoff date
+        try:
+            if start_date.month == 12:
+                 next_start_date = datetime.date(start_date.year + 1, 1, start_date.day)
+            else:
+                 try:
+                    next_start_date = datetime.date(start_date.year, start_date.month + 1, start_date.day)
+                 except ValueError:
+                    import calendar
+                    last_day = calendar.monthrange(start_date.year, start_date.month + 1)[1]
+                    next_start_date = datetime.date(start_date.year, start_date.month + 1, last_day)
+        except:
+             next_start_date = datetime.date(2100, 1, 1) # Future
+
+        filtered_consumos = []
+        if consumos_data and start_date:
+            accumulated = 0.0
+            for c in consumos_data:
+                try:
+                    fecha_str = c.get('fecha_lectura', '').strip()
+                    lectura_date = None
+                    if '-' in fecha_str:
+                        # Try YYYY-MM-DD
+                        parts = fecha_str.split('-')
+                        if len(parts) == 3:
+                            if len(parts[0]) == 4: # YYYY-MM-DD
+                                lectura_date = datetime.date(int(parts[0]), int(parts[1]), int(parts[2]))
+                            else: # DD-MM-YYYY
+                                lectura_date = datetime.date(int(parts[2]), int(parts[1]), int(parts[0]))
+                    elif '/' in fecha_str:
+                        # Try DD/MM/YYYY
+                        parts = fecha_str.split('/')
+                        if len(parts) == 3:
+                            if len(parts[2]) == 4: # DD/MM/YYYY
+                                lectura_date = datetime.date(int(parts[2]), int(parts[1]), int(parts[0]))
+                            else: # YYYY/MM/DD
+                                lectura_date = datetime.date(int(parts[0]), int(parts[1]), int(parts[2]))
+                    
+                    if lectura_date:
+                        # Monitor Accumulator: Always for the selected period
+                        # Period logic: (start_date, next_start_date]
+                        # A reading on the cutoff day belongs to the period ending that day.
+                        if lectura_date > start_date and lectura_date <= next_start_date:
+                            accumulated += float(c.get('consumo', 0))
+                            filtered_consumos.append(c)
+                except: pass
+            latest_consumo = accumulated
+            # Update consumos list to only show filtered? 
+            # If user selected a filter, yes. If default, maybe show all (history)?
+            # Let's show all in history table but highlight current in monitor?
+            # User request: "filtro para filtrar por año y mes".
+            # Usually filters affect the list.
+            if q_anio and q_mes:
+                related_data['consumos'] = filtered_consumos
+            else:
+                # Default view: Show all history in table, but monitor is current period
+                pass 
             
         related_data['latest_consumo'] = latest_consumo
+        
+        # Pass filter context to template
+        related_data['q_anio'] = q_anio or str(start_date.year)
+        related_data['q_mes'] = q_mes or str(start_date.month)
+            
+        related_data['latest_consumo'] = latest_consumo
+        related_data['period_start_date'] = start_date.strftime('%d/%m/%Y') if start_date else ''
         
         # Ranges Logic
         raw_rangos = read_csv(RANGOS_AGUA_CSV)
@@ -2388,9 +2516,9 @@ def guardar_directorio(tipo):
         headers = list(existing[0].keys())
     else:
         if tipo == 'clientes':
-            headers = ['folio', 'fecha_creacion', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'telefono_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'tipo_empresa', 'razon_social', 'rfc_empresa', 'nombre_usuario', 'periodo_servicios', 'titular_pago', 'tarifa', 'regimen', 'giro', 'uso', 'contrato_con', 'no_wc', 'no_mingitorios', 'no_lavamanos', 'no_regaderas']
+            headers = ['folio', 'fecha_creacion', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'telefono_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'tipo_empresa', 'razon_social', 'rfc_empresa', 'nombre_usuario', 'corte_servicio', 'titular_pago', 'tarifa', 'regimen', 'giro', 'uso', 'contrato_con', 'no_wc', 'no_mingitorios', 'no_lavamanos', 'no_regaderas']
         else:
-            headers = ['folio', 'fecha_creacion', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'telefono_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'tipo_empresa', 'rfc_empresa', 'nombre_usuario', 'periodo_servicios', 'titular_pago', 'tarifa', 'regimen', 'giro', 'uso', 'contrato_con', 'no_wc', 'no_mingitorios', 'no_lavamanos', 'no_regaderas']
+            headers = ['folio', 'fecha_creacion', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'telefono_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'tipo_empresa', 'rfc_empresa', 'nombre_usuario', 'corte_servicio', 'titular_pago', 'tarifa', 'regimen', 'giro', 'uso', 'contrato_con', 'no_wc', 'no_mingitorios', 'no_lavamanos', 'no_regaderas']
             
     # Key is always folio now
     key = 'folio'
