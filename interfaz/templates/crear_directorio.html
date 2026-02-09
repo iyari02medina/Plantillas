@@ -65,6 +65,8 @@ Cophi{% endblock %}
 {% endif %}
 
 <!-- SECCIONES DE CONTENIDO -->
+
+
 <div class="space-y-8 pb-20">
 
     <!-- PESTAÑA 1: INFORMACIÓN GENERAL -->
@@ -672,6 +674,128 @@ Cophi{% endblock %}
 
     <!-- PESTAÑA 4: TARIFICADOR -->
     <div id="tab-tarificador" class="tab-content hidden animate-in fade-in slide-in-from-bottom-5">
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Tarjeta de Precios (Último Tarificador) -->
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm h-full">
+                <div class="card-body p-6 relative flex flex-col">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center mb-4 border-b pb-2"
+                        style="border-color: rgba(0, 153, 207, 0.1);">
+                        <h4 class="text-xs font-black uppercase tracking-widest" style="color: #0099cf;">
+                            Tarifa de Saneamiento
+                        </h4>
+                        {% set latest_tar = tarificadores[0] if tarificadores else None %}
+                        <div class="flex items-center gap-2">
+                            <span class="status animate-pulse" style="background-color: #0099cf;"></span>
+                            <span class="text-[10px] font-bold text-base-content/60 uppercase">
+                                {{ latest_tar.fecha_tar if latest_tar else '---' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if latest_tar %}
+                    <div class="space-y-2 text-xs overflow-y-auto pr-1 custom-scrollbar flex-grow max-h-48">
+                        <!-- Headers -->
+                        <div
+                            class="flex justify-between border-b border-base-content/10 pb-1 font-bold uppercase text-base-content/40 tracking-tighter">
+                            <span class="w-1/4">Parám.</span>
+                            <span class="w-1/4 text-center">Res.</span>
+                            <span class="w-1/4 text-center">LMP</span>
+                            <span class="w-1/4 text-right">Precio</span>
+                        </div>
+
+                        {% set prefixes = [
+                        ('SST', 'sst'), ('DBO', 'dbo'), ('GyA', 'gya'),
+                        ('SS', 'ss'), ('MF', 'mf'), ('Temp', 'temp'),
+                        ('SAAM', 'saam'), ('DQO', 'dqo'), ('NT', 'nt'),
+                        ('Fen', 'fen'), ('Color', 'color')
+                        ] %}
+                        {% set has_params = false %}
+                        {% for label, pre in prefixes %}
+                        {% set p_key = pre ~ '_precio' %}
+                        {% set r_key = pre ~ '_resultado' %}
+                        {% set l_key = pre ~ '_lmp' %}
+
+                        {% set price = latest_tar.get(p_key, '$0.00') %}
+                        {% if price and price != '$0.00' and price != '0.00' and price != '' %}
+                        {% set has_params = true %}
+                        <div
+                            class="flex justify-between items-center border-b border-base-content/5 pb-1 last:border-0">
+                            <span class="w-1/4 text-base-content/70 font-semibold">{{ label }}</span>
+                            <span class="w-1/4 text-center font-mono">{{ latest_tar.get(r_key, '-') }}</span>
+                            <span class="w-1/4 text-center text-base-content/50 font-mono">{{ latest_tar.get(l_key, '-')
+                                }}</span>
+                            <span class="w-1/4 text-right font-mono font-bold">{{ price }}</span>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if not has_params %}
+                        <div class="text-center py-4 italic opacity-50">Sin cargos extra detectados.</div>
+                        {% endif %}
+                    </div>
+                    <div class="pt-3 mt-auto border-t-2 border-base-content/10 flex justify-between items-end">
+                        <span class="text-xs font-bold text-base-content/50 uppercase">Total / m³</span>
+                        <span class="text-xl font-black" style="color: #0099cf;">${{ latest_tar.get('precio_m3_total',
+                            '0.00') }}</span>
+                    </div>
+                    {% else %}
+                    <div
+                        class="flex flex-col items-center justify-center h-full opacity-30 italic text-sm text-center py-8">
+                        <span class="icon-[tabler--flask-off] size-10 mb-2"></span>
+                        Sin registros de laboratorio.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Filtros Tab Tarificador -->
+            <div class="lg:col-span-2 card bg-base-100 border border-base-content/10 shadow-sm h-full">
+                <div class="card-body p-6">
+                    <form method="GET"
+                        action="{{ url_for('detalle_directorio', tipo=tipo, id_val=item.get('folio') or item.get('id_cliente')) }}"
+                        class="space-y-6 w-full">
+                        <input type="hidden" name="tab" value="tarificador">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Búsqueda General -->
+                            <div class="form-control md:col-span-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Búsqueda</label>
+                                <input type="text" name="t_search" class="input input-bordered w-full h-10"
+                                    placeholder="Buscar por folio..." value="{{ request.args.get('t_search', '') }}">
+                            </div>
+
+                            <!-- Año -->
+                            <div class="form-control">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Año</label>
+                                <select name="t_anio" class="select select-bordered w-full h-10 min-h-0 px-3">
+                                    <option value="">Todos</option>
+                                    {% for y in range(2024, 2031) %}
+                                    <option value="{{ y }}" {% if request.args.get('t_anio')==y|string %}selected{%
+                                        endif %}>{{ y }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="flex gap-3 items-end">
+                                <button type="submit"
+                                    class="btn btn-primary h-10 min-h-0 px-6 flex items-center gap-2 w-full">
+                                    <span class="icon-[tabler--search] size-5"></span>
+                                    <span>Buscar</span>
+                                </button>
+                                <a href="{{ url_for('detalle_directorio', tipo=tipo, id_val=item.get('folio') or item.get('id_cliente')) }}?tab=tarificador"
+                                    class="btn btn-soft btn-secondary h-10 min-h-0 btn-square" title="Limpiar">
+                                    <span class="icon-[tabler--filter-x] size-5"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
             <div class="card-body p-0">
                 <table class="table table-lg">
