@@ -2169,7 +2169,7 @@ def ver_directorio(tipo):
     if data:
         # Prioritize important headers
         all_keys = list(data[0].keys())
-        priority = ['folio', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'rfc_empresa', 'telefono_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'tipo_empresa'] 
+        priority = ['folio', 'nombre_empresa', 'propietario_empresa', 'rfc_propietario', 'rfc_empresa', 'telefono_empresa', 'calle_num_empresa', 'colonia_empresa', 'municipio_empresa', 'localidad_empresa', 'cp_empresa', 'tipo_empresa', 'tiene_permiso'] 
         headers = [k for k in priority if k in all_keys]
         # Add others up to 5 cols
         for k in all_keys:

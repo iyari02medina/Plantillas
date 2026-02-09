@@ -568,6 +568,7 @@ Usa este prompt para generar barras de progreso segmentadas (útil para niveles 
 Usa este prompt para generar selectores avanzados con búsqueda y scroll (`max-h-52 overflow-y-auto`):
 
 > I'm using the FlyonUI Tailwind CSS component library in my project. Please integrate the following component into my project.
+> **IMPORTANTE**: Para evitar que el menú desplegable se corte, asegúrate de que el contenedor padre (como la `card`) **NO** tenga la clase `overflow-hidden`.
 > It is CRITICAL to include the `max-h-52 overflow-y-auto` classes in `dropdownClasses` to enable scrolling, and to use the specific `extraMarkup` for the chevron icon.
 >
 > Here are the code snippets for the block component:
