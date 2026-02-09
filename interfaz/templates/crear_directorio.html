@@ -244,7 +244,14 @@ Cophi{% endblock %}
                                 del Usuario</label>
                             <input type="text" name="nombre_usuario" value="{{ item.get('nombre_usuario', '') }}"
                                 class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
-                                placeholder="Nombre completo del usuario">
+                                placeholder="Según datos en boleta de agua">
+                        </div>
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">NIS
+                                (Contrato Agua)</label>
+                            <input type="text" name="nis" value="{{ item.get('nis', '') }}"
+                                class="input input-bordered w-full font-mono text-primary" {% if not is_new %}disabled{%
+                                endif %} placeholder="Según datos en boleta de agua">
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -254,14 +261,14 @@ Cophi{% endblock %}
                                     de Pago</label>
                                 <input type="text" name="titular_pago" value="{{ item.get('titular_pago', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
-                                    placeholder="Segun la boleta de agua">
+                                    placeholder="Según datos en boleta de agua">
                             </div>
                             <div class="form-control space-y-2">
                                 <label
                                     class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Régimen</label>
                                 <input type="text" name="regimen" value="{{ item.get('regimen', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
-                                    placeholder="Ej. Persona Física, Moral...">
+                                    placeholder="Según datos en boleta de agua">
                             </div>
                         </div>
 
@@ -271,14 +278,14 @@ Cophi{% endblock %}
                                     class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Giro</label>
                                 <input type="text" name="giro" value="{{ item.get('giro', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
-                                    placeholder="Giro específico">
+                                    placeholder="Según datos en boleta de agua">
                             </div>
                             <div class="form-control space-y-2">
                                 <label
                                     class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Uso</label>
                                 <input type="text" name="uso" value="{{ item.get('uso', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
-                                    placeholder="Ej. Comercial, Industrial...">
+                                    placeholder="Según datos en boleta de agua">
                             </div>
                         </div>
 
@@ -289,15 +296,35 @@ Cophi{% endblock %}
                                     de corte</label>
                                 <input type="text" name="corte_servicio" value="{{ item.get('corte_servicio', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
-                                    placeholder="Ej. Mensual, Bimestral...">
+                                    placeholder="Según datos en boleta de agua">
                             </div>
                             <div class="form-control space-y-2">
                                 <label
                                     class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Contrato
                                     con</label>
-                                <input type="text" name="contrato_con" value="{{ item.get('contrato_con', '') }}"
-                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
-                                    placeholder="Ej. Agua de Puebla, Municipio...">
+                                <div class="w-full">
+                                    <select name="contrato_con" data-select='{
+                                        "placeholder": "Selecciona opción...",
+                                        "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
+                                        "toggleClasses": "advance-select-toggle relative select-disabled:pointer-events-none select-disabled:opacity-40",
+                                        "dropdownClasses": "advance-select-menu max-h-52 overflow-y-auto",
+                                        "optionClasses": "advance-select-option selected:select-active",
+                                        "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"icon-[tabler--check] shrink-0 size-4 text-primary hidden selected:block \"></span></div>",
+                                        "extraMarkup": "<span class=\"icon-[tabler--caret-up-down] shrink-0 size-4 text-base-content absolute top-1/2 end-3 -translate-y-1/2 pointer-events-none\"></span>"
+                                        }' class="hidden" {% if not is_new %}disabled{% endif %}>
+                                        <option value="">Selecciona</option>
+                                        {% set opciones_contrato = ['Agua de Puebla', 'Plaza comercial'] %}
+                                        {% for opt in opciones_contrato %}
+                                        <option value="{{ opt }}" {% if item.get('contrato_con')==opt %}selected{% endif
+                                            %}>{{ opt }}</option>
+                                        {% endfor %}
+                                        {% if item.get('contrato_con') and item.get('contrato_con') not in
+                                        opciones_contrato %}
+                                        <option value="{{ item.get('contrato_con') }}" selected>{{
+                                            item.get('contrato_con') }}</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -306,7 +333,7 @@ Cophi{% endblock %}
                                 class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tarifa</label>
                             <input type="text" name="tarifa" value="{{ item.get('tarifa', '') }}"
                                 class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
-                                placeholder="Ej. $1,500.00">
+                                placeholder="Según datos en boleta de agua">
                         </div>
                     </div>
                 </div>
@@ -335,14 +362,7 @@ Cophi{% endblock %}
                                 <input type="text" name="giro_licencia" value="{{ item.get('giro_licencia', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
                             </div>
-                            <div class="form-control space-y-2">
-                                <label
-                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">NIS
-                                    (Contrato Agua)</label>
-                                <input type="text" name="nis" value="{{ item.get('nis', '') }}"
-                                    class="input input-bordered w-full font-mono text-secondary" {% if not is_new
-                                    %}disabled{% endif %}>
-                            </div>
+
                             <div class="form-control space-y-2">
                                 <label
                                     class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
