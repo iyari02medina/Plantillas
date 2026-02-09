@@ -108,21 +108,14 @@ Cophi{% endblock %}
                     </div>
                 </div>
 
-                <!-- Tarjeta Principal: Identificación -->
+                <!-- Tarjeta: Información General -->
                 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                     <div
                         class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
-                        <span class="icon-[tabler--id] size-5 text-primary"></span>
-                        <span>Identificación y Contacto</span>
+                        <span class="icon-[tabler--info-circle] size-5 text-primary"></span>
+                        <span>Información General</span>
                     </div>
                     <div class="card-body p-6 space-y-4">
-                        <div class="form-control space-y-2">
-                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre
-                                Empresa</label>
-                            <input type="text" name="nombre_empresa" value="{{ item.get('nombre_empresa', '') }}"
-                                required class="input input-bordered w-full font-black text-primary" {% if not is_new
-                                %}disabled{% endif %} placeholder="Ej. Abarrotes Don Pepe">
-                        </div>
                         <div class="form-control space-y-2">
                             <label
                                 class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Propietario
@@ -132,24 +125,6 @@ Cophi{% endblock %}
                                 value="{{ item.get('propietario_empresa', '') }}" class="input input-bordered w-full" {%
                                 if not is_new %}disabled{% endif %}
                                 placeholder="Nombre del dueño o representante legal">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-control space-y-2">
-                                <label
-                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">RFC
-                                    Propietario / Representante Legal</label>
-                                <input type="text" name="rfc_propietario" value="{{ item.get('rfc_propietario', '') }}"
-                                    class="input input-bordered w-full font-mono uppercase" {% if not is_new
-                                    %}disabled{% endif %} placeholder="RFC del Propietario">
-                            </div>
-                            <div class="form-control space-y-2">
-                                <label
-                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">RFC
-                                    Empresa</label>
-                                <input type="text" name="rfc_empresa" value="{{ item.get('rfc_empresa', '') }}"
-                                    class="input input-bordered w-full font-mono uppercase" {% if not is_new
-                                    %}disabled{% endif %} placeholder="RFC de la Empresa">
-                            </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="form-control space-y-2">
@@ -228,6 +203,82 @@ Cophi{% endblock %}
                                     {% if not is_new %}disabled{% endif %} placeholder="Ej. San Baltazar">
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Principal: Identificación -->
+                <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                    <div
+                        class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                        <span class="icon-[tabler--id] size-5 text-primary"></span>
+                        <span>Identificación y Contacto</span>
+                    </div>
+                    <div class="card-body p-6 space-y-4">
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre
+                                Empresa</label>
+                            <input type="text" name="nombre_empresa" value="{{ item.get('nombre_empresa', '') }}"
+                                required class="input input-bordered w-full font-black text-primary" {% if not is_new
+                                %}disabled{% endif %} placeholder="Ej. Abarrotes Don Pepe">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">RFC
+                                    Propietario / Representante Legal</label>
+                                <input type="text" name="rfc_propietario" value="{{ item.get('rfc_propietario', '') }}"
+                                    class="input input-bordered w-full font-mono uppercase" {% if not is_new
+                                    %}disabled{% endif %} placeholder="RFC del Propietario">
+                            </div>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Razón
+                                    Social</label>
+                                <input type="text" name="razon_social" value="{{ item.get('razon_social', '') }}"
+                                    class="input input-bordered w-full font-bold text-secondary" {% if not is_new
+                                    %}disabled{% endif %} placeholder="Razón Social Completa">
+                            </div>
+
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">RFC
+                                    Empresa</label>
+                                <input type="text" name="rfc_empresa" value="{{ item.get('rfc_empresa', '') }}"
+                                    class="input input-bordered w-full font-mono uppercase" {% if not is_new
+                                    %}disabled{% endif %} placeholder="RFC de la Empresa">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Giro
+                                    Licencia</label>
+                                <input type="text" name="giro_licencia" value="{{ item.get('giro_licencia', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
+                            </div>
+
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
+                                    Permiso
+                                    Descargas</label>
+                                <input type="text" name="no_permiso_descargas"
+                                    value="{{ item.get('no_permiso_descargas', '') }}"
+                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
+                            </div>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Vigencia
+                                    Permiso</label>
+                                <input type="text" name="vegencia_permiso_descargas"
+                                    value="{{ item.get('vegencia_permiso_descargas', '') }}"
+                                    class="input input-bordered w-full" placeholder="dd/mm/aaaa" {% if not is_new
+                                    %}disabled{% endif %}>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -338,53 +389,9 @@ Cophi{% endblock %}
                     </div>
                 </div>
 
+
+
                 {% if tipo == 'clientes' %}
-                <!-- Tarjeta: Datos Fiscales (Solo Clientes) -->
-                <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-                    <div
-                        class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
-                        <span class="icon-[tabler--receipt-tax] size-5 text-secondary"></span>
-                        <span>Datos Fiscales y Contrato</span>
-                    </div>
-                    <div class="card-body p-6 space-y-4">
-                        <div class="form-control space-y-2">
-                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Razón
-                                Social</label>
-                            <input type="text" name="razon_social" value="{{ item.get('razon_social', '') }}"
-                                class="input input-bordered w-full font-bold text-secondary" {% if not is_new
-                                %}disabled{% endif %} placeholder="Razón Social Completa">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-control space-y-2">
-                                <label
-                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Giro
-                                    Licencia</label>
-                                <input type="text" name="giro_licencia" value="{{ item.get('giro_licencia', '') }}"
-                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
-                            </div>
-
-                            <div class="form-control space-y-2">
-                                <label
-                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
-                                    Permiso
-                                    Descargas</label>
-                                <input type="text" name="no_permiso_descargas"
-                                    value="{{ item.get('no_permiso_descargas', '') }}"
-                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}>
-                            </div>
-                            <div class="form-control space-y-2">
-                                <label
-                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Vigencia
-                                    Permiso</label>
-                                <input type="text" name="vegencia_permiso_descargas"
-                                    value="{{ item.get('vegencia_permiso_descargas', '') }}"
-                                    class="input input-bordered w-full" placeholder="dd/mm/aaaa" {% if not is_new
-                                    %}disabled{% endif %}>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Tarjeta: Servicios e Infraestructura (Solo Clientes) -->
                 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
                     <div
