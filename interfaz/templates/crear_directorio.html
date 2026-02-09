@@ -49,7 +49,7 @@ Cophi{% endblock %}
                     <option value="general" selected>Información General</option>
                     <option value="cotizaciones">Cotizaciones</option>
                     <option value="ordenes">Órdenes de Trabajo</option>
-                    <option value="tarificador">Tarificador</option>
+                    <option value="tarificador">Análisis de Laboratorio</option>
                     <option value="permisos">Permisos de Descarga</option>
                     <option value="consumos">Consumos de Agua</option>
                 </select>
@@ -130,7 +130,8 @@ Cophi{% endblock %}
                                 Representante Legal</label>
                             <input type="text" name="propietario_empresa"
                                 value="{{ item.get('propietario_empresa', '') }}" class="input input-bordered w-full" {%
-                                if not is_new %}disabled{% endif %} placeholder="Nombre del dueño o responsable">
+                                if not is_new %}disabled{% endif %}
+                                placeholder="Nombre del dueño o representante legal">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="form-control space-y-2">
@@ -154,11 +155,31 @@ Cophi{% endblock %}
                             <div class="form-control space-y-2">
                                 <label
                                     class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tipo
-                                    /
-                                    Giro</label>
-                                <input type="text" name="tipo_empresa" value="{{ item.get('tipo_empresa', '') }}"
-                                    class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
-                                    placeholder="Ej. Restaurante, Taller...">
+                                    de Empresa</label>
+                                <div class="w-full">
+                                    <select name="tipo_empresa" data-select='{
+                                    "placeholder": "Selecciona opción...",
+                                    "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
+                                    "toggleClasses": "advance-select-toggle relative select-disabled:pointer-events-none select-disabled:opacity-40",
+                                    "dropdownClasses": "advance-select-menu max-h-52 overflow-y-auto",
+                                    "optionClasses": "advance-select-option selected:select-active",
+                                    "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"icon-[tabler--check] shrink-0 size-4 text-primary hidden selected:block \"></span></div>",
+                                    "extraMarkup": "<span class=\"icon-[tabler--caret-up-down] shrink-0 size-4 text-base-content absolute top-1/2 end-3 -translate-y-1/2 pointer-events-none\"></span>"
+                                    }' class="hidden" {% if not is_new %}disabled{% endif %}>
+                                        <option value="">Selecciona</option>
+                                        {% set opciones_giro = ['Restaurante', 'Plaza comercial', 'Torre Comercial',
+                                        'Industria', 'Escuela', 'Local Comercial'] %}
+                                        {% for opt in opciones_giro %}
+                                        <option value="{{ opt }}" {% if item.get('tipo_empresa')==opt %}selected{% endif
+                                            %}>{{ opt }}</option>
+                                        {% endfor %}
+                                        {% if item.get('tipo_empresa') and item.get('tipo_empresa') not in opciones_giro
+                                        %}
+                                        <option value="{{ item.get('tipo_empresa') }}" selected>{{
+                                            item.get('tipo_empresa') }}</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-control space-y-2">
                                 <label
@@ -233,7 +254,7 @@ Cophi{% endblock %}
                                     de Pago</label>
                                 <input type="text" name="titular_pago" value="{{ item.get('titular_pago', '') }}"
                                     class="input input-bordered w-full" {% if not is_new %}disabled{% endif %}
-                                    placeholder="Nombre del titular">
+                                    placeholder="Segun la boleta de agua">
                             </div>
                             <div class="form-control space-y-2">
                                 <label
