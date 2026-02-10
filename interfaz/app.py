@@ -1557,28 +1557,75 @@ def ver_orden_pdf(tipo, folio):
 @app.route('/eliminar_documento/<folio>/<filename>', methods=['POST'])
 @login_required
 def eliminar_documento(folio, filename):
-    import os  # Ensure os is imported locally if needed, though likely global
+    import os
     from werkzeug.utils import secure_filename
-    
+    import csv # Ensure csv is imported
+
     try:
-        # folio acts as the folder suffix (CLI-<folio>)
         safe_filename = secure_filename(filename)
-        safe_folio = str(folio).strip()
+        safe_folio = str(folio).strip() # This is the NIS or Client Folio used for the folder
         
+        # 1. Delete from Filesystem
         docs_base = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Documentos_Digitales'))
         client_folder = os.path.join(docs_base, f"CLI-{safe_folio}")
         file_path = os.path.join(client_folder, safe_filename)
         
-        if os.path.exists(file_path) and os.path.isfile(file_path):
-            os.remove(file_path)
-            flash(f'Documento {safe_filename} eliminado correctamente.', 'success')
+        file_deleted = False
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+                file_deleted = True
+                flash(f'Documento {safe_filename} eliminado correctamente.', 'success')
+            except Exception as e:
+                flash(f'Error al eliminar archivo físico: {e}', 'error')
         else:
-            flash(f'No se encontró el archivo {safe_filename}.', 'error')
-            
+             # If file doesn't exist, we still proceed to clean DB to fix "ghost" files
+            flash(f'Archivo físico no encontrado, limpiando registro de base de datos.', 'warning')
+            file_deleted = True 
+
+        if file_deleted:
+            # 2. Sync with Databases (Clean References)
+            # Define potential document fields to check
+            doc_fields = ['croquis_imagen', 'doc_acta', 'doc_ine', 'doc_rfc', 'doc_poder', 
+                          'doc_predial', 'doc_recibo_agua', 'doc_uso_suelo', 'doc_drenaje', 
+                          'doc_licencia', 'doc_otros']
+
+            # Helper to clean a CSV
+            def clean_csv_references(csv_path, match_field='nis'):
+                updated_rows = []
+                modified = False
+                if os.path.exists(csv_path):
+                    with open(csv_path, mode='r', encoding='utf-8-sig') as f:
+                        reader = csv.DictReader(f)
+                        fieldnames = reader.fieldnames
+                        for row in reader:
+                            # Check if this row belongs to the client (match by NIS or Folio)
+                            # We check both 'nis' and 'folio' just in case
+                            is_target = False
+                            if str(row.get('nis', '')).strip() == safe_folio: is_target = True
+                            if str(row.get('folio', '')).strip() == safe_folio: is_target = True
+                            
+                            if is_target:
+                                # Check all doc fields
+                                for field in doc_fields:
+                                    if field in row and row[field] == safe_filename:
+                                        row[field] = '' # Clear the reference
+                                        modified = True
+                            updated_rows.append(row)
+                    
+                    if modified and fieldnames:
+                        with open(csv_path, mode='w', encoding='utf-8-sig', newline='') as f:
+                            writer = csv.DictWriter(f, fieldnames=fieldnames)
+                            writer.writeheader()
+                            writer.writerows(updated_rows)
+                            
+            # Run cleanup on both DATABASES
+            clean_csv_references(CLIENTES_CSV)
+            clean_csv_references(PERMISOS_CSV)
+
     except Exception as e:
-        flash(f'Error al eliminar el documento: {e}', 'error')
+        flash(f'Error general al eliminar documento: {e}', 'error')
         
-    # Redirect back to the referrer (usually details page)
     return redirect(request.referrer or url_for('index'))
 
 

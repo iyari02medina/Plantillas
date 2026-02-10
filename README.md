@@ -97,6 +97,7 @@ Las tablas deben tener ciertas características obligatorias para mantener la co
 4.  **Menú de Acciones:** La primera columna **SIEMPRE** debe ser Acciones.
     *   **Header:** `<th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Acciones</th>`
     *   **Contenido:** Dropdown con opciones **Ver**, **Detalles** y **Borrar**.
+    *   **Nota Crítica:** La acción **Borrar** para documentos debe **SIEMPRE** sincronizarse con la base de datos (CSV). No basta con `os.remove()`; se debe buscar la referencia del archivo en `empresas.csv` o `cuestionario_variables.csv` y limpiarla para evitar estados "fantasma" en otras vistas (como Permisos de Descarga).
 5.  **Headers de Datos:** Usar la clase `text-base-content/70 font-bold uppercase tracking-widest text-xs` para todos los encabezados.
 6.  **Estado Vacío:** Usar `{% else %}` en el bucle `for`.
 7.  **Responsividad:** Envolver siempre en `<div class="overflow-x-auto">`.
