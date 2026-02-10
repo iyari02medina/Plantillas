@@ -139,6 +139,46 @@
             </div>
         </div>
 
+        <!-- DOCUMENTOS ADICIONALES -->
+        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+            <div
+                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                <span class="icon-[tabler--files] size-5 text-primary"></span>
+                <span>Documentos Adicionales</span>
+            </div>
+            <div class="card-body p-6">
+                <div class="form-control w-full max-w-md">
+                    <label class="label mb-1">
+                        <span
+                            class="label-text font-bold text-xs uppercase text-base-content/60 flex items-center gap-2">
+                            <span class="icon-[tabler--file-certificate] size-4"></span>
+                            Licencia de Funcionamiento
+                        </span>
+                    </label>
+
+                    <div class="flex items-center gap-3">
+                        <label for="doc_licencia_input"
+                            class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9">
+                            <span class="icon-[tabler--upload] size-4"></span>
+                            Seleccionar Archivo
+                        </label>
+                        <input type="file" id="doc_licencia_input" class="hidden"
+                            onchange="document.getElementById('file-name-val').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
+
+                        <span id="file-name-val" class="text-xs text-base-content/50 italic truncate">Ningún archivo
+                            seleccionado</span>
+                    </div>
+
+                    <label class="label mt-1">
+                        <span class="label-text-alt text-xs text-base-content/50 flex items-center gap-1">
+                            <span class="icon-[tabler--info-circle] size-3"></span>
+                            Requerido para validación (PDF o Imagen)
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
         <!-- SECCION 1: IDENTIFICACION -->
         <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
             <div
