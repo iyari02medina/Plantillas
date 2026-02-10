@@ -159,10 +159,18 @@
                             <label for="doc_acta_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_acta_input" class="hidden"
-                                onchange="document.getElementById('file-name-acta').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-acta" class="text-xs text-base-content/50 italic truncate">Ningún
-                                archivo seleccionado</span>
+                            <input type="file" id="doc_acta_input" name="doc_acta" class="hidden"
+                                onchange="document.getElementById('file-name-acta').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_acta if permiso and permiso.doc_acta else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-acta" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_acta %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{ permiso.doc_acta
+                                    }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -175,10 +183,18 @@
                             <label for="doc_ine_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_ine_input" class="hidden"
-                                onchange="document.getElementById('file-name-ine').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-ine" class="text-xs text-base-content/50 italic truncate">Ningún archivo
-                                seleccionado</span>
+                            <input type="file" id="doc_ine_input" name="doc_ine" class="hidden"
+                                onchange="document.getElementById('file-name-ine').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_ine if permiso and permiso.doc_ine else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-ine" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_ine %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{ permiso.doc_ine
+                                    }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -191,10 +207,18 @@
                             <label for="doc_rfc_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_rfc_input" class="hidden"
-                                onchange="document.getElementById('file-name-rfc').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-rfc" class="text-xs text-base-content/50 italic truncate">Ningún archivo
-                                seleccionado</span>
+                            <input type="file" id="doc_rfc_input" name="doc_rfc" class="hidden"
+                                onchange="document.getElementById('file-name-rfc').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_rfc if permiso and permiso.doc_rfc else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-rfc" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_rfc %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{ permiso.doc_rfc
+                                    }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -207,10 +231,18 @@
                             <label for="doc_factibilidad_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_factibilidad_input" class="hidden"
-                                onchange="document.getElementById('file-name-factibilidad').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-factibilidad"
-                                class="text-xs text-base-content/50 italic truncate">Ningún archivo seleccionado</span>
+                            <input type="file" id="doc_factibilidad_input" name="doc_factibilidad" class="hidden"
+                                onchange="document.getElementById('file-name-factibilidad').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_factibilidad if permiso and permiso.doc_factibilidad else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-factibilidad" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_factibilidad %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_factibilidad }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -224,10 +256,18 @@
                             <label for="doc_licencia_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_licencia_input" class="hidden"
-                                onchange="document.getElementById('file-name-licencia').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-licencia" class="text-xs text-base-content/50 italic truncate">Ningún
-                                archivo seleccionado</span>
+                            <input type="file" id="doc_licencia_input" name="doc_licencia" class="hidden"
+                                onchange="document.getElementById('file-name-licencia').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_licencia if permiso and permiso.doc_licencia else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-licencia" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_licencia %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_licencia }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -241,10 +281,18 @@
                             <label for="doc_alineamiento_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_alineamiento_input" class="hidden"
-                                onchange="document.getElementById('file-name-alineamiento').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-alineamiento"
-                                class="text-xs text-base-content/50 italic truncate">Ningún archivo seleccionado</span>
+                            <input type="file" id="doc_alineamiento_input" name="doc_alineamiento" class="hidden"
+                                onchange="document.getElementById('file-name-alineamiento').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_alineamiento if permiso and permiso.doc_alineamiento else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-alineamiento" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_alineamiento %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_alineamiento }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -257,10 +305,18 @@
                             <label for="doc_sanitaria_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_sanitaria_input" class="hidden"
-                                onchange="document.getElementById('file-name-sanitaria').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-sanitaria" class="text-xs text-base-content/50 italic truncate">Ningún
-                                archivo seleccionado</span>
+                            <input type="file" id="doc_sanitaria_input" name="doc_sanitaria" class="hidden"
+                                onchange="document.getElementById('file-name-sanitaria').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_sanitaria if permiso and permiso.doc_sanitaria else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-sanitaria" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_sanitaria %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_sanitaria }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -273,10 +329,18 @@
                             <label for="doc_bomberos_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_bomberos_input" class="hidden"
-                                onchange="document.getElementById('file-name-bomberos').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-bomberos" class="text-xs text-base-content/50 italic truncate">Ningún
-                                archivo seleccionado</span>
+                            <input type="file" id="doc_bomberos_input" name="doc_bomberos" class="hidden"
+                                onchange="document.getElementById('file-name-bomberos').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_bomberos if permiso and permiso.doc_bomberos else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-bomberos" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_bomberos %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_bomberos }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -290,10 +354,18 @@
                             <label for="doc_civil_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_civil_input" class="hidden"
-                                onchange="document.getElementById('file-name-civil').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-civil" class="text-xs text-base-content/50 italic truncate">Ningún
-                                archivo seleccionado</span>
+                            <input type="file" id="doc_civil_input" name="doc_civil" class="hidden"
+                                onchange="document.getElementById('file-name-civil').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_civil if permiso and permiso.doc_civil else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-civil" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_civil %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_civil }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -306,10 +378,18 @@
                             <label for="doc_predial_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_predial_input" class="hidden"
-                                onchange="document.getElementById('file-name-predial').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-predial" class="text-xs text-base-content/50 italic truncate">Ningún
-                                archivo seleccionado</span>
+                            <input type="file" id="doc_predial_input" name="doc_predial" class="hidden"
+                                onchange="document.getElementById('file-name-predial').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_predial if permiso and permiso.doc_predial else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-predial" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_predial %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_predial }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -323,10 +403,18 @@
                             <label for="doc_planos_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_planos_input" class="hidden"
-                                onchange="document.getElementById('file-name-planos').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-planos" class="text-xs text-base-content/50 italic truncate">Ningún
-                                archivo seleccionado</span>
+                            <input type="file" id="doc_planos_input" name="doc_planos" class="hidden"
+                                onchange="document.getElementById('file-name-planos').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_planos if permiso and permiso.doc_planos else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-planos" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_planos %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_planos }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -340,10 +428,18 @@
                             <label for="doc_materias_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_materias_input" class="hidden"
-                                onchange="document.getElementById('file-name-materias').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-materias" class="text-xs text-base-content/50 italic truncate">Ningún
-                                archivo seleccionado</span>
+                            <input type="file" id="doc_materias_input" name="doc_materias" class="hidden"
+                                onchange="document.getElementById('file-name-materias').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_materias if permiso and permiso.doc_materias else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-materias" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_materias %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_materias }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -357,10 +453,18 @@
                             <label for="doc_diagrama_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_diagrama_input" class="hidden"
-                                onchange="document.getElementById('file-name-diagrama').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-diagrama" class="text-xs text-base-content/50 italic truncate">Ningún
-                                archivo seleccionado</span>
+                            <input type="file" id="doc_diagrama_input" name="doc_diagrama" class="hidden"
+                                onchange="document.getElementById('file-name-diagrama').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_diagrama if permiso and permiso.doc_diagrama else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-diagrama" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_diagrama %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_diagrama }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -373,10 +477,18 @@
                             <label for="doc_balance_input"
                                 class="btn btn-primary btn-sm text-xs font-bold uppercase py-0 h-9"><span
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
-                            <input type="file" id="doc_balance_input" class="hidden"
-                                onchange="document.getElementById('file-name-balance').textContent = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado'" />
-                            <span id="file-name-balance" class="text-xs text-base-content/50 italic truncate">Ningún
-                                archivo seleccionado</span>
+                            <input type="file" id="doc_balance_input" name="doc_balance" class="hidden"
+                                onchange="document.getElementById('file-name-balance').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_balance if permiso and permiso.doc_balance else 'Ningún archivo seleccionado' }}'"
+                                {{ 'disabled' if permiso else '' }} />
+                            <span id="file-name-balance" class="text-xs text-base-content/50 italic truncate">
+                                {% if permiso and permiso.doc_balance %}
+                                <span class="text-success font-bold flex items-center gap-1"><span
+                                        class="icon-[tabler--check] size-3"></span> Archivo cargado: {{
+                                    permiso.doc_balance }}</span>
+                                {% else %}
+                                Ningún archivo seleccionado
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
 
@@ -858,6 +970,14 @@
 
         <div class="flex justify-end gap-3 pt-4">
             <a href="{{ url_for('permisos_descarga') }}" class="btn btn-ghost">Cancelar</a>
+
+            {% if permiso %}
+            <button type="button" class="btn btn-secondary btn-wide shadow-lg" id="btn-editar" onclick="enableEdit()">
+                <span class="icon-[tabler--pencil] size-5"></span>
+                Editar
+            </button>
+            {% endif %}
+
             <button type="submit" class="btn btn-primary btn-wide shadow-lg {{ 'hidden' if permiso else '' }}"
                 id="btn-submit">
                 <span class="icon-[tabler--device-floppy] size-5"></span>

@@ -1734,6 +1734,49 @@ def nuevo_permiso_descarga():
                 new_row['croquis_imagen'] = final_name
             except Exception as e:
                 print(f"Error saving croquis: {e}")
+
+        # Manejo de Documentos Digitales
+        document_fields = [
+            'doc_acta', 'doc_ine', 'doc_rfc', 'doc_factibilidad', 'doc_licencia',
+            'doc_alineamiento', 'doc_sanitaria', 'doc_bomberos', 'doc_civil',
+            'doc_predial', 'doc_planos', 'doc_materias', 'doc_diagrama', 'doc_balance'
+        ]
+        
+        # Asegurar que los campos existan en headers y new_row
+        for field in document_fields:
+            if field not in headers:
+                headers.append(field)
+            if field not in new_row:
+                new_row[field] = ''
+
+        docs_base_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Documentos_Digitales'))
+        if not os.path.exists(docs_base_folder):
+            os.makedirs(docs_base_folder)
+
+        # Usar NIS para la carpeta del cliente
+        client_folder = os.path.join(docs_base_folder, f"CLI-{str(nis).strip()}")
+        if not os.path.exists(client_folder):
+            os.makedirs(client_folder)
+            
+        from werkzeug.utils import secure_filename
+        import time
+        
+        for field in document_fields:
+            file_obj = request.files.get(field)
+            if file_obj and file_obj.filename:
+                try:
+                    filename = secure_filename(file_obj.filename)
+                    # Añadir timestamp para evitar colisiones
+                    timestamp = int(time.time())
+                    final_filename = f"{field}_{timestamp}_{filename}"
+                    
+                    save_path = os.path.join(client_folder, final_filename)
+                    file_obj.save(save_path)
+                    
+                    new_row[field] = final_filename
+                    
+                except Exception as e:
+                    print(f"Error saving document {field}: {e}")
             
         # Normalización de Si/No y NIS
         new_row['nis'] = str(nis).strip()
@@ -2329,6 +2372,69 @@ def detalle_directorio(tipo, id_val):
 
         # Permisos (Name key might be nombre_empresa)
         related_data['permisos'] = filter_rows(read_csv(PERMISOS_CSV), ['nis'], 'nombre_empresa')
+
+        # Documentos Digitales (Listar archivos en carpeta del cliente)
+        documentos = []
+        try:
+            # Collect all possible NIS sources
+            nis_candidates = set()
+            if item.get('nis'):
+                nis_candidates.add(str(item.get('nis')).strip())
+            
+            if related_data.get('permisos'):
+                for p in related_data['permisos']:
+                    if p.get('nis'):
+                        nis_candidates.add(str(p.get('nis')).strip())
+
+            if nis_candidates and tipo == 'clientes':
+                docs_base = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Documentos_Digitales'))
+                
+                seen_files = set()
+                for nis in nis_candidates:
+                    if not nis: continue
+                    
+                    client_folder = os.path.join(docs_base, f"CLI-{nis}")
+                    if os.path.exists(client_folder):
+                        for filename in os.listdir(client_folder):
+                            # Avoid duplicates if multiple folders somehow share content or are scanned
+                            if filename in seen_files: continue
+                            
+                            file_path = os.path.join(client_folder, filename)
+                            if os.path.isfile(file_path):
+                                seen_files.add(filename)
+                                # Fecha modificación
+                                mtime = os.path.getmtime(file_path)
+                                fecha_mod = datetime.datetime.fromtimestamp(mtime).strftime('%d/%m/%Y %H:%M')
+                                
+                                # Determinar tipo legible
+                                tipo_doc = "Documento"
+                                if filename.startswith('doc_acta'): tipo_doc = "Acta Constitutiva"
+                                elif filename.startswith('doc_ine'): tipo_doc = "Identificación Oficial"
+                                elif filename.startswith('doc_rfc'): tipo_doc = "RFC"
+                                elif filename.startswith('doc_factibilidad'): tipo_doc = "Factibilidad"
+                                elif filename.startswith('doc_licencia'): tipo_doc = "Licencia Funcionamiento"
+                                elif filename.startswith('doc_alineamiento'): tipo_doc = "Alineamiento"
+                                elif filename.startswith('doc_sanitaria'): tipo_doc = "Licencia Sanitaria"
+                                elif filename.startswith('doc_bomberos'): tipo_doc = "Bomberos"
+                                elif filename.startswith('doc_civil'): tipo_doc = "Protección Civil"
+                                elif filename.startswith('doc_predial'): tipo_doc = "Predial"
+                                elif filename.startswith('doc_planos'): tipo_doc = "Planos"
+                                elif filename.startswith('doc_materias'): tipo_doc = "Materias Primas"
+                                elif filename.startswith('doc_diagrama'): tipo_doc = "Diagrama Flujo"
+                                elif filename.startswith('doc_balance'): tipo_doc = "Balance Hídrico"
+                                elif filename.startswith('croquis'): tipo_doc = "Croquis"
+                                
+                                documentos.append({
+                                    'nombre': filename,
+                                    'tipo': tipo_doc,
+                                    'fecha': fecha_mod,
+                                    'folio': nis, # Usamos NIS como referencia para la descarga
+                                    'filename': filename
+                                })
+        except Exception as e:
+            print(f"Error loading documents: {e}")
+            
+        related_data['documentos'] = documentos
 
         # Consumos
         consumos_data = filter_rows(read_csv(CONSUMOS_CSV), ['ID_cliente'], 'nombre_cliente')
@@ -3035,6 +3141,26 @@ def actualizar_fecha_evento():
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/documentos/ver/<folio>/<filename>')
+@login_required
+def ver_documento(folio, filename):
+    from flask import send_from_directory
+    # Seguridad básica
+    if '..' in filename or '/' in filename or '\\' in filename:
+        return "Nombre de archivo inválido", 400
+        
+    docs_base = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Documentos_Digitales'))
+    client_folder = os.path.join(docs_base, f"CLI-{folio}")
+    
+    try:
+        if os.path.exists(os.path.join(client_folder, filename)):
+            return send_from_directory(client_folder, filename)
+        else:
+            return "Archivo no encontrado", 404
+    except Exception as e:
+        print(f"Error serving document: {e}")
+        return "Error al servir el documento", 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
