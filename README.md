@@ -89,53 +89,60 @@ Para añadir una barra de búsqueda a una nueva página, usa esta estructura den
 ```
 
 #### B. Tabla de Datos Estándar
-Las tablas deben tener ciertas características obligatorias:
-1.  **Tarjeta Separada:** Los filtros de búsqueda NUNCA deben ir dentro de la misma tarjeta que la tabla. Deben estar en una tarjeta superior con `mb-6`.
-2.  Estar dentro de un `card` con `overflow-hidden`.
-3.  Usar `table-lg` para buen espaciado.
-4.  **Menú de Acciones:** La primera columna siempre debe ser acciones (Ver/Editar/Borrar).
-5.  **Estado Vacío:** Usar `{% else %}` en el bucle `for` para mostrar un mensaje amigable cuando no hay datos.
-6.  **Responsividad:** Envolver siempre en `<div class="overflow-x-auto">`.
+Las tablas deben tener ciertas características obligatorias para mantener la consistencia visual (Padding 16px, Tipografía, etc):
+
+1.  **Tarjeta Separada:** Los filtros de búsqueda NUNCA deben ir dentro de la misma tarjeta que la tabla.
+2.  **Contenedor:** Estar dentro de un `card` con `overflow-hidden`.
+3.  **Clase de Tabla:** Usar **SIEMPRE** `table table-lg` para asegurar el padding correcto (16px).
+4.  **Menú de Acciones:** La primera columna **SIEMPRE** debe ser Acciones.
+    *   **Header:** `<th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Acciones</th>`
+    *   **Contenido:** Dropdown con opciones **Ver**, **Detalles** y **Borrar**.
+5.  **Headers de Datos:** Usar la clase `text-base-content/70 font-bold uppercase tracking-widest text-xs` para todos los encabezados.
+6.  **Estado Vacío:** Usar `{% else %}` en el bucle `for`.
+7.  **Responsividad:** Envolver siempre en `<div class="overflow-x-auto">`.
 
 **Snippet de Tabla:**
 ```html
 <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
     <!-- Header Opcional -->
-    <div class="card-header bg-base-200/30 p-4 border-b border-base-content/10">
-        <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
-            <span class="icon-[tabler--list-details] size-5"></span> Título Tabla
-        </h3>
+    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+        <span class="icon-[tabler--list-details] size-5 text-primary"></span>
+        <span>Título Tabla</span>
     </div>
     
-    <div class="overflow-x-auto">
-        <table class="table table-lg">
-            <thead class="bg-base-200/30">
-                <tr>
-                    <th>Acciones</th> <!-- Siempre primero -->
-                    <th>Nombre Columna</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in items %}
-                <tr class="hover:bg-base-200/30">
-                    <td>
-                        <!-- Dropdown de Acciones (Ver tabla_catalogo.html para ejemplo completo) -->
-                    </td>
-                    <td>{{ item.valor }}</td>
-                </tr>
-                {% else %}
-                <!-- ESTADO VACÍO (Importante) -->
-                <tr>
-                    <td colspan="10" class="text-center py-20">
-                        <span class="icon-[tabler--package-off] size-16 text-base-content/20"></span>
-                        <p>No se encontraron registros.</p>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table table-lg">
+                <thead class="bg-base-200/50">
+                    <tr>
+                        <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Acciones</th>
+                        <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Nombre Columna</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-base-content/5">
+                    {% for item in items %}
+                    <tr class="hover:bg-base-200/30 transition-colors">
+                        <td>
+                            <!-- Dropdown de Acciones -->
+                        </td>
+                        <td>{{ item.valor }}</td>
+                    </tr>
+                    {% else %}
+                    <!-- ESTADO VACÍO -->
+                    <tr>
+                        <td colspan="10" class="text-center py-20">
+                            <div class="flex flex-col items-center gap-4">
+                                <span class="icon-[tabler--package-off] size-16 text-base-content/20"></span>
+                                <p class="text-base-content/40 font-medium">No se encontraron registros.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-    <!-- Aquí va la paginación si aplica -->
+    <!-- Footer con Paginación si aplica -->
 </div>
 ```
 

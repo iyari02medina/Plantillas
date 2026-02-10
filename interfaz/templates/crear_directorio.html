@@ -638,22 +638,23 @@ Cophi{% endblock %}
                     <table class="table table-lg">
                         <thead class="bg-base-200/30">
                             <tr>
-                                <th>Folio</th>
-                                <th>Fecha</th>
-                                <th>Total</th>
-                                <th class="text-right">Acciones</th>
+                                <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Acciones
+                                </th>
+                                <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Folio</th>
+                                <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Fecha</th>
+                                <th class="text-base-content/70 font-bold uppercase tracking-widest text-xs">Total</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-base-content/5">
                             {% for data in cotizaciones %}
                             <tr class="hover:bg-base-200/30">
-                                <td><span class="font-bold text-primary">{{ data.folio_cot }}</span></td>
-                                <td class="text-base-content/60">{{ data.fecha_cot }}</td>
-                                <td class="font-black text-base-content">${{ data.total }}</td>
-                                <td class="text-right">
+                                <td>
                                     <a href="{{ url_for('detalle_cotizacion', folio=data.folio_cot) }}"
                                         class="btn btn-soft btn-secondary btn-sm">Ver</a>
                                 </td>
+                                <td><span class="font-bold text-primary">{{ data.folio_cot }}</span></td>
+                                <td class="text-base-content/60">{{ data.fecha_cot }}</td>
+                                <td class="font-black text-base-content">${{ data.total }}</td>
                             </tr>
                             {% else %}
                             <tr>
@@ -681,12 +682,13 @@ Cophi{% endblock %}
                             {% for o in ordenes_des|reverse %}
                             <tr class="hover:bg-base-200/30">
                                 <td>
+                                    <a href="{{ url_for('detalle_orden', tipo='desazolve', folio=o.folio_des) }}"
+                                        class="btn btn-link btn-xs">Ver</a>
+                                </td>
+                                <td>
                                     <div class="font-bold text-primary">{{ o.folio_des }}</div>
                                     <div class="text-[10px] opacity-60">{{ o.fecha_des }}</div>
                                 </td>
-                                <td class="text-right"><a
-                                        href="{{ url_for('detalle_orden', tipo='desazolve', folio=o.folio_des) }}"
-                                        class="btn btn-link btn-xs">Ver</a></td>
                             </tr>
                             {% else %}
                             <tr>
@@ -709,12 +711,13 @@ Cophi{% endblock %}
                             {% for o in ordenes_trampa|reverse %}
                             <tr class="hover:bg-base-200/30">
                                 <td>
+                                    <a href="{{ url_for('detalle_orden', tipo='trampa', folio=o.folio_lt) }}"
+                                        class="btn btn-link btn-xs">Ver</a>
+                                </td>
+                                <td>
                                     <div class="font-bold text-primary">{{ o.folio_lt }}</div>
                                     <div class="text-[10px] opacity-60">{{ o.fecha_lt }}</div>
                                 </td>
-                                <td class="text-right"><a
-                                        href="{{ url_for('detalle_orden', tipo='trampa', folio=o.folio_lt) }}"
-                                        class="btn btn-link btn-xs">Ver</a></td>
                             </tr>
                             {% else %}
                             <tr>
@@ -737,12 +740,13 @@ Cophi{% endblock %}
                             {% for o in ordenes_visita|reverse %}
                             <tr class="hover:bg-base-200/30">
                                 <td>
+                                    <a href="{{ url_for('detalle_orden', tipo='visita', folio=o.folio_vt) }}"
+                                        class="btn btn-link btn-xs">Ver</a>
+                                </td>
+                                <td>
                                     <div class="font-bold text-primary">{{ o.folio_vt }}</div>
                                     <div class="text-[10px] opacity-60">{{ o.fecha_vt }}</div>
                                 </td>
-                                <td class="text-right"><a
-                                        href="{{ url_for('detalle_orden', tipo='visita', folio=o.folio_vt) }}"
-                                        class="btn btn-link btn-xs">Ver</a></td>
                             </tr>
                             {% else %}
                             <tr>
@@ -957,10 +961,14 @@ Cophi{% endblock %}
             <div class="overflow-x-auto">
                 <div class="inline-block min-w-full align-middle">
                     <div class="overflow-hidden">
-                        <table class="table min-w-full">
+                        <table class="table table-lg min-w-full">
                             <thead>
                                 <tr>
-                                    <th scope="col" class="group">
+                                    <th scope="col"
+                                        class="--exclude-from-ordering text-base-content/70 font-bold uppercase tracking-widest text-xs">
+                                        Acciones</th>
+                                    <th scope="col"
+                                        class="group text-base-content/70 font-bold uppercase tracking-widest text-xs">
                                         <div class="flex items-center justify-between">
                                             Nombre
                                             <span
@@ -969,7 +977,8 @@ Cophi{% endblock %}
                                                 class="icon-[tabler--chevron-down] hidden datatable-ordering-desc:block"></span>
                                         </div>
                                     </th>
-                                    <th scope="col" class="group">
+                                    <th scope="col"
+                                        class="group text-base-content/70 font-bold uppercase tracking-widest text-xs">
                                         <div class="flex items-center justify-between">
                                             Tipo
                                             <span
@@ -978,7 +987,8 @@ Cophi{% endblock %}
                                                 class="icon-[tabler--chevron-down] hidden datatable-ordering-desc:block"></span>
                                         </div>
                                     </th>
-                                    <th scope="col" class="group">
+                                    <th scope="col"
+                                        class="group text-base-content/70 font-bold uppercase tracking-widest text-xs">
                                         <div class="flex items-center justify-between">
                                             Fecha
                                             <span
@@ -987,26 +997,75 @@ Cophi{% endblock %}
                                                 class="icon-[tabler--chevron-down] hidden datatable-ordering-desc:block"></span>
                                         </div>
                                     </th>
-                                    <th scope="col" class="--exclude-from-ordering text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="divide-y divide-base-content/5">
                                 {% for doc in documentos %}
-                                <tr>
-                                    <td>{{ doc.nombre }}</td>
-                                    <td>{{ doc.tipo }}</td>
-                                    <td>{{ doc.fecha }}</td>
-                                    <td class="text-right">
-                                        <a href="{{ url_for('ver_documento', folio=doc.folio, filename=doc.filename) }}"
-                                            target="_blank" class="btn btn-circle btn-text btn-sm"
-                                            aria-label="Ver Documento" title="Ver Documento">
-                                            <span class="icon-[tabler--eye] size-5"></span>
-                                        </a>
+                                <tr class="hover:bg-base-200/30 transition-colors">
+                                    <td>
+                                        <div class="flex gap-2">
+                                            <div class="dropdown relative inline-flex rtl:[--placement:bottom-end]">
+                                                <button id="dropdown-actions-{{ loop.index }}" type="button"
+                                                    class="dropdown-toggle btn btn-soft btn-secondary btn-sm"
+                                                    aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+                                                    <span class="icon-[tabler--dots-vertical] size-4"></span>
+                                                    <span>Ver</span>
+                                                    <span
+                                                        class="icon-[tabler--chevron-down] dropdown-open:rotate-180 size-4"></span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40"
+                                                    role="menu" aria-orientation="vertical"
+                                                    aria-labelledby="dropdown-actions-{{ loop.index }}">
+                                                    <li>
+                                                        <a class="dropdown-item flex items-center gap-2"
+                                                            href="{{ url_for('ver_documento', folio=doc.folio, filename=doc.filename) }}"
+                                                            target="_blank">
+                                                            <span class="icon-[tabler--eye] size-4"></span>
+                                                            Ver Documento
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item flex items-center gap-2"
+                                                            href="{{ url_for('ver_documento', folio=doc.folio, filename=doc.filename) }}"
+                                                            target="_blank">
+                                                            <span class="icon-[tabler--file-info] size-4"></span>
+                                                            Detalles
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <hr class="dropdown-divider my-1 border-base-content/10">
+                                                    </li>
+                                                    <li>
+                                                        <form
+                                                            action="{{ url_for('eliminar_documento', folio=doc.folio, filename=doc.filename) }}"
+                                                            method="POST"
+                                                            onsubmit="return confirm('¿Seguro que desea borrar este documento? Esta acción no se puede deshacer.');"
+                                                            class="w-full">
+                                                            <button type="submit"
+                                                                class="dropdown-item text-error hover:bg-error/10 flex items-center gap-2 w-full text-left">
+                                                                <span class="icon-[tabler--trash] size-4"></span>
+                                                                Borrar
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </td>
+                                    <td class="font-medium text-base-content">{{ doc.nombre }}</td>
+                                    <td>
+                                        <span class="badge badge-soft badge-primary text-xs">{{ doc.tipo }}</span>
+                                    </td>
+                                    <td class="text-base-content/60">{{ doc.fecha }}</td>
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="4" class="text-center py-4 opacity-40">No hay documentos disponibles.
+                                    <td colspan="4" class="text-center py-20">
+                                        <div class="flex flex-col items-center gap-4">
+                                            <span class="icon-[tabler--file-off] size-16 text-base-content/20"></span>
+                                            <p class="text-base-content/40 font-medium">No hay documentos disponibles.
+                                            </p>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}

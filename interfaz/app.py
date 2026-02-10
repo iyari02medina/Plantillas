@@ -1554,6 +1554,33 @@ def ver_orden_pdf(tipo, folio):
     return f"Archivo no encontrado para el folio {folio} en {folder}. Asegúrese de haber generado el documento.", 404
 
 
+@app.route('/eliminar_documento/<folio>/<filename>', methods=['POST'])
+@login_required
+def eliminar_documento(folio, filename):
+    import os  # Ensure os is imported locally if needed, though likely global
+    from werkzeug.utils import secure_filename
+    
+    try:
+        # folio acts as the folder suffix (CLI-<folio>)
+        safe_filename = secure_filename(filename)
+        safe_folio = str(folio).strip()
+        
+        docs_base = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Documentos_Digitales'))
+        client_folder = os.path.join(docs_base, f"CLI-{safe_folio}")
+        file_path = os.path.join(client_folder, safe_filename)
+        
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            os.remove(file_path)
+            flash(f'Documento {safe_filename} eliminado correctamente.', 'success')
+        else:
+            flash(f'No se encontró el archivo {safe_filename}.', 'error')
+            
+    except Exception as e:
+        flash(f'Error al eliminar el documento: {e}', 'error')
+        
+    # Redirect back to the referrer (usually details page)
+    return redirect(request.referrer or url_for('index'))
+
 
 @app.route('/permiso_descarga/<nis>')
 @login_required
@@ -1760,18 +1787,82 @@ def nuevo_permiso_descarga():
             
         from werkzeug.utils import secure_filename
         import time
-        
+        from PIL import Image
+
+        # Lookup Client Folio using NIS
+        # The user requested to use the 'folio' from empresas.csv (Client Folio) for the filename
+        try:
+            clients_lookup = read_csv(CLIENTES_CSV)
+            # Find client where nis matches
+            client_obj = next((c for c in clients_lookup if str(c.get('nis', '')).strip() == str(nis).strip()), None)
+            # Use found folio, or fallback to nis if not found
+            id_for_filename = client_obj.get('folio', str(nis)).strip() if client_obj else str(nis).strip()
+        except Exception as lookup_e:
+            print(f"Error looking up client folio: {lookup_e}")
+            id_for_filename = str(nis).strip()
+
         for field in document_fields:
             file_obj = request.files.get(field)
             if file_obj and file_obj.filename:
                 try:
-                    filename = secure_filename(file_obj.filename)
-                    # Añadir timestamp para evitar colisiones
-                    timestamp = int(time.time())
-                    final_filename = f"{field}_{timestamp}_{filename}"
+                    original_filename = secure_filename(file_obj.filename)
+                    # Extract extension
+                    ext = os.path.splitext(original_filename)[1].lower()
+                    
+                    # New Filename Format: doc_acta_CLI-0123_0226.pdf
+                    # [Field Name]_[ClientFolio]_[MMYY].ext
+                    current_mmyy = datetime.date.today().strftime('%m%y')
+                    
+                    # Safe identifier (remove invalid chars for filename)
+                    safe_id = id_for_filename.replace('/', '').replace('\\', '').replace(' ', '')
+                    
+                    final_filename = f"{field}_{safe_id}_{current_mmyy}{ext}"
                     
                     save_path = os.path.join(client_folder, final_filename)
-                    file_obj.save(save_path)
+                    
+                    # Logic: Optimize Images (jpg, png, webp, jpeg)
+                    # Keep PDFs as is
+                    if ext in ['.jpg', '.jpeg', '.png', '.webp', '.bmp']:
+                        try:
+                            # 1. Open Image
+                            img = Image.open(file_obj)
+                            
+                            # 2. Convert to RGB (in case of PNG with transparency, safe for JPEG)
+                            if img.mode in ("RGBA", "P"):
+                                img = img.convert("RGB")
+                                
+                            # 3. Resize if too big (Max 1600px width/height) - ~2MP
+                            max_dimension = 1600
+                            if img.width > max_dimension or img.height > max_dimension:
+                                img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
+                                
+                            # 4. Save Loop: Targeted < 1MB (1024*1024 bytes)
+                            # We default to JPEG for compression efficiency
+                            # Update extension in filename to .jpg
+                            final_filename = f"{field}_{safe_id}_{current_mmyy}.jpg"
+                            save_path = os.path.join(client_folder, final_filename)
+                            
+                            target_size = 1024 * 1024 # 1 MB
+                            quality = 90
+                            step = 10
+                            min_quality = 30
+                            
+                            # First save (high quality, 150 DPI)
+                            img.save(save_path, "JPEG", quality=quality, optimize=True, dpi=(150, 150))
+                            
+                            # Compress loop
+                            while os.path.getsize(save_path) > target_size and quality > min_quality:
+                                quality -= step
+                                img.save(save_path, "JPEG", quality=quality, optimize=True, dpi=(150, 150))
+                                
+                        except Exception as img_err:
+                            print(f"Error optimizing image {field}: {img_err}. Saving original.")
+                            # Fallback: Save original if optimization fails
+                            file_obj.seek(0)
+                            file_obj.save(save_path)
+                    else:
+                        # Non-image files (PDF, etc.) -> Just Save
+                        file_obj.save(save_path)
                     
                     new_row[field] = final_filename
                     
