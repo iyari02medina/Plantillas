@@ -573,6 +573,15 @@ Cophi{% endblock %}
                                         %}disabled{% endif %}>
                                 </div>
                             </div>
+                            <div class="form-control space-y-2">
+                                <label
+                                    class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Lectura
+                                    Registro Medidor</label>
+                                <input type="text" name="lectura_registro_medidor"
+                                    value="{{ item.get('lectura_registro_medidor', '') }}"
+                                    class="input input-bordered w-full" placeholder="Última lectura" {% if not is_new
+                                    %}disabled{% endif %}>
+                            </div>
                         </div>
 
                         <!-- Descargas -->
