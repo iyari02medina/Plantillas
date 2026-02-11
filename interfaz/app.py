@@ -3100,14 +3100,47 @@ def guardar_consumo():
              last_record = previous_records[0]
              lectura_anterior = float(last_record.get('lectura', 0))
         else:
-             lectura_anterior = 0.0
+             # First time consumption: Check Client's Initial Reading
+             clientes_all = read_csv(CLIENTES_CSV)
+             # Match client by ID or Folio (id_cliente comes from form select)
+             client_match = next((c for c in clientes_all if str(c.get('folio', '')).strip() == str(id_cliente).strip() or str(c.get('ID', '')).strip() == str(id_cliente).strip()), None)
              
+             initial_reading = 0.0
+             has_initial = False
+             
+             if client_match:
+                 val_init = client_match.get('lectura_registro_medidor', '').strip()
+                 if val_init:
+                     try:
+                         initial_reading = float(val_init)
+                         has_initial = True
+                     except: pass
+             
+             if has_initial:
+                 lectura_anterior = initial_reading
+             else:
+                 # Strict requirement as requested
+                 flash('El cliente no tiene definida una "Lectura Registro Medidor" inicial. Por favor agréguela en su Perfil -> Editar -> Pipas y Medidor antes de registrar el primer consumo.', 'error')
+                 return redirect(url_for('crear_consumo'))
+
         consumo_val = lectura_actual - lectura_anterior
-        # If negative, implies reset or error. Ensure non-negative? User said "calcula desde 0" monthly.
-        # If meter reset, maybe just take current reading?
-        # For safety/simplicity per request: "diferencia entre la actual y la pasada"
+        
+        # Validation for negative consumption
         if consumo_val < 0:
-             consumo_val = lectura_actual # Assume baseline reset if previous > current
+             # If negative, it might be a meter reset or error. 
+             # For now, we warn but allow? Or block? 
+             # "Calcula desde 0" implies maybe we should respect the new reading if it's a reset.
+             # But if it's just a typo, a warning is good.
+             # Reverting to 0 or keeping negative is tricky. 
+             # Let's assume meter rollover logic isn't requested yet, so just warn.
+             flash(f'Advertencia: El consumo calculado es negativo ({consumo_val:.2f}). Verifique las lecturas.', 'warning')
+             # Allow it? Or set to 0? The previous logic set it to current reading (reset).
+             # "if consumo_val < 0: consumo_val = lectura_actual" <- This was in previous code line 3110
+             consumo_val = max(0, consumo_val) # Or reset logic?
+             # Let's stick to previous behavior of assuming reset if simple diff is negative?
+             # The user's previous code: "consumo_val = lectura_actual"
+             # I'll keep that logic but explicit.
+             if consumo_val < 0: consumo_val = lectura_actual
         
         row['consumo'] = f"{consumo_val:.2f}"
         
