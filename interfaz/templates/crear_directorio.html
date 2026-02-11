@@ -952,6 +952,155 @@ Cophi{% endblock %}
 
     <!-- PESTAÑA 7: DOCUMENTOS -->
     <div id="tab-documentos" class="tab-content hidden animate-in fade-in slide-in-from-bottom-5">
+        <!-- Card: Subir Documentos -->
+        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden mb-6">
+            <div
+                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                <span class="icon-[tabler--tag] size-5 text-primary"></span>
+                <span>Subir Documentos</span>
+            </div>
+            <div class="card-body p-6">
+                <!-- Dropzone Assets -->
+                {% include 'components/dropzone_assets.html' %}
+
+                <!-- Formulario de Carga -->
+                <div class="grid grid-cols-1 gap-6">
+
+                    <!-- Descriptor / Tipo de Archivo -->
+                    <div class="form-control">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Tipo de
+                            Documento</label>
+                        <select id="tipo_doc_bg" name="tipo_documento" class="select select-bordered w-full">
+                            <option value="doc_otros" selected>Otro Documento (Especifique)</option>
+                            <option value="doc_ine">INE / Identificación</option>
+                            <option value="doc_acta">Acta Constitutiva</option>
+                            <option value="doc_rfc">Constancia Fiscal (RFC)</option>
+                            <option value="doc_predial">Boleta Predial</option>
+                            <option value="doc_recibo_agua">Recibo de Agua</option>
+                            <option value="doc_drenaje">Permiso Drenaje</option>
+                            <option value="doc_uso_suelo">Uso de Suelo</option>
+                            <option value="doc_licencia">Licencia Funcionamiento</option>
+                            <option value="doc_poder">Carta Poder</option>
+                            <option value="doc_planos">Planos Arquitectónicos</option>
+                            <option value="croquis">Croquis de Ubicación</option>
+                        </select>
+                        <!-- Campo para "Otro" -->
+                        <input type="text" id="custom_doc_type" class="input input-bordered w-full mt-3"
+                            placeholder="Ej: Factura Febrero, Plano Hidráulico..." />
+                    </div>
+
+                    <!-- FlyonUI File Upload Component -->
+                    <div id="document-upload-zone"
+                        class="dropzone bg-base-200/60 rounded-box flex flex-col justify-center border-2 border-base-content/20 border-dashed min-h-[200px] cursor-pointer hover:border-primary/50 transition-colors">
+                        <div class="dz-message needsclick text-center p-10">
+                            <span class="icon-[tabler--cloud-upload] size-10 text-primary mb-4 mx-auto block"></span>
+                            <h4 class="text-lg font-semibold mb-2">Arrastra archivos aquí o haz clic</h4>
+                            <p class="text-sm text-base-content/60">Soporta imágenes (JPG, PNG) y documentos PDF. Máx
+                                5MB.</p>
+                            <span class="btn btn-sm btn-primary mt-4">Seleccionar Archivo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Upload Button -->
+                <div class="flex justify-end mt-4">
+                    <button id="btn-upload-files" type="button" class="btn btn-primary shadow-lg px-8">
+                        <span class="icon-[tabler--upload] size-5"></span>
+                        Subir Documentos
+                    </button>
+                </div>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        // Disable auto-discovery to manually init
+                        Dropzone.autoDiscover = false;
+
+                        // Logic for Custom Type Input
+                        const selectType = document.getElementById('tipo_doc_bg');
+                        const customInput = document.getElementById('custom_doc_type');
+
+                        function toggleCustomInput() {
+                            if (selectType.value === 'doc_otros') {
+                                customInput.style.display = 'block';
+                                customInput.focus();
+                            } else {
+                                customInput.style.display = 'none';
+                            }
+                        }
+
+                        // Init state
+                        toggleCustomInput();
+                        selectType.addEventListener('change', toggleCustomInput);
+
+                        let filesUploaded = false;
+
+                        const myDropzone = new Dropzone("#document-upload-zone", {
+                            url: "{{ url_for('subir_documento_extra', folio=item.get('folio') or item.get('id_cliente') or 'PENDIENTE') }}",
+                            paramName: "file",
+                            maxFilesize: 15, // MB (Aumentado para permitir compresión en servidor)
+                            acceptedFiles: ".jpeg,.jpg,.png,.webp,.pdf",
+                            maxFiles: 10,
+                            autoProcessQueue: false, // Wait for button click/manual process
+                            addRemoveLinks: true,
+                            dictDefaultMessage: "Arrastra archivos aquí",
+                            init: function () {
+                                var dz = this;
+
+                                this.on("sending", function (file, xhr, formData) {
+                                    // Append the selected document type
+                                    let tipo = selectType.value;
+                                    if (tipo === 'doc_otros') {
+                                        const rawVal = customInput.value.trim();
+                                        // Sanitize basics
+                                        if (rawVal) {
+                                            // Prefix 'doc_' if not present to keep consistency, remove special chars
+                                            const cleanVal = rawVal.replace(/[^a-zA-Z0-9\s-_]/g, '').replace(/\s+/g, '_');
+                                            tipo = cleanVal;
+                                        } else {
+                                            tipo = "otros_sin_nombre";
+                                        }
+                                    }
+                                    formData.append("tipo_documento", tipo);
+                                });
+
+                                this.on("success", function (file, response) {
+                                    filesUploaded = true;
+                                });
+
+                                this.on("queuecomplete", function () {
+                                    if (filesUploaded) {
+                                        setTimeout(() => {
+                                            window.location.reload();
+                                        }, 1000);
+                                    }
+                                });
+
+                                this.on("error", function (file, errorMessage) {
+                                    console.error("Error:", errorMessage);
+                                });
+
+                                // Manual Button Logic
+                                document.getElementById("btn-upload-files").addEventListener("click", function () {
+                                    // Validation
+                                    if (selectType.value === 'doc_otros' && !customInput.value.trim()) {
+                                        alert("Por favor especifique el tipo de documento.");
+                                        customInput.focus();
+                                        return;
+                                    }
+
+                                    if (dz.getQueuedFiles().length > 0) {
+                                        dz.processQueue();
+                                    } else {
+                                        alert("Por favor seleccione al menos un archivo.");
+                                    }
+                                });
+                            }
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+
         <div class="bg-base-100 flex flex-col rounded-md shadow-base-300/20 shadow-sm" data-datatable='{
         "pageLength": 10,
         "pagingOptions": {

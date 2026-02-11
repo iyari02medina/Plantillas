@@ -372,6 +372,11 @@ Para ahorrar espacio en pantallas pequeñas, oculta el texto de los botones secu
 </a>
 ```
 
+#### 4. Regla de Ancho de Botones
+**NUNCA** uses `w-full` en botones dentro de tarjetas o grillas, ya que distorsiona el diseño y "se ve feo".
+*   **Recomendación:** Deja que el botón tome su ancho natural por el texto/icono, o usa la clase `btn-wide` si necesitas que sea más imponente.
+*   **Excepción:** Solo se permite `w-full` en móviles (`max-sm:w-full`) si el diseño lo requiere estrictamente para facilitar el toque.
+
 #### 4. Encabezados de Página
 Usa Flexbox para apilar título y botones verticalmente en móvil, y alinearlos horizontalmente en escritorio.
 *   **Margen Crítico:** Todos los contenedores `div` que contengan un `h1` deben llevar obligatoriamente la clase `mb-6` para dar espacio al contenido inferior (referencia: `cotizaciones.html`).
@@ -415,6 +420,7 @@ Cuando generes nuevo código:
 2.  Usa **SIEMPRE** los componentes del diccionario (Sección E).
 3.  No inventes clases nuevas si ya existe un `card-body` o un `grid` estándar definido aquí.
 4.  Si usas un input compuesto, **copia y pega** el bloque `Split-Flex` explícitamente.
+5.  **Prohibición de `w-full` en botones:** No estires los botones al 100% del contenedor. Usa el ancho natural o `btn-wide`.
 
 #### E. Diccionario de Componentes (Div Dictionary)
 Catálogo oficial de las etiquetas `div` y sus clases estándar para reproducir la interfaz.
@@ -433,6 +439,7 @@ Catálogo oficial de las etiquetas `div` y sus clases estándar para reproducir 
 | **8. Estado Vacío (Tabla)** | `text-center py-20 opacity-40` | `td` único para mostrar mensajes cuando no hay datos en una tabla. |
 | **9. Folio de Consumo** | `CON-MMAA-###` | Formato estricto para registros de agua. El contador se reinicia mensualmente (ej: `CON-0226-001`). **Protegido:** Solo lectura para el usuario. |
 | **10. Div con H1 (Header)** | `div.mb-6` | Todo contenedor `div` que tenga un `h1` (título de página) tendrá un margen `mb-6` (como en `cotizaciones.html`). |
+| **11. File Upload (Dropzone)** | `div.dropzone bg-base-200/60...` + Botón Manual | **ESTRICTO:** Usar SIEMPRE con `autoProcessQueue: false`. El usuario debe confirmar la carga con un botón secundario. Incluir assets desde `components/dropzone_assets.html`. |
 
 #### Ejemplo de Estructura Completa (Skeleton)
 ```html

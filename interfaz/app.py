@@ -1554,6 +1554,52 @@ def ver_orden_pdf(tipo, folio):
     return f"Archivo no encontrado para el folio {folio} en {folder}. Asegúrese de haber generado el documento.", 404
 
 
+
+@app.route('/subir_documento_extra/<folio>', methods=['POST'])
+@login_required
+def subir_documento_extra(folio):
+    import os
+    from werkzeug.utils import secure_filename
+    from PIL import Image
+    import datetime
+
+    try:
+        file_obj = request.files.get('file')
+        tipo_doc = request.form.get('tipo_documento', 'doc_otros')
+        
+        if not file_obj or not file_obj.filename:
+            flash('No se seleccionó ningún archivo.', 'error')
+            return redirect(request.referrer)
+
+        # 1. Prepare Paths
+        safe_folio = str(folio).strip()
+        docs_base = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Documentos_Digitales'))
+        client_folder = os.path.join(docs_base, f"CLI-{safe_folio}")
+        
+        if not os.path.exists(client_folder):
+            os.makedirs(client_folder)
+
+        # 2. Construct Filename: [Type]_[Folio]_[MMYY].ext
+        original_filename = secure_filename(file_obj.filename)
+        current_mmyy = datetime.date.today().strftime('%m%y')
+        safe_id = safe_folio.replace('/', '').replace('\\', '').replace(' ', '')
+        
+        base_name = f"{tipo_doc}_{safe_id}_{current_mmyy}"
+        
+        try:
+            from utils_file import optimize_and_save_file
+            final_filename, status_msg = optimize_and_save_file(file_obj, client_folder, base_name)
+            flash(f'Archivo subido: {final_filename}. {status_msg}', 'success')
+        except ImportError:
+            # Fallback if utils_file not found (should not happen if saved)
+            file_obj.save(os.path.join(client_folder, original_filename))
+            flash(f'Archivo guardado (sin optimizar): {original_filename}', 'warning')
+
+    except Exception as e:
+        flash(f'Error al subir documento: {e}', 'error')
+
+    return redirect(request.referrer)
+
 @app.route('/eliminar_documento/<folio>/<filename>', methods=['POST'])
 @login_required
 def eliminar_documento(folio, filename):
@@ -1863,55 +1909,21 @@ def nuevo_permiso_descarga():
                     # Safe identifier (remove invalid chars for filename)
                     safe_id = id_for_filename.replace('/', '').replace('\\', '').replace(' ', '')
                     
-                    final_filename = f"{field}_{safe_id}_{current_mmyy}{ext}"
+                    # Prepare base name
+                    base_name = f"{field}_{safe_id}_{current_mmyy}"
                     
-                    save_path = os.path.join(client_folder, final_filename)
-                    
-                    # Logic: Optimize Images (jpg, png, webp, jpeg)
-                    # Keep PDFs as is
-                    if ext in ['.jpg', '.jpeg', '.png', '.webp', '.bmp']:
-                        try:
-                            # 1. Open Image
-                            img = Image.open(file_obj)
-                            
-                            # 2. Convert to RGB (in case of PNG with transparency, safe for JPEG)
-                            if img.mode in ("RGBA", "P"):
-                                img = img.convert("RGB")
-                                
-                            # 3. Resize if too big (Max 1600px width/height) - ~2MP
-                            max_dimension = 1600
-                            if img.width > max_dimension or img.height > max_dimension:
-                                img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
-                                
-                            # 4. Save Loop: Targeted < 1MB (1024*1024 bytes)
-                            # We default to JPEG for compression efficiency
-                            # Update extension in filename to .jpg
-                            final_filename = f"{field}_{safe_id}_{current_mmyy}.jpg"
-                            save_path = os.path.join(client_folder, final_filename)
-                            
-                            target_size = 1024 * 1024 # 1 MB
-                            quality = 90
-                            step = 10
-                            min_quality = 30
-                            
-                            # First save (high quality, 150 DPI)
-                            img.save(save_path, "JPEG", quality=quality, optimize=True, dpi=(150, 150))
-                            
-                            # Compress loop
-                            while os.path.getsize(save_path) > target_size and quality > min_quality:
-                                quality -= step
-                                img.save(save_path, "JPEG", quality=quality, optimize=True, dpi=(150, 150))
-                                
-                        except Exception as img_err:
-                            print(f"Error optimizing image {field}: {img_err}. Saving original.")
-                            # Fallback: Save original if optimization fails
-                            file_obj.seek(0)
-                            file_obj.save(save_path)
-                    else:
-                        # Non-image files (PDF, etc.) -> Just Save
-                        file_obj.save(save_path)
-                    
-                    new_row[field] = final_filename
+                    try:
+                        from utils_file import optimize_and_save_file
+                        final_filename, status_msg = optimize_and_save_file(file_obj, client_folder, base_name)
+                        # Optional: Print status (flash happens at end)
+                        # print(f"{field}: {status_msg}")
+                        new_row[field] = final_filename
+                    except Exception as e:
+                        print(f"Error optimizing {field}: {e}")
+                        # Fallback
+                        filename = secure_filename(file_obj.filename)
+                        file_obj.save(os.path.join(client_folder, filename))
+                        new_row[field] = filename
                     
                 except Exception as e:
                     print(f"Error saving document {field}: {e}")
@@ -2516,6 +2528,10 @@ def detalle_directorio(tipo, id_val):
         try:
             # Collect all possible NIS sources
             nis_candidates = set()
+            # Add main client ID/Folio as a candidate
+            if client_id:
+                nis_candidates.add(str(client_id).strip())
+
             if item.get('nis'):
                 nis_candidates.add(str(item.get('nis')).strip())
             
@@ -2560,7 +2576,21 @@ def detalle_directorio(tipo, id_val):
                                 elif filename.startswith('doc_materias'): tipo_doc = "Materias Primas"
                                 elif filename.startswith('doc_diagrama'): tipo_doc = "Diagrama Flujo"
                                 elif filename.startswith('doc_balance'): tipo_doc = "Balance Hídrico"
+                                elif filename.startswith('doc_poder'): tipo_doc = "Carta Poder"
+                                elif filename.startswith('doc_uso_suelo'): tipo_doc = "Uso de Suelo"
+                                elif filename.startswith('doc_drenaje'): tipo_doc = "Permiso Drenaje"
+                                elif filename.startswith('doc_recibo_agua'): tipo_doc = "Recibo de Agua"
+                                elif filename.startswith('doc_otros'): tipo_doc = "Otro Documento"
                                 elif filename.startswith('croquis'): tipo_doc = "Croquis"
+                                else:
+                                    # Fallback para tipos personalizados
+                                    parts = filename.split('_')
+                                    # Caso: doc_Factura_CLI...
+                                    if len(parts) > 1 and parts[0].lower() == 'doc':
+                                        tipo_doc = parts[1].replace('-', ' ').title()
+                                    # Caso: Factura_CLI...
+                                    elif parts and parts[0].lower() not in ['doc', 'archivo']:
+                                        tipo_doc = parts[0].replace('-', ' ').title()
                                 
                                 documentos.append({
                                     'nombre': filename,
@@ -3139,6 +3169,7 @@ def detalle_consumo(folio):
     clientes = read_csv(CLIENTES_CSV)
     return render_template('crea_consumo.html', consumo=target, clientes=clientes)
 
+from utils_file import optimize_and_save_file # Import helper
 @app.route('/calendario')
 @login_required
 def calendario():
