@@ -19,9 +19,6 @@ endblock %}
             <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle' if cotizacion and not is_new else 'Nueva' }}
                 Cotización</h1>
         </div>
-        <p class="text-base-content/60 font-medium ml-10 uppercase tracking-widest text-xs font-black">
-            Módulo de Cotizaciones
-        </p>
     </div>
     {% if cotizacion and not is_new %}
     <div class="flex gap-2">
@@ -217,25 +214,28 @@ endblock %}
             <!-- Totales -->
             <div class="card bg-base-100 border border-base-content/10 shadow-lg overflow-hidden">
                 <div class="card-body p-0">
-                    <div
-                        class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-base-content/10">
-                        <div class="p-6 flex flex-col items-center justify-center gap-1">
-                            <span
-                                class="text-[10px] font-black uppercase tracking-widest text-base-content/60">Subtotal</span>
-                            <div class="text-2xl font-bold" id="subtotal-display">$0.00</div>
-                        </div>
-                        <div class="p-6 flex flex-col items-center justify-center gap-1">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-base-content/60">IVA
-                                (16%)</span>
-                            <div class="text-2xl font-bold" id="iva-display">$0.00</div>
-                        </div>
-                        <div
-                            class="p-6 bg-primary text-primary-content flex flex-col items-center justify-center gap-1">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-primary-content/70">Total
-                                Final</span>
-                            <div class="text-4xl font-black" id="total-display">$0.00</div>
-                        </div>
-                    </div>
+                    <table class="table">
+                        <thead class="bg-base-200/30">
+                            <tr>
+                                <th
+                                    class="text-xs text-center uppercase tracking-widest text-base-content/70 font-bold">
+                                    SUBTOTAL
+                                </th>
+                                <th
+                                    class="text-xs text-center uppercase tracking-widest text-base-content/70 font-bold">
+                                    IVA</th>
+                                <th
+                                    class="text-xs text-center uppercase tracking-widest text-base-content/70 font-bold">
+                                    TOTAL</th>
+                            </tr>
+                        <tbody>
+                            <tr class="text-center font-bold">
+                                <td id="subtotal-display" class="py-4">$0.00</td>
+                                <td id="iva-display" class="py-4">$0.00</td>
+                                <td id="total-display" class="py-4 text-primary font-black">$0.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
