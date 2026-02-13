@@ -38,9 +38,10 @@ function fillClient(input) {
 
 function selectClient(client) {
     document.getElementById('nombre_cliente').value = client.nombre_empresa;
-    document.getElementById('razon_social_cliente').value = client.nombre_empresa;
+    if (document.getElementById('id_cliente')) document.getElementById('id_cliente').value = client.folio || client.id_cliente || '';
     if (document.getElementById('direccion_cliente')) document.getElementById('direccion_cliente').value = client.direccion_empresa || '';
     if (document.getElementById('telefono_contacto')) document.getElementById('telefono_contacto').value = client.telefono_empresa || '';
+    if (document.getElementById('nombre_contacto')) document.getElementById('nombre_contacto').value = client.propietario_empresa || '';
 
     const box = document.getElementById('suggestions-box');
     if (box) box.classList.add('hidden');

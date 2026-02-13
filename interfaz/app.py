@@ -231,6 +231,7 @@ def get_cotizacion_data(folio):
         'nombre_cot': first.get('nombre_cot', ''),
         'fecha_cot': to_iso(first.get('fecha_cot', '')),
         'fecha_registro_cot': to_iso(first.get('fecha_registro_cot', '')),
+        'id_cliente': first.get('id_cliente', ''),
         'nombre_cliente': first.get('nombre_cliente', ''),
         'razon_social_cliente': first.get('razon_social_cliente', ''),
         'direccion_cliente': first.get('direccion_cliente', ''),

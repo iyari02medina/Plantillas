@@ -7,6 +7,15 @@ endblock %}
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
         <div class="flex items-center gap-2 mb-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-pencil-dollar size-10 text-primary">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+                <path d="M13.5 6.5l4 4" />
+                <path d="M21 15h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5" />
+                <path d="M19 21v1m0 -8v1" />
+            </svg>
             <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle' if cotizacion and not is_new else 'Nueva' }}
                 Cotización</h1>
         </div>
@@ -38,11 +47,6 @@ endblock %}
         <!-- Columna Izquierda: Datos Cliente -->
         <div class="lg:col-span-1 space-y-6">
             <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-                <div
-                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
-                    <span class="icon-[tabler--file-info] size-5 text-primary"></span>
-                    <span>Información General</span>
-                </div>
                 <div class="card-body p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="form-control space-y-2">
@@ -63,6 +67,16 @@ endblock %}
                                 }} required>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+                <div
+                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                    <span class="icon-[tabler--user] size-5 text-secondary"></span>
+                    <span>Datos Generales</span>
+                </div>
+                <div class="card-body p-6">
                     <div class="form-control space-y-2 mt-4">
                         <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre
                             de
@@ -71,36 +85,43 @@ endblock %}
                             class="input input-bordered w-full font-bold" placeholder="Ej. Servicio de Mantenimiento..."
                             {{ 'disabled' if cotizacion and not is_new else '' }} required>
                     </div>
-                </div>
-            </div>
-
-            <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
-                <div
-                    class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
-                    <span class="icon-[tabler--user] size-5 text-secondary"></span>
-                    <span>Datos del Cliente</span>
-                </div>
-                <div class="card-body p-6 space-y-4">
-                    <div class="form-control relative space-y-2">
-                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre /
-                            Empresa</label>
-                        <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar..."
-                            autocomplete="off" class="input input-bordered w-full font-bold" oninput="fillClient(this)"
-                            required value="{{ cotizacion.nombre_cliente if cotizacion else '' }}" {{ 'disabled' if
-                            cotizacion and not is_new else '' }}>
-                        <input type="hidden" id="id_cliente" name="id_cliente"
-                            value="{{ cotizacion.id_cliente if cotizacion else '' }}">
-                        <div id="suggestions-box"
-                            class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control relative space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre
+                                / Empresa</label>
+                            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar..."
+                                autocomplete="off" class="input input-bordered w-full font-bold"
+                                oninput="fillClient(this)" required
+                                value="{{ cotizacion.nombre_cliente if cotizacion else '' }}" {{ 'disabled' if
+                                cotizacion and not is_new else '' }}>
+                            <div id="suggestions-box"
+                                class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-control space-y-2">
-                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Razón
-                            Social</label>
-                        <input type="text" id="razon_social_cliente" name="razon_social_cliente"
-                            class="input input-bordered w-full"
-                            value="{{ cotizacion.razon_social_cliente if cotizacion else '' }}" {{ 'disabled' if
-                            cotizacion and not is_new else '' }}>
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">NO.
+                                CLIENTE</label>
+                            <input type="text" id="id_cliente" name="id_cliente"
+                                class="input input-bordered w-full font-black text-secondary always-locked"
+                                value="{{ cotizacion.id_cliente if cotizacion else '' }}" readonly required>
+                        </div>
+
+                        <div class="form-control space-y-2">
+                            <label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Teléfono</label>
+                            <input type="text" id="telefono_contacto" name="telefono_contacto"
+                                class="input input-bordered w-full"
+                                value="{{ cotizacion.telefono_contacto if cotizacion else '' }}" {{ 'disabled' if
+                                cotizacion and not is_new else '' }}>
+                        </div>
+                        <div class="form-control space-y-2">
+                            <label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Atención</label>
+                            <input type="text" id="nombre_contacto" name="nombre_contacto"
+                                class="input input-bordered w-full"
+                                value="{{ cotizacion.nombre_contacto if cotizacion else '' }}" {{ 'disabled' if
+                                cotizacion and not is_new else '' }}>
+                        </div>
                     </div>
                     <div class="form-control space-y-2">
                         <label
@@ -108,14 +129,6 @@ endblock %}
                         <textarea id="direccion_cliente" name="direccion_cliente"
                             class="textarea textarea-bordered w-full" rows="2" {{ 'disabled' if cotizacion and not
                             is_new else '' }}>{{ cotizacion.direccion_cliente if cotizacion else '' }}</textarea>
-                    </div>
-                    <div class="form-control space-y-2">
-                        <label
-                            class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Teléfono</label>
-                        <input type="text" id="telefono_contacto" name="telefono_contacto"
-                            class="input input-bordered w-full"
-                            value="{{ cotizacion.telefono_contacto if cotizacion else '' }}" {{ 'disabled' if cotizacion
-                            and not is_new else '' }}>
                     </div>
                 </div>
             </div>
@@ -131,7 +144,7 @@ endblock %}
                     <span>Conceptos de la Cotización</span>
                 </div>
                 <div class="card-body p-0">
-                    <div class="">
+                    <div class="overflow-x-auto">
                         <table class="table table-lg">
                             <thead class="bg-base-200/30">
                                 <tr>
@@ -263,15 +276,5 @@ endblock %}
         if (btnEdit) btnEdit.classList.add('hidden');
     }
 
-    // Overwrite the selectClient from external JS to fill id_cliente
-    const originalSelectClient = window.selectClient;
-    window.selectClient = function (client) {
-        if (typeof originalSelectClient === 'function') {
-            originalSelectClient(client);
-        }
-        if (document.getElementById('id_cliente')) {
-            document.getElementById('id_cliente').value = client.folio || client.id_cliente || '';
-        }
-    }
 </script>
 {% endblock %}
