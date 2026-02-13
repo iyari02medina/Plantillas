@@ -1,6 +1,7 @@
 {% extends 'base_flyonui.html' %}
 
-{% block title %}{{ 'Detalle' if permiso else 'Nuevo' }} Permiso de Descarga - Sistema Cophi{% endblock %}
+{% block title %}{{ 'Detalle' if permiso and not is_new else 'Nuevo' }} Permiso de Descarga - Sistema Cophi{% endblock
+%}
 
 {% block content %}
 <div class="w-full p-0 space-y-8">
@@ -12,15 +13,16 @@
                 </a>
                 <h1 class="text-3xl font-bold text-base-content flex items-center gap-3">
                     <span class="icon-[tabler--id] size-10" style="color: #0099cf !important;"></span>
-                    <span>{{ 'Detalle' if permiso else 'Nuevo' }} Permiso de Descarga</span>
+                    <span>{{ 'Detalle' if permiso and not is_new else 'Nuevo' }} Permiso de Descarga</span>
                 </h1>
             </div>
             <p class="text-base-content/60 font-medium ml-10">
-                {{ 'Consulta y edita los datos del cuestionario para trámites municipales.' if permiso else 'Complete el
+                {{ 'Consulta y edita los datos del cuestionario para trámites municipales.' if permiso and not is_new
+                else 'Complete el
                 formulario para generar el trámite de descarga municipal.' }}
             </p>
         </div>
-        {% if permiso %}
+        {% if permiso and not is_new %}
         <div class="flex gap-2">
             <div class="dropdown">
                 <button class="btn btn-soft btn-secondary shadow-sm" type="button" id="btn-ver-docs"
@@ -64,14 +66,16 @@
                     <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Folio</label>
                     <input type="text" id="folio" name="folio" placeholder="PER-MMYY-###"
                         class="input input-bordered w-full font-bold text-primary always-locked"
-                        value="{{ (permiso.folio if permiso else suggested_folio) or '' }}" required readonly>
+                        value="{{ (permiso.folio if permiso and not is_new else suggested_folio) or '' }}" required
+                        readonly>
                 </div>
                 <div class="form-control flex-1">
                     <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Fecha de
                         Creación</label>
                     <input type="text" id="fecha_creacion" name="fecha_creacion"
                         class="input input-bordered w-full always-locked"
-                        value="{{ (permiso.fecha_creacion if permiso else todays_date) or '' }}" readonly>
+                        value="{{ (permiso.fecha_creacion if permiso and not is_new else todays_date) or '' }}"
+                        readonly>
                 </div>
             </div>
         </div>
@@ -91,9 +95,10 @@
                     <div class="form-control">
                         <label
                             class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">NIS</label>
-                        <input type="text" name="nis" value="{{ permiso.nis if permiso else suggested_nis }}" required
+                        <input type="text" name="nis"
+                            value="{{ permiso.nis if permiso and not is_new else suggested_nis }}" required
                             class="input input-bordered w-full font-mono font-black text-primary font-bold"
-                            {{ 'readonly' if permiso else '' }}>
+                            {{ 'readonly' if permiso and not is_new else '' }}>
                     </div>
                     <div class="form-control md:col-span-3 relative">
                         <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Nombre de
@@ -102,7 +107,7 @@
                         <input type="text" id="nombre_empresa" name="nombre_empresa"
                             class="input input-bordered w-full font-bold"
                             value="{{ permiso.nombre_empresa if permiso else '' }}" placeholder="Buscar cliente..."
-                            oninput="fillClient(this)" {{ 'disabled' if permiso else '' }}>
+                            oninput="fillClient(this)" {{ 'disabled' if permiso and not is_new else '' }}>
                         <div id="suggestions-box"
                             class="absolute z-50 w-full mt-1 bg-base-100 border border-base-content/10 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden">
                         </div>
@@ -111,7 +116,8 @@
                         <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Giro según
                             Licencia</label>
                         <input type="text" name="giro_licencia" class="input input-bordered w-full"
-                            value="{{ permiso.giro_licencia if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                            value="{{ permiso.giro_licencia if permiso else '' }}" {{ 'disabled' if permiso and not
+                            is_new else '' }}>
                     </div>
                     <div class="form-control md:col-span-2">
                         <label
@@ -140,19 +146,22 @@
                         <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Nombre
                             Completo</label>
                         <input type="text" id="prop_nombre" name="prop_nombre" class="input input-bordered w-full"
-                            value="{{ permiso.prop_nombre if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                            value="{{ permiso.prop_nombre if permiso else '' }}" {{ 'disabled' if permiso and not is_new
+                            else '' }}>
                     </div>
                     <div class="form-control">
                         <label
                             class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">RFC</label>
                         <input type="text" name="prop_rfc" class="input input-bordered w-full"
-                            value="{{ permiso.prop_rfc if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                            value="{{ permiso.prop_rfc if permiso else '' }}" {{ 'disabled' if permiso and not is_new
+                            else '' }}>
                     </div>
                     <div class="form-control">
                         <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Calle y
                             Número</label>
                         <input type="text" id="prop_direccion" name="prop_direccion" class="input input-bordered w-full"
-                            value="{{ permiso.prop_direccion if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                            value="{{ permiso.prop_direccion if permiso else '' }}" {{ 'disabled' if permiso and not
+                            is_new else '' }}>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="form-control">
@@ -181,7 +190,8 @@
                             <label
                                 class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">C.P.</label>
                             <input type="text" name="prop_cp" class="input input-bordered w-full"
-                                value="{{ permiso.prop_cp if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                                value="{{ permiso.prop_cp if permiso else '' }}" {{ 'disabled' if permiso and not is_new
+                                else '' }}>
                         </div>
                     </div>
                 </div>
@@ -201,51 +211,59 @@
                             class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs text-base-content/60">Razón
                             Social</label>
                         <input type="text" id="arr_nombre" name="arr_nombre" class="input input-bordered w-full"
-                            value="{{ permiso.arr_nombre if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                            value="{{ permiso.arr_nombre if permiso else '' }}" {{ 'disabled' if permiso and not is_new
+                            else '' }}>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="form-control">
                             <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">RFC
                                 Moral</label>
                             <input type="text" name="arr_rfc" class="input input-bordered w-full"
-                                value="{{ permiso.arr_rfc if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                                value="{{ permiso.arr_rfc if permiso else '' }}" {{ 'disabled' if permiso and not is_new
+                                else '' }}>
                         </div>
                         <div class="form-control">
                             <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">INE
                                 Rep.</label>
                             <input type="text" name="arr_ine" class="input input-bordered w-full"
-                                value="{{ permiso.arr_ine if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                                value="{{ permiso.arr_ine if permiso else '' }}" {{ 'disabled' if permiso and not is_new
+                                else '' }}>
                         </div>
                     </div>
                     <div class="form-control">
                         <label class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Calle y
                             Número</label>
                         <input type="text" id="arr_direccion" name="arr_direccion" class="input input-bordered w-full"
-                            value="{{ permiso.arr_direccion if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                            value="{{ permiso.arr_direccion if permiso else '' }}" {{ 'disabled' if permiso and not
+                            is_new else '' }}>
                     </div>
                     <div class="form-control">
                         <label
                             class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Colonia</label>
                         <input type="text" name="arr_colonia" class="input input-bordered w-full"
-                            value="{{ permiso.arr_colonia if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                            value="{{ permiso.arr_colonia if permiso else '' }}" {{ 'disabled' if permiso and not is_new
+                            else '' }}>
                     </div>
                     <div class="form-control">
                         <label
                             class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Municipio</label>
                         <input type="text" name="arr_municipio" class="input input-bordered w-full"
-                            value="{{ permiso.arr_municipio if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                            value="{{ permiso.arr_municipio if permiso else '' }}" {{ 'disabled' if permiso and not
+                            is_new else '' }}>
                     </div>
                     <div class="form-control">
                         <label
                             class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">Teléfono</label>
                         <input type="text" id="arr_telefono" name="arr_telefono" class="input input-bordered w-full"
-                            value="{{ permiso.arr_telefono if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                            value="{{ permiso.arr_telefono if permiso else '' }}" {{ 'disabled' if permiso and not
+                            is_new else '' }}>
                     </div>
                     <div class="form-control">
                         <label
                             class="label-text mb-2 block uppercase font-bold text-base-content/50 text-xs">C.P.</label>
                         <input type="text" name="arr_cp" class="input input-bordered w-full"
-                            value="{{ permiso.arr_cp if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                            value="{{ permiso.arr_cp if permiso else '' }}" {{ 'disabled' if permiso and not is_new
+                            else '' }}>
                     </div>
                 </div>
             </div>
@@ -272,7 +290,8 @@
                         <div class="form-control space-y-2"><label
                                 class="label text-xs uppercase font-bold opacity-60">No.
                                 Turnos</label><input type="text" name="turnos" class="input input-bordered w-full"
-                                value="{{ permiso.turnos if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                                value="{{ permiso.turnos if permiso else '' }}" {{ 'disabled' if permiso and not is_new
+                                else '' }}>
                         </div>
                         <div class="form-control col-span-2 space-y-2"><label
                                 class="label text-xs uppercase font-bold opacity-60">Horario</label><input type="text"
@@ -301,7 +320,7 @@
                                 <label class="flex items-center gap-3 cursor-pointer">
                                     <input type="checkbox" name="pipas" value="Si" class="checkbox checkbox-primary"
                                         {{ 'checked' if (permiso and permiso.pipas|lower=='si' ) else '' }}
-                                        {{ 'disabled' if permiso else '' }}>
+                                        {{ 'disabled' if permiso and not is_new else '' }}>
                                     <span class="text-sm font-bold">Pipas de Agua</span>
                                 </label>
                                 <div class="grid grid-cols-2 gap-2">
@@ -345,7 +364,8 @@
                         <div class="form-control space-y-2"><label
                                 class="label text-[10px] uppercase font-bold opacity-60">WC</label><input type="number"
                                 name="total_wc" class="input input-bordered w-full"
-                                value="{{ permiso.total_wc if permiso else '' }}" {{ 'disabled' if permiso else '' }}>
+                                value="{{ permiso.total_wc if permiso else '' }}" {{ 'disabled' if permiso and not
+                                is_new else '' }}>
                         </div>
                         <div class="form-control space-y-2"><label
                                 class="label text-[10px] uppercase font-bold opacity-60">Mingitorios</label><input
@@ -395,7 +415,7 @@
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="checkbox" name="tiene_comedor" value="Si" class="checkbox checkbox-primary"
                                 {{ 'checked' if (permiso and permiso.tiene_comedor|lower=='si' ) else '' }}
-                                {{ 'disabled' if permiso else '' }}>
+                                {{ 'disabled' if permiso and not is_new else '' }}>
                             <span class="text-sm font-black uppercase text-primary">¿Cuenta con servicio de
                                 Comedor?</span>
                         </label>
@@ -429,7 +449,7 @@
                             <label class="flex items-center gap-3 cursor-pointer mb-2">
                                 <input type="checkbox" name="descarga_muni" value="Si" class="checkbox checkbox-success"
                                     {{ 'checked' if (permiso and permiso.descarga_muni|lower=='si' ) else '' }}
-                                    {{ 'disabled' if permiso else '' }}>
+                                    {{ 'disabled' if permiso and not is_new else '' }}>
                                 <span class="text-sm font-bold">Descarga al Municipio</span>
                             </label>
                             <input type="text" name="prom_descarga_muni" placeholder="m3/mes"
@@ -454,7 +474,7 @@
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="checkbox" name="tiene_registro" value="Si" class="checkbox checkbox-success"
                                 {{ 'checked' if (permiso and permiso.tiene_registro|lower=='si' ) else '' }}
-                                {{ 'disabled' if permiso else '' }}>
+                                {{ 'disabled' if permiso and not is_new else '' }}>
                             <span class="text-sm font-bold">¿Cuenta con Registro?</span>
                         </label>
                         <div class="form-control space-y-2"><label
@@ -486,7 +506,7 @@
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="checkbox" name="tiene_pretrat" value="Si" class="checkbox checkbox-success"
                                 {{ 'checked' if (permiso and permiso.tiene_pretrat|lower=='si' ) else '' }}
-                                {{ 'disabled' if permiso else '' }}>
+                                {{ 'disabled' if permiso and not is_new else '' }}>
                             <span class="text-sm font-bold">¿Tiene Pretratamiento?</span>
                         </label>
                         <div class="form-control space-y-2"><label
@@ -498,7 +518,7 @@
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="checkbox" name="tiene_analisis" value="Si" class="checkbox checkbox-success"
                                 {{ 'checked' if (permiso and permiso.tiene_analisis|lower=='si' ) else '' }}
-                                {{ 'disabled' if permiso else '' }}>
+                                {{ 'disabled' if permiso and not is_new else '' }}>
                             <span class="text-sm font-bold">¿Tiene Análisis Recientes?</span>
                         </label>
                     </div>
@@ -603,7 +623,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_acta_input" name="doc_acta" class="hidden"
                                 onchange="document.getElementById('file-name-acta').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_acta if permiso and permiso.doc_acta else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-acta" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_acta %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -627,7 +647,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_ine_input" name="doc_ine" class="hidden"
                                 onchange="document.getElementById('file-name-ine').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_ine if permiso and permiso.doc_ine else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-ine" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_ine %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -651,7 +671,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_rfc_input" name="doc_rfc" class="hidden"
                                 onchange="document.getElementById('file-name-rfc').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_rfc if permiso and permiso.doc_rfc else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-rfc" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_rfc %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -675,7 +695,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_factibilidad_input" name="doc_factibilidad" class="hidden"
                                 onchange="document.getElementById('file-name-factibilidad').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_factibilidad if permiso and permiso.doc_factibilidad else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-factibilidad" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_factibilidad %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -700,7 +720,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_licencia_input" name="doc_licencia" class="hidden"
                                 onchange="document.getElementById('file-name-licencia').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_licencia if permiso and permiso.doc_licencia else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-licencia" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_licencia %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -725,7 +745,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_alineamiento_input" name="doc_alineamiento" class="hidden"
                                 onchange="document.getElementById('file-name-alineamiento').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_alineamiento if permiso and permiso.doc_alineamiento else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-alineamiento" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_alineamiento %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -749,7 +769,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_sanitaria_input" name="doc_sanitaria" class="hidden"
                                 onchange="document.getElementById('file-name-sanitaria').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_sanitaria if permiso and permiso.doc_sanitaria else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-sanitaria" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_sanitaria %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -773,7 +793,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_bomberos_input" name="doc_bomberos" class="hidden"
                                 onchange="document.getElementById('file-name-bomberos').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_bomberos if permiso and permiso.doc_bomberos else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-bomberos" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_bomberos %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -798,7 +818,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_civil_input" name="doc_civil" class="hidden"
                                 onchange="document.getElementById('file-name-civil').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_civil if permiso and permiso.doc_civil else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-civil" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_civil %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -822,7 +842,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_predial_input" name="doc_predial" class="hidden"
                                 onchange="document.getElementById('file-name-predial').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_predial if permiso and permiso.doc_predial else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-predial" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_predial %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -847,7 +867,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_planos_input" name="doc_planos" class="hidden"
                                 onchange="document.getElementById('file-name-planos').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_planos if permiso and permiso.doc_planos else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-planos" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_planos %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -872,7 +892,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_materias_input" name="doc_materias" class="hidden"
                                 onchange="document.getElementById('file-name-materias').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_materias if permiso and permiso.doc_materias else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-materias" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_materias %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -897,7 +917,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_diagrama_input" name="doc_diagrama" class="hidden"
                                 onchange="document.getElementById('file-name-diagrama').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_diagrama if permiso and permiso.doc_diagrama else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-diagrama" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_diagrama %}
                                 <span class="text-success font-bold flex items-center gap-1"><span
@@ -921,7 +941,7 @@
                                     class="icon-[tabler--upload] size-4"></span>Seleccionar Archivo</label>
                             <input type="file" id="doc_balance_input" name="doc_balance" class="hidden"
                                 onchange="document.getElementById('file-name-balance').textContent = this.files[0] ? this.files[0].name : '{{ permiso.doc_balance if permiso and permiso.doc_balance else 'Ningún archivo seleccionado' }}'"
-                                {{ 'disabled' if permiso else '' }} />
+                                {{ 'disabled' if permiso and not is_new else '' }} />
                             <span id="file-name-balance" class="text-xs text-base-content/50 italic truncate">
                                 {% if permiso and permiso.doc_balance %}
                                 <span class="text-success font-bold flex items-center gap-1"><span

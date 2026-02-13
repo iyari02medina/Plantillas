@@ -159,47 +159,74 @@ El buscador que aparece con `Ctrl+K` o en el header es **estático** en JavaScri
 }
 ```
 
-#### D. Estándares de Grillas y Formularios (Responsive)
-El layout de todos los formularios debe seguir estas reglas de grilla estrictas para asegurar que se vean bien en móvil y escritorio.
+#### D. Estándares de Layout (GRID OBLIGATORIO)
+**Regla Absoluta:** No se permite el uso de `flex` ni anchos fijos (`w-1/2`) para estructurar filas de formularios. Toda tarjeta debe usar **estrictamente** el sistema de Grid CSS responsivo.
 
-##### 1. Grilla Maestra
-El contenedor principal de cualquier grupo de inputs debe ser una grilla que empieza en **1 columna** y crece.
-*   **Clase Base:** `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6` (ajusta `lg:` según necesites 3, 4 o 5 columnas).
-*   **Ejemplo (`ordenes.html`):**
-    ```html
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <!-- Los inputs van aquí -->
-        <div class="form-control lg:col-span-2">...</div> <!-- Input ancho -->
+##### 1. Estructura Maestra de Tarjeta (Snippet Oficial)
+Cualquier tarjeta que contenga inputs o información debe seguir este patrón exacto. Copia y pega este bloque:
+
+```html
+<div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+    <!-- Header (Opcional) -->
+    <div class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold uppercase tracking-widest text-xs">
+        TÍTULO DE TARJETA
     </div>
-    ```
 
-##### 2. Inputs Compuestos (Split-Flex Pattern)
-Cuando necesites dividir un solo campo en dos datos relacionados (ej: "No. / Capacidad" o "Mes / Año"), utiliza el patrón **Split-Flex**. Esto garantiza que los inputs se mantengan alineados horizontalmente de forma sólida.
-
-*   **Estructura Obligatoria:**
-    ```html
-    <div class="form-control">
-        <!-- 1. Label Estándar -->
-        <label class="label text-xs uppercase font-bold text-base-content/60">Cisternas (No. / Cap.)</label>
-        
-        <!-- 2. Contenedor Flex (Para forzar fila) -->
-        <div class="flex gap-2">
-            <!-- 3. Input Pequeño (33% ancho) -->
-            <input type="text" class="input input-bordered w-1/3" placeholder="No.">
+    <!-- Body: AQUÍ APLICA LA REGLA DE GRID -->
+    <div class="card-body p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             
-            <!-- 4. Input Grande (66% ancho) -->
-            <input type="text" class="input input-bordered w-2/3" placeholder="Litros">
+            <!-- Input Normal 1 -->
+            <div class="form-control space-y-2">
+                <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Etiqueta 1</label>
+                <input type="text" class="input input-bordered w-full" ...>
+            </div>
+
+            <!-- Input Normal 2 -->
+            <div class="form-control space-y-2">
+                <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Etiqueta 2</label>
+                <input type="text" class="input input-bordered w-full" ...>
+            </div>
+
+            <!-- Elemento de Ancho Completo (Ocupa toda la fila) -->
+            <!-- Usar: col-span-full (RECOMENDADO) o sacarlo del div grid -->
+            <div class="form-control space-y-2 col-span-full">
+                <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Descripción Larga</label>
+                <input type="text" class="input input-bordered w-full" ...>
+            </div>
+
         </div>
     </div>
-    ```
-    *   **`div.flex gap-2`**: Contenedor padre. `gap-2` crea la separación visual.
-    *   **`w-1/3` y `w-2/3`**: Definen la proporción. Para mitades iguales usa `w-1/2` en ambos.
+</div>
+```
+
+##### 2. Reglas de Comportamiento
+1.  **Grid Container:** Siempre usa `grid grid-cols-1 md:grid-cols-2 gap-4`. Esto asegura que en celular sea 1 columna y en PC sean 2.
+2.  **Ancho Completo:** Si necesitas un campo que ocupe todo el ancho, agrega la clase `col-span-full` al `div` del `form-control`.
+3.  **Inputs Compuestos:** Si necesitas dos inputs pequeños juntos (ej: "Lada" y "Teléfono"), usa un `flex` *dentro* de la celda del grid, pero nunca para el layout principal.
+
+##### 3. Tamaño de Inputs
+*   **Estándar:** `input input-bordered w-full` (Sin altura fija, dejar natural).
+*   **En Tablas:** `input input-bordered input-sm w-full`.
 
 ##### 4. Tamaño Estándar de Inputs
 Para mantener la consistencia en el programa, todos los inputs deben tener un tamaño uniforme:
 *   **Clase para campos estándar:** `input input-bordered w-full h-10` (El `h-10` asegura que coincidan con la altura de los botones estándar).
 *   **Clase para campos en tablas:** `input input-bordered input-sm w-full`.
 *   **Evita:** Usar `input-lg`, `input-xs` o paddings arbitrarios como `py-10` a menos que sea una excepción de diseño justificada.
+
+##### 5. Estructura Obligatoria de Cards Nuevas
+De ahora en adelante, todas las tarjetas nuevas que se crean deben seguir estrictamente esta estructura interna para garantizar la consistencia en el espaciado y la responsividad:
+
+```html
+<div class="card-body p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Tus inputs van aquí -->
+    </div>
+</div>
+```
+*   **`card-body p-6`**: Contenedor con padding estándar.
+*   **`grid grid-cols-1 md:grid-cols-2 gap-4`**: Grid responsivo que inicia en 1 columna y pasa a 2 en pantallas medianas.
 
 #### E. Componente de Búsqueda Autocomplete (Filtros y Formularios)
 Este componente permite realizar búsquedas en tiempo real sobre listas de datos locales (CSV), siendo totalmente insensible a acentos y mayúsculas.

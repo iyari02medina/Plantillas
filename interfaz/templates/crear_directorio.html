@@ -53,6 +53,9 @@ Cophi{% endblock %}
                     <option value="permisos">Permisos de Descarga</option>
                     <option value="documentos">Documentos</option>
                     <option value="consumos">Consumos de Agua</option>
+                    {% if item.get('tipo_empresa') and item.get('tipo_empresa').strip().lower() == 'plaza comercial' %}
+                    <option value="locales">Locales</option>
+                    {% endif %}
                 </select>
             </div>
             <!-- Acciones Dinámicas según Tab -->
@@ -141,7 +144,7 @@ Cophi{% endblock %}
                                     "extraMarkup": "<span class=\"icon-[tabler--caret-up-down] shrink-0 size-4 text-base-content absolute top-1/2 end-3 -translate-y-1/2 pointer-events-none\"></span>"
                                     }' class="hidden" {% if not is_new %}disabled{% endif %}>
                                         <option value="">Selecciona</option>
-                                        {% set opciones_giro = ['Restaurante', 'Plaza comercial', 'Torre Comercial',
+                                        {% set opciones_giro = ['Restaurante', 'Plaza Comercial', 'Torre Comercial',
                                         'Industria', 'Escuela', 'Local Comercial'] %}
                                         {% for opt in opciones_giro %}
                                         <option value="{{ opt }}" {% if item.get('tipo_empresa')==opt %}selected{% endif
@@ -1522,6 +1525,33 @@ Cophi{% endblock %}
             </div>
         </div>
     </div>
+
+    <!-- PESTAÑA 8: LOCALES (Solo Plaza Comercial) -->
+    {% if item.get('tipo_empresa') and item.get('tipo_empresa').strip().lower() == 'plaza comercial' %}
+    <div id="tab-locales" class="tab-content hidden animate-in fade-in slide-in-from-bottom-5">
+        <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
+            <div
+                class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
+                <span class="icon-[tabler--building-store] size-5 text-primary"></span>
+                <span>Gestión de Locales</span>
+            </div>
+            <div class="card-body p-10 text-center space-y-4">
+                <div class="flex flex-col items-center gap-4">
+                    <span class="icon-[tabler--building-store] size-16 text-base-content/20"></span>
+                    <h3 class="text-xl font-bold text-base-content">Módulo de Locales</h3>
+                    <p class="text-base-content/60 max-w-md mx-auto">
+                        Aquí podrá gestionar los locales asignados a esta Plaza Comercial.
+                    </p>
+                    <div class="alert alert-soft alert-info max-w-lg mx-auto">
+                        <span class="icon-[tabler--info-circle] size-5"></span>
+                        <p class="text-xs">Esta funcionalidad está siendo preparada para su próxima actualización.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     {% endif %}
 
 </div>
@@ -1549,19 +1579,65 @@ Cophi{% endblock %}
 
         // Actualizar botones de acción (ejemplo: si estamos en Cotizaciones, mostrar botón de Nueva Cotización)
         updateActionButtons(tabName);
+
+        // Controlar visibilidad del botón Editar (Solo visible en Información General y si no estamos editando)
+        const btnEdit = document.getElementById('btn-editar');
+        const btnSubmit = document.getElementById('btn-submit');
+
+        if (btnEdit) {
+            const isEditing = btnSubmit && !btnSubmit.classList.contains('hidden');
+            // Solo mostrar si es tab 'general' y NO estamos en modo edición
+            if (tabName === 'general' && !isEditing) {
+                btnEdit.classList.remove('hidden');
+            } else {
+                btnEdit.classList.add('hidden');
+            }
+        }
     }
 
     function updateActionButtons(tabName) {
         const container = document.getElementById('tab-actions');
         if (!container) return;
 
+        // Intentar obtener el folio del cliente actual desde el input
+        const folioInput = document.querySelector('input[name="folio"]');
+        // Si no hay input folio, intentar buscar un input hidden con name ID (caso id_cliente)
+        const idInput = document.querySelector('input[name="ID"]');
+
+        let clientIdentifier = '';
+        if (folioInput && folioInput.value) clientIdentifier = folioInput.value;
+        else if (idInput && idInput.value) clientIdentifier = idInput.value;
+
         container.innerHTML = ''; // Limpiar
+
+        const appendClient = (url) => {
+            if (!clientIdentifier) return url;
+            return url + (url.includes('?') ? '&' : '?') + 'cliente_folio=' + encodeURIComponent(clientIdentifier);
+        };
 
         if (tabName === 'cotizaciones') {
             const btn = document.createElement('a');
-            btn.href = "{{ url_for('nueva_cotizacion') }}";
+            btn.href = appendClient("{{ url_for('nueva_cotizacion') }}");
             btn.className = "btn btn-primary";
             btn.innerHTML = '<span class="icon-[tabler--plus] size-5"></span><span class="hidden sm:inline">Nueva Cotización</span>';
+            container.appendChild(btn);
+        } else if (tabName === 'tarificador') {
+            const btn = document.createElement('a');
+            btn.href = appendClient("{{ url_for('nuevo_tarificador') }}");
+            btn.className = "btn btn-primary";
+            btn.innerHTML = '<span class="icon-[tabler--plus] size-5"></span><span class="hidden sm:inline">Nuevo Análisis</span>';
+            container.appendChild(btn);
+        } else if (tabName === 'permisos') {
+            const btn = document.createElement('a');
+            btn.href = appendClient("{{ url_for('nuevo_permiso_descarga') }}");
+            btn.className = "btn btn-primary";
+            btn.innerHTML = '<span class="icon-[tabler--plus] size-5"></span><span class="hidden sm:inline">Nuevo Permiso</span>';
+            container.appendChild(btn);
+        } else if (tabName === 'consumos') {
+            const btn = document.createElement('a');
+            btn.href = appendClient("{{ url_for('crear_consumo') }}");
+            btn.className = "btn btn-primary";
+            btn.innerHTML = '<span class="icon-[tabler--plus] size-5"></span><span class="hidden sm:inline">Nuevo Consumo</span>';
             container.appendChild(btn);
         }
     }

@@ -1,18 +1,20 @@
 {% extends 'base_flyonui.html' %}
 
-{% block title %}{{ 'Detalle Cotización' if cotizacion else 'Nueva Cotización' }} - Sistema Cophi{% endblock %}
+{% block title %}{{ 'Detalle Cotización' if cotizacion and not is_new else 'Nueva Cotización' }} - Sistema Cophi{%
+endblock %}
 
 {% block content %}
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
         <div class="flex items-center gap-2 mb-1">
-            <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle' if cotizacion else 'Nueva' }} Cotización</h1>
+            <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle' if cotizacion and not is_new else 'Nueva' }}
+                Cotización</h1>
         </div>
         <p class="text-base-content/60 font-medium ml-10 uppercase tracking-widest text-xs font-black">
             Módulo de Cotizaciones
         </p>
     </div>
-    {% if cotizacion %}
+    {% if cotizacion and not is_new %}
     <div class="flex gap-2">
         <a href="{{ url_for('ver_cotizacion', folio=cotizacion.folio_cot) }}" target="_blank"
             class="btn btn-soft btn-secondary">
@@ -27,9 +29,10 @@
     {% endif %}
 </div>
 
-<form
-    action="{{ url_for('nueva_cotizacion' if not cotizacion else 'detalle_cotizacion', folio=cotizacion.folio_cot if cotizacion else '') }}"
-    method="POST" class="space-y-8 pb-20">
+<form action="{{ url_for('nueva_cotizacion') }}" method="POST" class="space-y-8 pb-20">
+    {% if cotizacion and not is_new %}
+    <input type="hidden" name="original_folio" value="{{ cotizacion.folio_cot }}">
+    {% endif %}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         <!-- Columna Izquierda: Datos Cliente -->
@@ -40,27 +43,33 @@
                     <span class="icon-[tabler--file-info] size-5 text-primary"></span>
                     <span>Información General</span>
                 </div>
-                <div class="card-body p-6 space-y-4">
-                    <div class="form-control space-y-2">
-                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio
-                            Cotización</label>
-                        <input type="text" name="folio_cot" placeholder="COT-MMYY-###"
-                            value="{{ suggested_folio if not cotizacion else cotizacion.folio_cot }}"
-                            class="input input-bordered w-full font-black text-primary always-locked" readonly required>
+                <div class="card-body p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio
+                                Cotización</label>
+                            <input type="text" name="folio_cot" placeholder="COT-MMYY-###"
+                                value="{{ suggested_folio if not cotizacion or is_new else cotizacion.folio_cot }}"
+                                class="input input-bordered w-full font-black text-primary always-locked" readonly
+                                required>
+                        </div>
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha
+                                de
+                                Cotización</label>
+                            <input type="date" name="fecha_cot"
+                                value="{{ cotizacion.fecha_cot if cotizacion else todays_date }}"
+                                class="input input-bordered w-full" {{ 'disabled' if cotizacion and not is_new else ''
+                                }} required>
+                        </div>
                     </div>
-                    <div class="form-control space-y-2">
-                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre de
+                    <div class="form-control space-y-2 mt-4">
+                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Nombre
+                            de
                             Cotización</label>
                         <input type="text" name="nombre_cot" value="{{ cotizacion.nombre_cot if cotizacion else '' }}"
                             class="input input-bordered w-full font-bold" placeholder="Ej. Servicio de Mantenimiento..."
-                            {{ 'disabled' if cotizacion else '' }} required>
-                    </div>
-                    <div class="form-control space-y-2">
-                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha de
-                            Creación</label>
-                        <input type="text" name="fecha_cot"
-                            value="{{ cotizacion.fecha_cot if cotizacion else todays_date }}"
-                            class="input input-bordered w-full always-locked" readonly>
+                            {{ 'disabled' if cotizacion and not is_new else '' }} required>
                     </div>
                 </div>
             </div>
@@ -78,7 +87,7 @@
                         <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Buscar..."
                             autocomplete="off" class="input input-bordered w-full font-bold" oninput="fillClient(this)"
                             required value="{{ cotizacion.nombre_cliente if cotizacion else '' }}" {{ 'disabled' if
-                            cotizacion else '' }}>
+                            cotizacion and not is_new else '' }}>
                         <input type="hidden" id="id_cliente" name="id_cliente"
                             value="{{ cotizacion.id_cliente if cotizacion else '' }}">
                         <div id="suggestions-box"
@@ -91,14 +100,14 @@
                         <input type="text" id="razon_social_cliente" name="razon_social_cliente"
                             class="input input-bordered w-full"
                             value="{{ cotizacion.razon_social_cliente if cotizacion else '' }}" {{ 'disabled' if
-                            cotizacion else '' }}>
+                            cotizacion and not is_new else '' }}>
                     </div>
                     <div class="form-control space-y-2">
                         <label
                             class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Dirección</label>
                         <textarea id="direccion_cliente" name="direccion_cliente"
-                            class="textarea textarea-bordered w-full" rows="2" {{ 'disabled' if cotizacion else ''
-                            }}>{{ cotizacion.direccion_cliente if cotizacion else '' }}</textarea>
+                            class="textarea textarea-bordered w-full" rows="2" {{ 'disabled' if cotizacion and not
+                            is_new else '' }}>{{ cotizacion.direccion_cliente if cotizacion else '' }}</textarea>
                     </div>
                     <div class="form-control space-y-2">
                         <label
@@ -106,7 +115,7 @@
                         <input type="text" id="telefono_contacto" name="telefono_contacto"
                             class="input input-bordered w-full"
                             value="{{ cotizacion.telefono_contacto if cotizacion else '' }}" {{ 'disabled' if cotizacion
-                            else '' }}>
+                            and not is_new else '' }}>
                     </div>
                 </div>
             </div>
@@ -185,7 +194,7 @@
                 </div>
                 <div class="p-4 border-t border-base-content/10 flex justify-end bg-base-100">
                     <button type="button" class="btn btn-primary btn-sm rounded-full shadow-md" onclick="addItem()"
-                        id="btn-add-item" {{ 'hidden' if cotizacion else '' }}>
+                        id="btn-add-item" {{ 'hidden' if cotizacion and not is_new else '' }}>
                         <span class="icon-[tabler--plus] size-4"></span>
                         Agregar Concepto
                     </button>
@@ -219,10 +228,11 @@
 
             <div class="flex justify-end gap-3 pt-4">
                 <a href="{{ url_for('cotizaciones') }}" class="btn btn-ghost">Cancelar</a>
-                <button type="submit" class="btn btn-primary btn-wide shadow-lg {{ 'hidden' if cotizacion else '' }}"
+                <button type="submit"
+                    class="btn btn-primary btn-wide shadow-lg {{ 'hidden' if cotizacion and not is_new else '' }}"
                     id="btn-submit">
                     <span class="icon-[tabler--device-floppy] size-5"></span>
-                    {{ 'Actualizar Cotización' if cotizacion else 'Guardar Cotización' }}
+                    {{ 'Actualizar Cotización' if cotizacion and not is_new else 'Guardar Cotización' }}
                 </button>
             </div>
         </div>

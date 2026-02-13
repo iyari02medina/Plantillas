@@ -55,6 +55,8 @@
                                 else '' }}>Industrial</option>
                             <option value="Comercial" {{ 'selected' if request.args.get('d_tipo_emp')=='Comercial'
                                 else '' }}>Comercial</option>
+                            <option value="Plaza Comercial" {{ 'selected' if
+                                request.args.get('d_tipo_emp')=='Plaza Comercial' else '' }}>Plaza Comercial</option>
                             <option value="Residencial" {{ 'selected' if request.args.get('d_tipo_emp')=='Residencial'
                                 else '' }}>Residencial</option>
                             <option value="Salud" {{ 'selected' if request.args.get('d_tipo_emp')=='Salud' else '' }}>

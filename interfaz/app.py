@@ -46,6 +46,7 @@ FIELD_MAPPING = {
     'nombre_cliente': ['nombre_cliente', 'cliente', 'Cliente', 'Nombre Cliente', 'nombre_empresa'],
     'nombre_cot': ['nombre_cot', 'nombre', 'Nombre', 'nombre_cotizacion', 'nombre_cotización'],
     'fecha_cot': ['fecha_cot', 'fecha', 'Fecha', 'fecha_cotización'],
+    'fecha_registro_cot': ['fecha_registro_cot', 'Fecha Registro'],
     'id_cliente': ['id_cliente', 'id', 'ID', 'ID Cliente', 'folio'],
     'razon_social_cliente': ['razon_social_cliente', 'razon_social', 'Razon Social', 'Razón Social'],
     'direccion_cliente': ['direccion_cliente', 'direccion', 'Direccion', 'Dirección'],
@@ -216,10 +217,20 @@ def get_cotizacion_data(folio):
         return None
         
     first = folio_rows[0]
+    
+    def to_iso(date_str):
+        if not date_str or '-' in date_str: return date_str
+        try:
+            p = date_str.split('/')
+            if len(p) == 3: return f"{p[2]}-{p[1]}-{p[0]}"
+        except: pass
+        return date_str
+
     data = {
         'folio_cot': folio,
         'nombre_cot': first.get('nombre_cot', ''),
-        'fecha_cot': first.get('fecha_cot', ''),
+        'fecha_cot': to_iso(first.get('fecha_cot', '')),
+        'fecha_registro_cot': to_iso(first.get('fecha_registro_cot', '')),
         'nombre_cliente': first.get('nombre_cliente', ''),
         'razon_social_cliente': first.get('razon_social_cliente', ''),
         'direccion_cliente': first.get('direccion_cliente', ''),
@@ -406,10 +417,21 @@ def nueva_cotizacion():
                 return redirect(url_for('detalle_cotizacion', folio=original_folio))
 
 
+        # Transform fecha_cot from YYYY-MM-DD to DD/MM/YYYY
+        fecha_cot_form = request.form.get('fecha_cot')
+        if fecha_cot_form and '-' in fecha_cot_form:
+            try:
+                parts = fecha_cot_form.split('-')
+                fecha_cot = f"{parts[2]}/{parts[1]}/{parts[0]}"
+            except:
+                fecha_cot = fecha_cot_form
+        else:
+            fecha_cot = fecha_cot_form or datetime.date.today().strftime('%d/%m/%Y')
+
         base_data = {
             'folio_cot': folio,
             'nombre_cot': request.form.get('nombre_cot'),
-            'fecha_cot': request.form.get('fecha_cot') or datetime.date.today().strftime('%d/%m/%Y'),
+            'fecha_cot': fecha_cot,
             'id_cliente': request.form.get('id_cliente') or 'CLI-GENERICO',
             'nombre_cliente': request.form.get('nombre_cliente'),
             'razon_social_cliente': request.form.get('razon_social_cliente'),
@@ -422,6 +444,14 @@ def nueva_cotizacion():
             'iva': '0.00',
             'total': '0.00'
         }
+
+        # fecha_registro_cot logic
+        if original_folio:
+            # Try to get existing date
+            original_row = next((r for r in existing if r.get('folio_cot') == original_folio), None)
+            base_data['fecha_registro_cot'] = original_row.get('fecha_registro_cot', '') if original_row else ''
+        else:
+            base_data['fecha_registro_cot'] = datetime.date.today().strftime('%d/%m/%Y')
 
         # Handle items (dynamic list from frontend)
         items_names = request.form.getlist('nombre_item[]')
@@ -487,7 +517,7 @@ def nueva_cotizacion():
                      pass
         
         if not headers:
-             headers = ['folio_cot','nombre_cot','fecha_cot','id_cliente','nombre_cliente','razon_social_cliente','direccion_cliente','nombre_contacto','telefono_contacto','alcance_cot','nombre_item','descripcion_item','imagen_item','unidad_item','cantidad_item','precio_unitario_item','importe_item','subtotal','iva','total','terminos']
+             headers = ['folio_cot','nombre_cot','fecha_cot','fecha_registro_cot','id_cliente','nombre_cliente','razon_social_cliente','direccion_cliente','nombre_contacto','telefono_contacto','alcance_cot','nombre_item','descripcion_item','imagen_item','unidad_item','cantidad_item','precio_unitario_item','importe_item','subtotal','iva','total','terminos']
 
         # Ensure all keys exist
         for r in rows_to_save:
@@ -539,7 +569,7 @@ def nueva_cotizacion():
 
     clientes = read_csv(CLIENTES_CSV)
     
-    # Get next folio suggestion: Format COT-MMYY-###
+    # Suggest Folio: COT-MMYY-###
     now = datetime.date.today()
     month_str = now.strftime('%m')
     year_str = now.strftime('%y')
@@ -557,12 +587,33 @@ def nueva_cotizacion():
                 except: pass
     
     suggested_folio = f"{prefix}{max_num + 1:03d}"
+    
+    # Check for prefill (client data)
+    cliente_folio = request.args.get('cliente_folio')
+    dummy_cotizacion = None
+    is_new = False
+    
+    if cliente_folio:
+        target_client = next((c for c in clientes if str(c.get('folio', '')).strip() == str(cliente_folio).strip()), None)
+        if target_client:
+            is_new = True
+            dummy_cotizacion = {
+                'id_cliente': target_client.get('folio', ''),
+                'nombre_cliente': target_client.get('nombre_empresa', ''),
+                'razon_social_cliente': target_client.get('razon_social', '') or target_client.get('nombre_empresa', ''),
+                'direccion_cliente': f"{target_client.get('calle_num_empresa', '')}, {target_client.get('colonia_empresa', '')}, {target_client.get('municipio_empresa', '')}, {target_client.get('cp_empresa', '')}".strip(', '),
+                'telefono_contacto': target_client.get('telefono_empresa', ''),
+                'nombre_contacto': target_client.get('propietario_empresa', ''),
+                'conceptos': [] # Empty list for items needed for template loop
+            }
 
     return render_template('crear_cotizacion.html', 
                          inventario=inventario, 
                          clientes=clientes, 
                          suggested_folio=suggested_folio,
-                         todays_date=now.strftime('%d/%m/%Y'))
+                         todays_date=now.strftime('%Y-%m-%d'),
+                         cotizacion=dummy_cotizacion,
+                         is_new=is_new)
 
 @app.route('/eliminar_cotizacion/<folio>', methods=['POST'])
 @login_required
@@ -923,6 +974,22 @@ def nuevo_tarificador():
 
     # GET
     clientes = read_csv(CLIENTES_CSV)
+
+    # Check for prefill
+    cliente_folio = request.args.get('cliente_folio')
+    dummy_tarificador = None
+    is_new = False
+    
+    if cliente_folio:
+        target_client = next((c for c in clientes if str(c.get('folio', '')).strip() == str(cliente_folio).strip()), None)
+        if target_client:
+            is_new = True
+            dummy_tarificador = {
+                'nombre_cliente': target_client.get('nombre_empresa', ''),
+                'no_cliente': target_client.get('folio', ''),
+                'direccion_cliente': f"{target_client.get('calle_num_empresa', '')}, {target_client.get('colonia_empresa', '')}, {target_client.get('municipio_empresa', '')}, {target_client.get('cp_empresa', '')}".strip(', ')
+                # Add other prefill logic if needed
+            }
     
     # Suggest Folio: Format TAR-MMYY-### (e.g., TAR-0226-001)
     now = datetime.date.today()
@@ -946,7 +1013,7 @@ def nuevo_tarificador():
     
     suggested_folio = f"{prefix}{max_num + 1:03d}"
     
-    return render_template('crear_tarificador.html', clientes=clientes, suggested_folio=suggested_folio, todays_date=now.strftime('%d/%m/%Y'), rangos=load_rangos(), default_lmps=get_default_lmps())
+    return render_template('crear_tarificador.html', clientes=clientes, suggested_folio=suggested_folio, todays_date=now.strftime('%d/%m/%Y'), rangos=load_rangos(), default_lmps=get_default_lmps(), tarificador=dummy_tarificador, is_new=is_new)
 
 @app.route('/tarificador/<folio>')
 @login_required
@@ -1964,7 +2031,38 @@ def nuevo_permiso_descarga():
 
     # GET
     clientes = read_csv(CLIENTES_CSV)
-    
+
+    # Check for prefill
+    cliente_folio = request.args.get('cliente_folio')
+    dummy_permiso = None
+    is_new = False
+
+    if cliente_folio:
+        target_client = next((c for c in clientes if str(c.get('folio', '')).strip() == str(cliente_folio).strip()), None)
+        if target_client:
+            is_new = True
+            dummy_permiso = {
+                 'nombre_empresa': target_client.get('nombre_empresa', ''),
+                 'nis': target_client.get('folio', ''), # Using Folio as NIS or vice versa
+                 'prop_nombre': target_client.get('propietario_empresa', ''),
+                 'prop_rfc': target_client.get('rfc_propietario', ''),
+                 'prop_telefono': target_client.get('telefono_empresa', ''),
+                 'prop_direccion': target_client.get('calle_num_empresa', ''),
+                 'prop_colonia': target_client.get('colonia_empresa', ''),
+                 'prop_municipio': target_client.get('municipio_empresa', ''),
+                 'prop_localidad': target_client.get('localidad_empresa', ''),
+                 'prop_cp': target_client.get('cp_empresa', ''),
+                 'arr_nombre': target_client.get('razon_social', '') or target_client.get('nombre_empresa', ''), 
+                 'arr_rfc': target_client.get('rfc_empresa', ''),
+                 'arr_direccion': target_client.get('calle_num_empresa', ''), # Assuming same address
+                 'arr_colonia': target_client.get('colonia_empresa', ''),
+                 'arr_municipio': target_client.get('municipio_empresa', ''),
+                 'arr_telefono': target_client.get('telefono_empresa', ''),
+                 'arr_localidad': target_client.get('localidad_empresa', ''),
+                 'arr_cp': target_client.get('cp_empresa', ''),
+                 'giro_descripcion': target_client.get('giro', '')
+            }
+            
     # Sugerir NIS (numericamente si es posible)
     existing = read_csv(PERMISOS_CSV)
     max_num = 0
@@ -1997,7 +2095,8 @@ def nuevo_permiso_descarga():
                          suggested_nis=suggested_nis, 
                          suggested_folio=suggested_folio,
                          todays_date=now.strftime('%d/%m/%Y'),
-                         permiso=None)
+                         permiso=dummy_permiso,
+                         is_new=is_new)
 
 
 
@@ -3011,6 +3110,20 @@ def consumos():
 def crear_consumo():
     # Load clients for the search
     clientes = read_csv(CLIENTES_CSV)
+
+    # Check for prefill
+    cliente_folio = request.args.get('cliente_folio')
+    dummy_consumo = None
+    is_new = False
+    
+    if cliente_folio:
+        target_client = next((c for c in clientes if str(c.get('folio', '')).strip() == str(cliente_folio).strip()), None)
+        if target_client:
+            is_new = True
+            dummy_consumo = {
+                'nombre_cliente': target_client.get('nombre_empresa', ''),
+                'ID_cliente': target_client.get('folio', '')
+            }
     
     # Suggest Folio: CON-MMYY-###
     now = datetime.date.today()
@@ -3031,7 +3144,7 @@ def crear_consumo():
             except: pass
     suggested_folio = f"{prefix}{max_num + 1:03d}"
     
-    return render_template('crea_consumo.html', clientes=clientes, suggested_folio=suggested_folio)
+    return render_template('crea_consumo.html', clientes=clientes, suggested_folio=suggested_folio, consumo=dummy_consumo, is_new=is_new)
 
 @app.route('/guardar_consumo', methods=['POST'])
 @login_required

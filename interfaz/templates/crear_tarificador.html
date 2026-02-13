@@ -1,6 +1,7 @@
 {% extends 'base_flyonui.html' %}
 
-{% block title %}{{ 'Detalle Tarificador' if tarificador else 'Nuevo Tarificador' }} - Sistema Cophi{% endblock %}
+{% block title %}{{ 'Detalle Tarificador' if tarificador and not is_new else 'Nuevo Tarificador' }} - Sistema Cophi{%
+endblock %}
 
 {% block content %}
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -9,15 +10,17 @@
             <a href="{{ url_for('tarificador') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
                 <span class="icon-[tabler--arrow-left] size-5"></span>
             </a>
-            <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle Tarificador' if tarificador else 'Nuevo
+            <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle Tarificador' if tarificador and not is_new else
+                'Nuevo
                 Tarificador' }}</h1>
         </div>
         <p class="text-base-content/60 font-medium ml-10">
-            {{ 'Consulta y edita los detalles de análisis de laboratorio.' if tarificador else 'Complete el formulario
+            {{ 'Consulta y edita los detalles de análisis de laboratorio.' if tarificador and not is_new else 'Complete
+            el formulario
             para registrar un registro de tarificación.' }}
         </p>
     </div>
-    {% if tarificador %}
+    {% if tarificador and not is_new %}
     <div class="flex gap-2">
         <a href="{{ url_for('ver_tarificador', folio=tarificador.folio_tar) }}" target="_blank"
             class="btn btn-soft btn-secondary">
@@ -48,16 +51,16 @@
                             class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                         <input type="text" id="folio_tar" name="folio_tar" placeholder="TAR-MMYY-###"
                             class="input input-bordered w-full font-bold text-primary always-locked"
-                            value="{{ suggested_folio if not tarificador else tarificador.folio_tar }}" required
-                            readonly {% if tarificador %}disabled{% endif %}>
+                            value="{{ suggested_folio if not tarificador or is_new else tarificador.folio_tar }}"
+                            required readonly {% if tarificador and not is_new %}disabled{% endif %}>
                     </div>
                     <div class="form-control space-y-2">
                         <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Fecha de
                             Creación</label>
                         <input type="text" id="fecha_tar" name="fecha_tar"
                             class="input input-bordered w-full always-locked"
-                            value="{{ tarificador.fecha_tar if tarificador else todays_date }}" readonly {% if
-                            tarificador %}disabled{% endif %}>
+                            value="{{ tarificador.fecha_tar if tarificador and not is_new else todays_date }}" readonly
+                            {% if tarificador and not is_new %}disabled{% endif %}>
                     </div>
                 </div>
             </div>
@@ -273,7 +276,8 @@
 
             <div class="flex justify-end gap-4 mt-4">
                 <a href="{{ url_for('tarificador') }}" class="btn btn-ghost">Cancelar</a>
-                <button type="submit" class="btn btn-primary shadow-lg btn-wide {% if tarificador %}hidden{% endif %}"
+                <button type="submit"
+                    class="btn btn-primary shadow-lg btn-wide {% if tarificador and not is_new %}hidden{% endif %}"
                     id="btn-submit">
                     <span class="icon-[tabler--device-floppy] size-5"></span>
                     Guardar Tarificador

@@ -1,6 +1,7 @@
 {% extends 'base_flyonui.html' %}
 
-{% block title %}{{ 'Detalle Consumo' if consumo else 'Registro de Consumo' }} - Sistema Cophi{% endblock %}
+{% block title %}{{ 'Detalle Consumo' if consumo and not is_new else 'Registro de Consumo' }} - Sistema Cophi{% endblock
+%}
 
 {% block content %}
 <div class="w-full p-0 space-y-8">
@@ -10,16 +11,18 @@
                 <a href="{{ url_for('consumos') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
                     <span class="icon-[tabler--arrow-left] size-5"></span>
                 </a>
-                <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle Consumo' if consumo else 'Registro de
+                <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle Consumo' if consumo and not is_new else
+                    'Registro de
                     Consumo'
                     }}</h1>
             </div>
             <p class="text-base-content/60 font-medium ml-10">
-                {{ 'Consulta y edita los detalles del consumo registrado.' if consumo else 'Complete el formulario para
+                {{ 'Consulta y edita los detalles del consumo registrado.' if consumo and not is_new else 'Complete el
+                formulario para
                 registrar una nueva lectura de medidor.' }}
             </p>
         </div>
-        {% if consumo %}
+        {% if consumo and not is_new %}
         <div class="flex gap-2">
             <button type="button" class="btn btn-primary shadow-sm" onclick="enableEdit()" id="btn-editar">
                 <span class="icon-[tabler--edit] size-5"></span>
@@ -46,7 +49,7 @@
                             class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Folio</label>
                         <input type="text" id="folio" name="folio" placeholder="Ej. CON-001"
                             class="input input-bordered w-full h-10 font-bold text-primary"
-                            value="{{ suggested_folio if not consumo else consumo.folio }}" required readonly>
+                            value="{{ suggested_folio if not consumo or is_new else consumo.folio }}" required readonly>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="form-control space-y-2">
@@ -113,8 +116,8 @@
                                 Actual (m³)</label>
                             <input type="number" step="0.01" id="lectura" name="lectura" placeholder="0.00"
                                 class="input input-bordered w-full h-10 font-black text-center text-xl"
-                                value="{{ consumo.lectura if consumo else '' }}" {% if consumo %}disabled{% endif %}
-                                required>
+                                value="{{ consumo.lectura if consumo else '' }}" {% if consumo and not is_new
+                                %}disabled{% endif %} required>
                         </div>
 
                         <div class="form-control space-y-2">
@@ -138,7 +141,8 @@
 
 <div class="mt-8 flex justify-end gap-3 pb-20">
     <a href="{{ url_for('consumos') }}" class="btn btn-ghost h-10 min-h-0">Cancelar</a>
-    <button type="submit" class="btn btn-primary btn-wide shadow-lg h-10 min-h-0 {% if consumo %}hidden{% endif %}"
+    <button type="submit"
+        class="btn btn-primary btn-wide shadow-lg h-10 min-h-0 {% if consumo and not is_new %}hidden{% endif %}"
         id="btn-submit">
         <span class="icon-[tabler--device-floppy] size-5"></span>
         Guardar Consumo
