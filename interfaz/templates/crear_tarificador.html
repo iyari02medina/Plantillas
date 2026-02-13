@@ -7,12 +7,21 @@ endblock %}
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
         <div class="flex items-center gap-2 mb-1">
-            <a href="{{ url_for('tarificador') }}" class="btn btn-sm btn-ghost btn-circle" title="Volver">
-                <span class="icon-[tabler--arrow-left] size-5"></span>
-            </a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-microscope size-10 text-primary">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 21h14" />
+                <path d="M6 18h2" />
+                <path d="M7 18v3" />
+                <path d="M9 11l3 3l6 -6l-3 -3l-6 6" />
+                <path d="M10.5 12.5l-1.5 1.5" />
+                <path d="M17 3l3 3" />
+                <path d="M12 21a6 6 0 0 0 3.715 -10.712" />
+            </svg>
             <h1 class="text-3xl font-bold text-base-content">{{ 'Detalle Tarificador' if tarificador and not is_new else
                 'Nuevo
-                Tarificador' }}</h1>
+                Análisis de Laboratorio' }}</h1>
         </div>
         <p class="text-base-content/60 font-medium ml-10">
             {{ 'Consulta y edita los detalles de análisis de laboratorio.' if tarificador and not is_new else 'Complete
@@ -38,7 +47,7 @@ endblock %}
 <form action="{{ url_for('nuevo_tarificador') }}" method="POST" class="space-y-8 pb-20">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Columna Izquierda: Datos Generales -->
-        <div class="mb-4">
+        <div class="lg:col-span-1 flex flex-col gap-6">
             <div class="card bg-base-100 border border-base-content/10 shadow-sm overflow-hidden">
 
                 <div class="card-body p-6">
@@ -110,26 +119,30 @@ endblock %}
                 <div
                     class="card-header bg-base-200/50 border-b border-base-content/10 p-5 font-bold flex items-center gap-2 uppercase tracking-widest text-xs">
                     <span class="icon-[tabler--key] size-5 text-primary"></span>
-                    <span>Permisos Relacionados</span>
+                    <span>Datos Permisos de Descargas</span>
                 </div>
-                <div class="card-body p-6 flex flex-col gap-4">
-                    <div class="form-control space-y-2">
-                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
-                            Permiso
-                            Descargas</label>
-                        <input type="text" id="no_permiso_descargas" name="no_permiso_descargas"
-                            class="input input-bordered w-full"
-                            value="{{ tarificador.no_permiso_descargas if tarificador else '' }}" {% if tarificador
-                            %}disabled{% endif %}>
+                <div class="card-body p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control space-y-2">
+                            <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">No.
+                                Permiso
+                                Descargas</label>
+                            <input type="text" id="no_permiso_descargas" name="no_permiso_descargas"
+                                class="input input-bordered w-full"
+                                value="{{ tarificador.no_permiso_descargas if tarificador else '' }}" {% if tarificador
+                                %}disabled{% endif %}>
+                        </div>
+                        <div class="form-control space-y-2">
+                            <label
+                                class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Vigencia
+                                Permiso</label>
+                            <input type="text" id="vigencia_permiso_descargas" name="vigencia_permiso_descargas"
+                                class="input input-bordered w-full"
+                                value="{{ tarificador.vigencia_permiso_descargas if tarificador else '' }}" {% if
+                                tarificador %}disabled{% endif %}>
+                        </div>
                     </div>
-                    <div class="form-control space-y-2">
-                        <label class="label font-bold text-xs uppercase text-base-content/60 tracking-widest">Vigencia
-                            Permiso</label>
-                        <input type="text" id="vigencia_permiso_descargas" name="vigencia_permiso_descargas"
-                            class="input input-bordered w-full"
-                            value="{{ tarificador.vigencia_permiso_descargas if tarificador else '' }}" {% if
-                            tarificador %}disabled{% endif %}>
-                    </div>
+
                 </div>
             </div>
         </div>
