@@ -936,16 +936,25 @@ def nuevo_tarificador():
         contaminantes = ['sst', 'dbo', 'gya', 'ss', 'mf', 'temp', 'saam', 'dqo', 'nt', 'fen', 'color']
         for c in contaminantes:
             needed_headers.extend([f'{c}_resultado', f'{c}_lmp', f'{c}_precio'])
-        needed_headers.extend(['precio_m3_total', 'total_pagar'])
+        needed_headers.extend(['precio_m3_total', 'total_pagar', 'acuse_archivo'])
         
         for h in needed_headers:
              if h not in headers: headers.append(h)
              
+        # Decide Append or Update
+        original_row = next((r for r in existing if r.get('folio_tar') == folio), None)
+        
         # Create row data
         row = {}
         # Fill from form
         for h in headers:
-            row[h] = request.form.get(h, '')
+            val = request.form.get(h)
+            if val is None and original_row:
+                # If input disabled/missing, keep original value
+                val = original_row.get(h, '')
+            elif val is None:
+                val = ''
+            row[h] = val
             
         # Ensure ID
         row['folio_tar'] = folio
@@ -958,23 +967,34 @@ def nuevo_tarificador():
             try:
                 from utils_file import optimize_and_save_file
                 
-                # Folder: Documentos_Digitales / [FOLIO_TAR]
-                # We use the full folio as the folder name to be unique
-                safe_folio = str(folio).strip()
+                # Folder: Documentos_Digitales / [CLIENT_FOLIO]
+                # We want it to appear in the Client's Folder
+                client_folio = row.get('no_cliente', '').strip()
+                
+                # If no client folio, fallback to Tarificador folder (should not happen if flow is correct)
+                if client_folio:
+                    safe_folio = client_folio
+                else:
+                    safe_folio = str(folio).strip()
+                
                 docs_base = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Documentos_Digitales'))
-                tar_folder = os.path.join(docs_base, safe_folio)
+                target_folder = os.path.join(docs_base, safe_folio)
                 
-                if not os.path.exists(tar_folder):
-                    os.makedirs(tar_folder)
+                if not os.path.exists(target_folder):
+                    os.makedirs(target_folder)
                 
-                # Base Filename: ACUSE_[FOLIO]
-                safe_id = safe_folio.replace('/', '').replace('\\', '').replace(' ', '')
-                base_name = f"ACUSE_{safe_id}"
+                # Base Filename: doc_acuse_firmado_[FOLIO_TAR]_[MMYY]
+                # Prefix 'doc_' ensures it appears in documents list.
+                # 'acuse_firmado' will be mapped to "Acuse Firmado"
                 
-                final_filename, status_msg = optimize_and_save_file(acuse_file, tar_folder, base_name)
+                safe_tar_id = str(folio).replace('/', '').replace('\\', '').replace(' ', '')
+                current_mmyy = datetime.date.today().strftime('%m%y')
+                base_name = f"doc_acuse_firmado_{safe_tar_id}_{current_mmyy}"
+                
+                final_filename, status_msg = optimize_and_save_file(acuse_file, target_folder, base_name)
                 
                 row['acuse_archivo'] = final_filename
-                flash(f'Acuse subido: {status_msg}', 'success')
+                flash(f'Acuse subido al expediente del cliente: {status_msg}', 'success')
                 
             except Exception as e:
                 print(f"Error uploading acuse: {e}")
@@ -2675,7 +2695,11 @@ def detalle_directorio(tipo, id_val):
                 for nis in nis_candidates:
                     if not nis: continue
                     
-                    client_folder = os.path.join(docs_base, f"CLI-{nis}")
+                    folder_name = nis
+                    if not folder_name.startswith('CLI-'):
+                        folder_name = f"CLI-{folder_name}"
+                    
+                    client_folder = os.path.join(docs_base, folder_name)
                     if os.path.exists(client_folder):
                         for filename in os.listdir(client_folder):
                             # Avoid duplicates if multiple folders somehow share content or are scanned
@@ -2708,6 +2732,7 @@ def detalle_directorio(tipo, id_val):
                                 elif filename.startswith('doc_uso_suelo'): tipo_doc = "Uso de Suelo"
                                 elif filename.startswith('doc_drenaje'): tipo_doc = "Permiso Drenaje"
                                 elif filename.startswith('doc_recibo_agua'): tipo_doc = "Recibo de Agua"
+                                elif filename.startswith('doc_acuse_firmado'): tipo_doc = "Acuse Firmado"
                                 elif filename.startswith('doc_otros'): tipo_doc = "Otro Documento"
                                 elif filename.startswith('croquis'): tipo_doc = "Croquis"
                                 else:
@@ -3495,7 +3520,21 @@ def ver_documento(folio, filename):
         return "Nombre de archivo inválido", 400
         
     docs_base = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Documentos_Digitales'))
-    client_folder = os.path.join(docs_base, f"CLI-{folio}")
+    
+    # Smart Folder Resolution
+    folder_name = str(folio).strip()
+    possible_folders = [folder_name, f"CLI-{folder_name}"]
+    
+    client_folder = None
+    for f in possible_folders:
+        path = os.path.join(docs_base, f)
+        if os.path.exists(path):
+            client_folder = path
+            break
+            
+    if not client_folder:
+         # Fallback default
+         client_folder = os.path.join(docs_base, f"CLI-{folder_name}")
     
     try:
         if os.path.exists(os.path.join(client_folder, filename)):
