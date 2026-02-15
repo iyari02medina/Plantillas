@@ -638,8 +638,45 @@ Usa este prompt para generar selectores avanzados con búsqueda y scroll (`max-h
 
 ---
 
+#### G. Sistema de Compresión y Optimización de Archivos
+Este módulo permite reducir automáticamente el tamaño de imágenes y documentos antes de guardarlos en el servidor, optimizando el almacenamiento.
+
+**Ubicación:** `interfaz/utils_file.py`
+
+**Funcionalidades:**
+*   **Imágenes (JPG, PNG, WEBP, BMP):**
+    *   Redimensiona a un máximo de 1600px (ancho o alto).
+    *   Convierte formatos pesados a JPG optimizado.
+    *   Comprime progresivamente la calidad hasta que el archivo pese menos de 1MB.
+*   **PDFs:**
+    *   Utiliza `pypdf` para reescribir el archivo eliminando objetos duplicados y metadatos innecesarios si pesa más de 1MB.
+
+**Cómo Implementar en Nuevas Rutas:**
+
+1.  Asegúrate de importar la función en tu ruta de `app.py`:
+    ```python
+    from utils_file import optimize_and_save_file
+    ```
+2.  Usa la función al recibir el archivo del formulario:
+    ```python
+    file_obj = request.files.get('mi_archivo')
+    if file_obj:
+        # Define carpeta destino y nombre base (sin extensión)
+        folder = os.path.join(docs_base, "CARPETA_CLIENTE")
+        base_name = f"DOC_{folio}"
+        
+        # Guarda y optimiza
+        final_filename, msg = optimize_and_save_file(file_obj, folder, base_name)
+    ```
+
+---
+
 ## 🚀 Despliegue
 Consulta [README_DESPLIEGUE.md](README_DESPLIEGUE.md) para saber cómo subir tus cambios al servidor de DigitalOcean usando:
 ```powershell
 .\desplegar.ps1
+```
+o en Mac/Linux:
+```bash
+./desplegar.sh
 ```

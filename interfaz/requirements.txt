@@ -4,3 +4,4 @@ gunicorn
 Flask-Login
 Werkzeug
 Pillow
+pypdf

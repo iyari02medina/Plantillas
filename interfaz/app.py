@@ -951,7 +951,35 @@ def nuevo_tarificador():
         row['folio_tar'] = folio
         if not row.get('fecha_tar'):
              row['fecha_tar'] = datetime.date.today().strftime('%d/%m/%Y')
-             
+
+        # Handle File Upload (Acuse)
+        acuse_file = request.files.get('acuse_archivo')
+        if acuse_file and acuse_file.filename:
+            try:
+                from utils_file import optimize_and_save_file
+                
+                # Folder: Documentos_Digitales / [FOLIO_TAR]
+                # We use the full folio as the folder name to be unique
+                safe_folio = str(folio).strip()
+                docs_base = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Documentos_Digitales'))
+                tar_folder = os.path.join(docs_base, safe_folio)
+                
+                if not os.path.exists(tar_folder):
+                    os.makedirs(tar_folder)
+                
+                # Base Filename: ACUSE_[FOLIO]
+                safe_id = safe_folio.replace('/', '').replace('\\', '').replace(' ', '')
+                base_name = f"ACUSE_{safe_id}"
+                
+                final_filename, status_msg = optimize_and_save_file(acuse_file, tar_folder, base_name)
+                
+                row['acuse_archivo'] = final_filename
+                flash(f'Acuse subido: {status_msg}', 'success')
+                
+            except Exception as e:
+                print(f"Error uploading acuse: {e}")
+                flash(f'Error al subir acuse: {e}', 'warning')
+
         # Perform Calculations
         row = calculate_tarificador_row(row)
         
